@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Post on Paul&#39;s Blog</title>
+    <link>/posts/</link>
+    <description>Recent content in Post on Paul&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 01 Feb 2024 21:56:31 +0800</lastBuildDate>
+    <atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>[Effective Modern Cpp Notes] Ch08 微调</title>
+      <link>/posts/effective-modern-cpp/ch08-%E5%BE%AE%E8%B0%83/</link>
+      <pubDate>Thu, 01 Feb 2024 21:56:31 +0800</pubDate>
+      <guid>/posts/effective-modern-cpp/ch08-%E5%BE%AE%E8%B0%83/</guid>
+      <description>41：针对可复制的形参，在移动成本低并且一定会被复制的前提下，考虑将其按值传递 一般C++传参方式有三种： 对左值引用和右值引用分别重载，需要实</description>
+    </item>
+    <item>
+      <title>[Effective Modern Cpp Notes] Ch07 并发API</title>
+      <link>/posts/effective-modern-cpp/ch07-%E5%B9%B6%E5%8F%91api/</link>
+      <pubDate>Thu, 01 Feb 2024 21:56:20 +0800</pubDate>
+      <guid>/posts/effective-modern-cpp/ch07-%E5%B9%B6%E5%8F%91api/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Effective Cpp Reading Notes</title>
+      <link>/posts/effective-cpp/effective-cpp-reading-notes/</link>
+      <pubDate>Thu, 01 Feb 2024 21:54:24 +0800</pubDate>
+      <guid>/posts/effective-cpp/effective-cpp-reading-notes/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Effective Modern Cpp Reading Notes</title>
+      <link>/posts/effective-modern-cpp/effective-modern-cpp-reading-notes/</link>
+      <pubDate>Thu, 01 Feb 2024 21:53:53 +0800</pubDate>
+      <guid>/posts/effective-modern-cpp/effective-modern-cpp-reading-notes/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>[Effective Modern Cpp Notes] Ch06 Lambda表达式</title>
+      <link>/posts/effective-modern-cpp/ch06-lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F/</link>
+      <pubDate>Thu, 01 Feb 2024 21:48:40 +0800</pubDate>
+      <guid>/posts/effective-modern-cpp/ch06-lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F/</guid>
+      <description>31：避免默认捕获模式 闭包：lambda所创建的运行期对象 默认捕获可能导致引用悬挂 默认传引用可能导致引用悬挂 显式传引用也可能导致引用悬挂，但</description>
+    </item>
+    <item>
+      <title>[Effective Modern Cpp Notes] Ch05 右值引用、移动语句和完美转发</title>
+      <link>/posts/effective-modern-cpp/ch05-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8%E7%A7%BB%E5%8A%A8%E8%AF%AD%E5%8F%A5%E5%92%8C%E5%AE%8C%E7%BE%8E%E8%BD%AC%E5%8F%91/</link>
+      <pubDate>Thu, 01 Feb 2024 21:48:16 +0800</pubDate>
+      <guid>/posts/effective-modern-cpp/ch05-%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8%E7%A7%BB%E5%8A%A8%E8%AF%AD%E5%8F%A5%E5%92%8C%E5%AE%8C%E7%BE%8E%E8%BD%AC%E5%8F%91/</guid>
+      <description>23：理解std::move和std::forward std::move：返回变量的右值引用 对const对象的移动操作会被转换为拷贝操作 因为</description>
+    </item>
+    <item>
+      <title>[Effective Modern Cpp Notes] Ch04 智能指针</title>
+      <link>/posts/effective-modern-cpp/ch04-%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/</link>
+      <pubDate>Thu, 01 Feb 2024 21:47:58 +0800</pubDate>
+      <guid>/posts/effective-modern-cpp/ch04-%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/</guid>
+      <description>18：使用std::unique_ptr管理具备专属所有权的资源 std::unique_ptr表示独占所有权，因此无法拷贝（拷贝构造、拷贝赋</description>
+    </item>
+    <item>
+      <title>[Effective Modern Cpp Notes] Ch03 转向现代C&#43;&#43;</title>
+      <link>/posts/effective-modern-cpp/ch03-%E8%BD%AC%E5%90%91%E7%8E%B0%E4%BB%A3c&#43;&#43;/</link>
+      <pubDate>Thu, 01 Feb 2024 21:47:37 +0800</pubDate>
+      <guid>/posts/effective-modern-cpp/ch03-%E8%BD%AC%E5%90%91%E7%8E%B0%E4%BB%A3c&#43;&#43;/</guid>
+      <description>07：在创建对象时注意区分()和{} 初始化方式 1 2 3 4 int x1(1); int x2 = 2; int x3{3}; // 统一初始化（列表初始化） int x4 = {4}; // 和第三种方式相同 ()和=初始化的限</description>
+    </item>
+    <item>
+      <title>[Effective Modern Cpp Notes] Ch02 Auto</title>
+      <link>/posts/effective-modern-cpp/ch02-auto/</link>
+      <pubDate>Thu, 01 Feb 2024 21:47:20 +0800</pubDate>
+      <guid>/posts/effective-modern-cpp/ch02-auto/</guid>
+      <description>05：优先选用auto，而非显式类型推断 优点一：避免变量未初始化 使用auto声明的变量未初始化，直接导致编译报错 优点二：简化变量声明（避免写</description>
+    </item>
+    <item>
+      <title>[Effective Modern Cpp Notes] Ch01 类型推导</title>
+      <link>/posts/effective-modern-cpp/ch01-%E7%B1%BB%E5%9E%8B%E6%8E%A8%E5%AF%BC/</link>
+      <pubDate>Thu, 01 Feb 2024 21:47:04 +0800</pubDate>
+      <guid>/posts/effective-modern-cpp/ch01-%E7%B1%BB%E5%9E%8B%E6%8E%A8%E5%AF%BC/</guid>
+      <description>01：理解模板类型推导 在模板类型推导中，引用类型参数将被视为非引用类型处理，也就是说其引用性被忽略。 - 在万能引用参数类型推导时，左值参数被特</description>
+    </item>
+    <item>
+      <title>[Effective Cpp Notes] Ch08 定制new和delete</title>
+      <link>/posts/effective-cpp/ch08-%E5%AE%9A%E5%88%B6new%E5%92%8Cdelete/</link>
+      <pubDate>Thu, 01 Feb 2024 21:14:41 +0800</pubDate>
+      <guid>/posts/effective-cpp/ch08-%E5%AE%9A%E5%88%B6new%E5%92%8Cdelete/</guid>
+      <description>49：了解new-handler的行为 new申请内存失败会抛出bad alloc的异常，此前会调用一个错误处理函数，此函数由std::set_</description>
+    </item>
+    <item>
+      <title>[Effective Cpp Notes] Ch07 模板与泛型编程</title>
+      <link>/posts/effective-cpp/ch07-%E6%A8%A1%E6%9D%BF%E4%B8%8E%E6%B3%9B%E5%9E%8B%E7%BC%96%E7%A8%8B/</link>
+      <pubDate>Thu, 01 Feb 2024 21:14:25 +0800</pubDate>
+      <guid>/posts/effective-cpp/ch07-%E6%A8%A1%E6%9D%BF%E4%B8%8E%E6%B3%9B%E5%9E%8B%E7%BC%96%E7%A8%8B/</guid>
+      <description>41： 了解隐式接口与编译期多态 面向对象中的类设计时需要考虑显式接口和运行时多态，而模板编程中需要考虑隐式接口和编译器多态 如果函数的形参是普通</description>
+    </item>
+    <item>
+      <title>[Effective Cpp Notes] Ch06 继承与面向对象设计</title>
+      <link>/posts/effective-cpp/ch06-%E7%BB%A7%E6%89%BF%E4%B8%8E%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1/</link>
+      <pubDate>Thu, 01 Feb 2024 21:14:04 +0800</pubDate>
+      <guid>/posts/effective-cpp/ch06-%E7%BB%A7%E6%89%BF%E4%B8%8E%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1/</guid>
+      <description>32：确定你的public继承构造出is-a关系 public继承的意思是，子类是一种特殊的父类（is-a关系） 子类必须涵盖父类每一个特点，必</description>
+    </item>
+    <item>
+      <title>[Effective Cpp Notes] Ch05 实现</title>
+      <link>/posts/effective-cpp/ch05-%E5%AE%9E%E7%8E%B0/</link>
+      <pubDate>Thu, 01 Feb 2024 21:13:46 +0800</pubDate>
+      <guid>/posts/effective-cpp/ch05-%E5%AE%9E%E7%8E%B0/</guid>
+      <description>26：尽可能延后变量定义式的出现时间 原因一：程序前面部分可能有if判断、异常处理等，可能不会运行到后面部分 原因二：直接构造的效率高于默认构造</description>
+    </item>
+    <item>
+      <title>[Effective Cpp Notes] Ch04 设计与声明</title>
+      <link>/posts/effective-cpp/ch04-%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%A3%B0%E6%98%8E/</link>
+      <pubDate>Thu, 01 Feb 2024 21:13:35 +0800</pubDate>
+      <guid>/posts/effective-cpp/ch04-%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%A3%B0%E6%98%8E/</guid>
+      <description>18：让接口容易被正确使用，不易被误用 函数接口传参，使用者可能理解错误或不小心传错 将函数参数封装为新的类型，比如封装新的年月日类，而非直接传</description>
+    </item>
+    <item>
+      <title>[Effective Cpp Notes] Ch03 资源管理</title>
+      <link>/posts/effective-cpp/ch03-%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86/</link>
+      <pubDate>Thu, 01 Feb 2024 21:13:22 +0800</pubDate>
+      <guid>/posts/effective-cpp/ch03-%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86/</guid>
+      <description>13：以对象管理资源 资源获取即初始化（RAII）：使用析构函数确保资源被释放 复制时使用移动语义，移交资源的所有权 背景：使用动态内存分配时，很</description>
+    </item>
+    <item>
+      <title>[Effective Cpp Notes] Ch02 构造、析构、赋值运算</title>
+      <link>/posts/effective-cpp/ch02-%E6%9E%84%E9%80%A0%E6%9E%90%E6%9E%84%E8%B5%8B%E5%80%BC%E8%BF%90%E7%AE%97/</link>
+      <pubDate>Thu, 01 Feb 2024 21:12:53 +0800</pubDate>
+      <guid>/posts/effective-cpp/ch02-%E6%9E%84%E9%80%A0%E6%9E%90%E6%9E%84%E8%B5%8B%E5%80%BC%E8%BF%90%E7%AE%97/</guid>
+      <description>05：了解C++默默编写并调用了哪些函数 如果没有自定义相应拷贝控制成员，而且需要使用该拷贝控制成员，则编译器进行合成 有时编译器不会进行合成，</description>
+    </item>
+    <item>
+      <title>[Effective Cpp Notes] Ch01 让自己习惯C&#43;&#43;</title>
+      <link>/posts/effective-cpp/ch01-%E8%AE%A9%E8%87%AA%E5%B7%B1%E4%B9%A0%E6%83%AFc&#43;&#43;/</link>
+      <pubDate>Thu, 01 Feb 2024 21:10:56 +0800</pubDate>
+      <guid>/posts/effective-cpp/ch01-%E8%AE%A9%E8%87%AA%E5%B7%B1%E4%B9%A0%E6%83%AFc&#43;&#43;/</guid>
+      <description>01 视C++为一个语言联邦 C++高效编程守则视状况而变化，取决于你使用C++的哪一部分 C++支持面向过程、面向对象、面向函数、泛型编程、元编程</description>
+    </item>
+  </channel>
+</rss>
