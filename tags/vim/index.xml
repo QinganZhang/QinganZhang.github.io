@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>vim on Paul&#39;s Blog</title>
+    <link>https://qinganzhang.github.io/tags/vim/</link>
+    <description>Recent content in vim on Paul&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 29 Feb 2024 15:29:41 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/tags/vim/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>常用vim操作</title>
+      <link>https://qinganzhang.github.io/posts/%E5%B8%B8%E7%94%A8vim%E6%93%8D%E4%BD%9C/</link>
+      <pubDate>Thu, 29 Feb 2024 15:29:41 +0800</pubDate>
+      
+      <guid>https://qinganzhang.github.io/posts/%E5%B8%B8%E7%94%A8vim%E6%93%8D%E4%BD%9C/</guid>
+      <description>1. 查看 1.1 移动光标 w/W, b/B移动到下一单词、上一单词的开头，e/E移动到下一单词的结尾，大写空格分割，小写非字母分割 $, ^行尾 行首，0行间第一个字</description>
+      <content:encoded><![CDATA[<h1 id="1-查看">1. 查看</h1>
+<h2 id="11--移动光标">1.1  移动光标</h2>
+<ul>
+<li><code>w/W, b/B</code>移动到下一单词、上一单词的开头，<code>e/E</code>移动到下一单词的结尾，大写空格分割，小写非字母分割</li>
+<li><code>$, ^</code>行尾 行首，<code>0</code>行间第一个字符</li>
+<li><code>Ctrl+f/b</code>翻页，<code>Ctrl+d/u</code>翻半页，<code>Ctrl+e/y</code>上下滚动一行</li>
+<li><code>数字+方向键</code>移动多次（<code>数字+cmd</code>执行多次cmd）</li>
+<li><code>gg, G</code>文件首尾</li>
+<li><code>50%</code>移动到文件50%的位置，<code>:50</code>移动到第50行，<code>.</code>表示当前行号，<code>$</code>表示最后一行的行号</li>
+<li><code>/pattern</code>正则匹配查找，<code>n/N</code>上下跳转</li>
+<li>光标移动到括号上时，使用<code>%</code>进行括号配对</li>
+</ul>
+<h2 id="12--文件编码">1.2  文件编码</h2>
+<ul>
+<li><code>:set fileencoding</code>查看当前文件编码</li>
+<li><code>:e ++enc=utf-8</code>使用utf-8重新打开文件</li>
+</ul>
+<h2 id="13--显示">1.3  显示</h2>
+<ul>
+<li><code>:set nu, :set nonu</code>显示/不显示行号，在<code>~/.vimrc</code>中设置<code>set nu</code>持久化设置</li>
+<li><code>Ctrl+G</code>显示当前状态</li>
+</ul>
+<h2 id="14--分屏">1.4  分屏</h2>
+<ol>
+<li>打开
+<ul>
+<li><code>vim -O file1 file2 </code>打开多个文本（<code>-O</code>垂直分屏，<code>-o</code>水平分屏）</li>
+<li><code>:vs file</code>在当前vim中打开file的垂直分屏，<code>:sp file</code>在当前vim中打开file的水平分屏</li>
+<li><code>Ctrl+w v/s</code>复制当前屏为相同垂直分屏或水平分屏</li>
+<li><code>:new newfile</code>在vim中创建新文本并创建分屏</li>
+</ul>
+</li>
+<li>切换
+<ul>
+<li><code>Ctrl+w+w</code>切换下一个</li>
+<li><code>Ctrl+w+h/j/k/l</code>，hl左右，jk上下</li>
+</ul>
+</li>
+<li>改变位置
+<ul>
+<li><code>Ctrl+w Shift+h/j/k/l</code>，当前屏左上下右移动</li>
+</ul>
+</li>
+<li>改变大小
+<ul>
+<li><code>Ctrl+w Shift+|</code>水平加宽，<code>Ctrl+w Shift+_</code>垂直加宽，<code>Ctrl+w =</code>重置大小</li>
+<li><code>Ctrl+w n +</code>增加高度n，<code>Ctrl+w n -</code>减少高度n，<code>Ctrl+w n Shift+&lt;</code>界线左移n，<code>Ctrl+w n Shift+&gt;</code>界线右移n</li>
+</ul>
+</li>
+<li>关闭
+<ul>
+<li><code>Ctrl+w c</code>关闭当前分屏</li>
+<li><code>Ctrl+w o</code>只保留当前分屏</li>
+</ul>
+</li>
+</ol>
+<h1 id="2-编辑">2. 编辑</h1>
+<h2 id="21-进入编辑模式">2.1 进入编辑模式</h2>
+<ul>
+<li><code>i</code>光标处插入，<code>a</code>光标右边插入，<code>o,O</code>下面、上面另起一行，<code>I,A</code>行首尾插入</li>
+</ul>
+<h2 id="22-简单编辑">2.2 简单编辑</h2>
+<h3 id="221--选中v">2.2.1  选中：<code>v</code></h3>
+<ul>
+<li><code>v, V, Ctrl+v</code>字符、行、块选中</li>
+<li>可以结合<code>w/W, b/B, e/E</code></li>
+<li>结合text object</li>
+</ul>
+<h3 id="222--text-object">2.2.2  text object</h3>
+<pre><code>包括范围和文本对象，可以结合各种操作使用
+</code></pre>
+<ul>
+<li>范围：<code>i</code>：inner,<code>a</code>：around</li>
+<li>文本对象：<code>w</code>：word，<code>s</code>：sentence，各种括号引号</li>
+</ul>
+<h3 id="223--删除和剪切d">2.2.3  删除和剪切：<code>d</code></h3>
+<ul>
+<li>
+<p>删除将内容复制到匿名寄存器中（即剪切），可以使用黑洞寄存器<code>&quot;_</code>避免剪切内容</p>
+<ul>
+<li>
+<p>不剪切的删除（将删除内容复制到黑洞寄存器中，相当于不保存）：<code>&quot;_cmd</code>，其中cmd是删除相关的命令，eg：<code>&quot;_x</code></p>
+</li>
+<li>
+<p>使用键盘映射实现更简便的写法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&#34;在~/.vimrc中,将删除映射为不剪切的删除，剪切映射为删除命令前加前缀&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">let mapleader = &#34;,&#34;
+</span></span><span class="line"><span class="cl">nnoremap x &#34;_x
+</span></span><span class="line"><span class="cl">nnoremap X &#34;_X
+</span></span><span class="line"><span class="cl">nnoremap d &#34;_d
+</span></span><span class="line"><span class="cl">nnoremap dd &#34;_dd
+</span></span><span class="line"><span class="cl">nnoremap D &#34;_D
+</span></span><span class="line"><span class="cl">vnoremap d &#34;_d
+</span></span><span class="line"><span class="cl">vnoremap dd &#34;_dd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&#34;&lt;leader&gt;是前缀，通过mapleader设定&#34;
+</span></span><span class="line"><span class="cl">nnoremap &lt;leader&gt;x &#34;&#34;x
+</span></span><span class="line"><span class="cl">nnoremap &lt;leader&gt;X &#34;&#34;X
+</span></span><span class="line"><span class="cl">nnoremap &lt;leader&gt;d &#34;&#34;d
+</span></span><span class="line"><span class="cl">nnoremap &lt;leader&gt;dd &#34;&#34;dd
+</span></span><span class="line"><span class="cl">nnoremap &lt;leader&gt;D &#34;&#34;D
+</span></span><span class="line"><span class="cl">vnoremap &lt;leader&gt;d &#34;&#34;d
+</span></span><span class="line"><span class="cl">vnoremap &lt;leader&gt;dd &#34;&#34;dd
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在<code>~/.vimrc</code>中输入<code>:source ~/.vimrc</code>使设定生效</p>
+<p>在vim中输入<code>:map</code>查看当前的键盘映射</p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>D, d$</code>删除光标至行尾，<code>dd</code>删除当前行</p>
+</li>
+<li>
+<p><code>x</code>删除当前字符，<code>daw</code>删除单词及后面的空格，<code>diw</code>删除单词，结合text object</p>
+</li>
+<li>
+<p><code>:m,nd</code>删除m-n行</p>
+</li>
+<li>
+<p><code>s</code>删除字符并插入，<code>S</code>清空行并插入</p>
+</li>
+<li>
+<p>先选中，然后<code>x</code>删除选中部分，<code>D</code>删除选中行</p>
+</li>
+</ul>
+<h3 id="224--复制y">2.2.4  复制：<code>y</code></h3>
+<ul>
+<li><code>yy</code>复制当前行，<code>:m,ny</code>复制m-n行到剪贴板</li>
+<li>结合text object</li>
+</ul>
+<h3 id="225--粘贴p">2.2.5  粘贴：<code>p</code></h3>
+<ul>
+<li><code>p，P</code>粘贴到光标处/后</li>
+<li><code>m,ncok</code>复制m-n行到k行下一行</li>
+<li><code>m,nmk</code>移动m-n行到k行下一行</li>
+</ul>
+<h3 id="226--搜索">2.2.6  搜索</h3>
+<ul>
+<li><code>/pattern</code>匹配，<code>n, N</code>下一个上一个匹配对象</li>
+<li><code>*, #</code>匹配下一个，上一个相同的单词</li>
+</ul>
+<h3 id="227--替换c">2.2.7  替换：<code>c</code></h3>
+<ul>
+<li>结合text object</li>
+<li><code>r</code>单字符替换，<code>R</code>字符串替换</li>
+<li><code>[range]s/pattern/replace/[flags]</code>
+<ul>
+<li><code>[range]</code>：<code>%</code>(全文)，<code>.</code>，<code>m,n</code>，<code>m</code></li>
+<li><code>[flags]</code>：<code>g</code>全局替换，<code>c</code>替换前询问，不写默认替换首个</li>
+</ul>
+</li>
+</ul>
+<h3 id="228--撤销重做">2.2.8  撤销重做</h3>
+<ul>
+<li><code>u</code>撤销</li>
+<li><code>Ctrl+r</code>重做</li>
+</ul>
+<h3 id="229--批量注释">2.2.9  批量注释</h3>
+<ol>
+<li>方法一：
+<ul>
+<li>注释：<code>Ctrl+v</code>选择，<code>Shift+i</code>进入编辑模式，输入插入的字符比如<code>#</code>，再两次<code>Esc</code></li>
+<li>取消注释：<code>Ctrl+v</code>选择，<code>x</code>或<code>d</code>删除（就是选择然后删除）</li>
+</ul>
+</li>
+<li>方法二：正则替换
+<ul>
+<li>注释：<code>:m,ns/^/#/g</code></li>
+<li>取消注释：<code>:m,ns/^#//g</code>（替换成空白）</li>
+</ul>
+</li>
+</ol>
+<h3 id="2210--其他">2.2.10  其他</h3>
+<ul>
+<li><code>J</code>将当前行下面的行合并到当前行</li>
+</ul>
+<h1 id="3-其他">3. 其他</h1>
+<h2 id="31--优质blog">3.1  优质Blog</h2>
+<ul>
+<li><a href="https://harttle.land/vim-practice.html">完全用Vim工作</a></li>
+</ul>
+]]></content:encoded>
+    </item>
+    
+  </channel>
+</rss>
