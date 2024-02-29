@@ -1,0 +1,471 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>[Effective Cpp Notes] Ch07 模板与泛型编程 | Paul's Blog</title>
+<meta name=keywords content="cpp"><meta name=description content="41： 了解隐式接口与编译期多态 面向对象中的类设计时需要考虑显式接口和运行时多态，而模板编程中需要考虑隐式接口和编译器多态 如果函数的形参是普通"><meta name=author content="Paul"><link rel=canonical href=https://qinganzhang.github.io/posts/effective-cpp/ch07-%E6%A8%A1%E6%9D%BF%E4%B8%8E%E6%B3%9B%E5%9E%8B%E7%BC%96%E7%A8%8B/><link crossorigin=anonymous href=/assets/css/stylesheet.min.css rel="preload stylesheet" as=style><link rel=icon href=https://qinganzhang.github.io/favicon.ico><link rel=apple-touch-icon href=https://qinganzhang.github.io/apple-touch-icon.png><meta name=twitter:title content="[Effective Cpp Notes] Ch07 模板与泛型编程 | Paul's Blog"><meta name=twitter:description content="41： 了解隐式接口与编译期多态 面向对象中的类设计时需要考虑显式接口和运行时多态，而模板编程中需要考虑隐式接口和编译器多态 如果函数的形参是普通"><meta property="og:title" content="[Effective Cpp Notes] Ch07 模板与泛型编程 | Paul's Blog"><meta property="og:description" content="41： 了解隐式接口与编译期多态 面向对象中的类设计时需要考虑显式接口和运行时多态，而模板编程中需要考虑隐式接口和编译器多态 如果函数的形参是普通"><meta property="og:type" content="article"><meta property="og:url" content="https://qinganzhang.github.io/posts/effective-cpp/ch07-%E6%A8%A1%E6%9D%BF%E4%B8%8E%E6%B3%9B%E5%9E%8B%E7%BC%96%E7%A8%8B/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2024-02-01T21:14:25+08:00"><meta property="article:modified_time" content="2024-02-01T21:14:25+08:00"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Post","item":"https://qinganzhang.github.io/posts/"},{"@type":"ListItem","position":2,"name":"[Effective Cpp Notes] Ch07 模板与泛型编程","item":"https://qinganzhang.github.io/posts/effective-cpp/ch07-%E6%A8%A1%E6%9D%BF%E4%B8%8E%E6%B3%9B%E5%9E%8B%E7%BC%96%E7%A8%8B/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"[Effective Cpp Notes] Ch07 模板与泛型编程 | Paul's Blog","name":"[Effective Cpp Notes] Ch07 模板与泛型编程","description":"41： 了解隐式接口与编译期多态 面向对象中的类设计时需要考虑显式接口和运行时多态，而模板编程中需要考虑隐式接口和编译器多态 如果函数的形参是普通","keywords":["cpp"],"wordCount":"4426","inLanguage":"en","datePublished":"2024-02-01T21:14:25+08:00","dateModified":"2024-02-01T21:14:25+08:00","author":{"@type":"Person","name":"Paul"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://qinganzhang.github.io/posts/effective-cpp/ch07-%E6%A8%A1%E6%9D%BF%E4%B8%8E%E6%B3%9B%E5%9E%8B%E7%BC%96%E7%A8%8B/"},"publisher":{"@type":"Organization","name":"Paul's Blog","logo":{"@type":"ImageObject","url":"https://qinganzhang.github.io/favicon.ico"}}}</script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.css integrity=sha384-bYdxxUwYipFNohQlHt0bjN/LCpueqWz13HufFEV1SUatKs1cm4L6fFgCi1jT643X crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.js integrity=sha384-Qsn9KnoKISj6dI8g7p1HBlNpVx0I8p1SvlwOldgi3IorMle61nQy4zEahWYtljaz crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous></script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],throwOnError:!1})})</script><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary-bg:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list-page{background:var(--theme)}.list-page:not(.dark)::-webkit-scrollbar-track{background:0 0}.list-page:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript></head><body class="type-posts kind-page layout-" id=top><script data-no-instant>function switchTheme(e){switch(e){case"light":document.body.classList.remove("dark");break;case"dark":document.body.classList.add("dark");break;default:window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")}}function isDarkTheme(){return document.body.className.includes("dark")}function getPrefTheme(){return localStorage.getItem("pref-theme")}function setPrefTheme(e){switchTheme(e),localStorage.setItem("pref-theme",e)}const toggleThemeCallbacks={};toggleThemeCallbacks.main=e=>{setPrefTheme(e?"light":"dark")},window.addEventListener("toggle-theme",function(){const e=isDarkTheme();for(const t in toggleThemeCallbacks)toggleThemeCallbacks[t](e)});function toggleThemeListener(){window.dispatchEvent(new CustomEvent("toggle-theme"))}</script><script>(function(){const t="auto",e=getPrefTheme(),n=e||t;switchTheme(n)})()</script><header class=header><nav class=nav><div class=logo><a href=https://qinganzhang.github.io/ accesskey=h title="Paul's Blog (Alt + H)">Paul's Blog</a>
+<span class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></span></div><ul id=menu><li><a href=https://qinganzhang.github.io/posts/ title=Posts class=active>Posts</a></li><li><a href=https://qinganzhang.github.io/archives/ title=Archive>Archive</a></li><li><a href=https://qinganzhang.github.io/search/ title="Search (Alt + /)" data-no-instant accesskey=/>Search</a></li><li><a href=https://qinganzhang.github.io/tags/ title=Tags>Tags</a></li><li><a href=https://qinganzhang.github.io/categories/ title=Categories>Categories</a></li><li><a href=https://qinganzhang.github.io/about/ title=About>About</a></li></ul></nav></header><main class="main post"><article class=post-single><header class=post-header><div class=breadcrumbs><a href=https://qinganzhang.github.io/>Home</a>&nbsp;»&nbsp;<a href=https://qinganzhang.github.io/posts/>Post</a></div><h1 class=post-title>[Effective Cpp Notes] Ch07 模板与泛型编程</h1><div class=post-meta><span class=meta-item><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar" style="user-select:text"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" style="user-select:text"/><line x1="16" y1="2" x2="16" y2="6" style="user-select:text"/><line x1="8" y1="2" x2="8" y2="6" style="user-select:text"/><line x1="3" y1="10" x2="21" y2="10" style="user-select:text"/></svg>
+<span>2024-02-01</span></span><span class=meta-item>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon" style="user-select:text"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" style="user-select:text"/><line x1="7" y1="7" x2="7" y2="7" style="user-select:text"/></svg>
+<span class=post-tags><a href=https://qinganzhang.github.io/tags/cpp/>cpp</a></span></span><span class=meta-item>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select:text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z" style="user-select:text"/><polyline points="14 2 14 8 20 8" style="user-select:text"/><line x1="16" y1="13" x2="8" y2="13" style="user-select:text"/><line x1="16" y1="17" x2="8" y2="17" style="user-select:text"/><polyline points="10 9 9 9 8 9" style="user-select:text"/></svg>
+<span>4426 words</span></span><span class=meta-item>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke="currentcolor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<span>9 min</span></span></div></header><div class="toc side right"><details open><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><ul><li><a href=#41-%e4%ba%86%e8%a7%a3%e9%9a%90%e5%bc%8f%e6%8e%a5%e5%8f%a3%e4%b8%8e%e7%bc%96%e8%af%91%e6%9c%9f%e5%a4%9a%e6%80%81 aria-label="41： 了解隐式接口与编译期多态">41： 了解隐式接口与编译期多态</a></li><li><a href=#42-%e4%ba%86%e8%a7%a3typename%e7%9a%84%e5%8f%8c%e9%87%8d%e6%84%8f%e4%b9%89 aria-label="42： 了解typename的双重意义">42： 了解<code>typename</code>的双重意义</a></li><li><a href=#43-%e4%bd%bf%e7%94%a8%e6%a8%a1%e6%9d%bf%e5%8c%96%e5%9f%ba%e7%b1%bb%e4%b8%ad%e7%9a%84%e6%88%90%e5%91%98%e5%87%bd%e6%95%b0 aria-label="43： 使用模板化基类中的成员函数">43： 使用模板化基类中的成员函数</a></li><li><a href=#44-%e5%b0%86%e4%b8%8e%e5%8f%82%e6%95%b0%e6%97%a0%e5%85%b3%e7%9a%84%e4%bb%a3%e7%a0%81%e6%8a%bd%e7%a6%bb%e6%a8%a1%e6%9d%bf aria-label="44： 将与参数无关的代码抽离模板">44： 将与参数无关的代码抽离模板</a></li><li><a href=#45-%e8%bf%90%e7%94%a8%e6%88%90%e5%91%98%e5%87%bd%e6%95%b0%e6%a8%a1%e6%9d%bf%e6%8e%a5%e5%8f%97%e6%89%80%e6%9c%89%e5%85%bc%e5%ae%b9%e7%b1%bb%e5%9e%8b aria-label="45： 运用成员函数模板接受所有兼容类型">45： 运用成员函数模板接受所有兼容类型</a></li><li><a href=#46%e9%9c%80%e8%a6%81%e7%b1%bb%e5%9e%8b%e8%bd%ac%e6%8d%a2%e6%97%b6%e8%af%b7%e5%b0%86%e6%a8%a1%e6%9d%bf%e5%ae%9a%e4%b9%89%e4%b8%ba%e9%9d%9e%e6%88%90%e5%91%98%e5%87%bd%e6%95%b0 aria-label=46：需要类型转换时请将模板定义为非成员函数>46：需要类型转换时请将模板定义为非成员函数</a></li><li><a href=#47-%e8%af%b7%e4%bd%bf%e7%94%a8traits-classes%e8%a1%a8%e7%8e%b0%e7%b1%bb%e5%9e%8b%e4%bf%a1%e6%81%af aria-label="47： 请使用traits classes表现类型信息">47： 请使用traits classes表现类型信息</a></li><li><a href=#48-%e8%ae%a4%e8%af%86%e6%a8%a1%e6%9d%bf%e5%85%83%e7%bc%96%e7%a8%8b aria-label="48： 认识模板元编程">48： 认识模板元编程</a></li></ul></div></details></div><div class=post-content><h1 id=41-了解隐式接口与编译期多态>41： 了解隐式接口与编译期多态<a hidden class=anchor aria-hidden=true href=#41-了解隐式接口与编译期多态>¶</a></h1><blockquote><p>面向对象中的类设计时需要考虑显式接口和运行时多态，而模板编程中需要考虑隐式接口和编译器多态</p></blockquote><ul><li>如果函数的形参是普通类：<ul><li>普通类的显式接口由函数签名（函数名、形参类型、返回值类型）表征，运行时多态由虚函数实现</li><li>在函数进行编译时，就可以知道该普通类有哪些接口</li></ul></li><li>如果函数的形参是模板类型：<ul><li>模板类型的隐式接口由表达式的合法性表征（即该模板类型应该支持函数中形参调用的方法），编译器多态由模板初始化和重载函数的解析实现</li><li>在函数进行编译时，无法知道模板类型有哪些接口，因此视为鸭子类型（即传入对象支持函数中调用的方法即可）<ul><li>在编译函数时当然无法确定模板类型，但是当传入实参后，内部如果调用了实参未定义的函数，同样会在编译期报错而非运行期</li></ul></li></ul></li><li>参考：<ul><li><a href=https://www.zhihu.com/question/423699453>https://www.zhihu.com/question/423699453</a></li></ul></li></ul><h1 id=42-了解typename的双重意义>42： 了解<code>typename</code>的双重意义<a hidden class=anchor aria-hidden=true href=#42-了解typename的双重意义>¶</a></h1><ul><li>在模板声明中，使用<code>class</code>与<code>typename</code>完全相同</li><li>在模板内部，<code>typename</code>还可以用来显式指明【嵌套从属类型名称】<ul><li>背景：比如编译器无法在模板内部判断<code>T::mem</code>是一个static成员（默认），还是一个类型</li><li>嵌套从属类型名称：<code>T::mem</code>是一个依赖于模板参数<code>T</code>的类型</li><li>例子：模板内部<code>typename T::age myAge = 25;</code></li><li><code>typename</code>还可以用来显式指明【嵌套从属类型名称】，可以出现在模板内部、函数形参列表，但是不可以出现在【类派生列表】和【构造函数中成员初始化列表】中<ul><li>当类型名称过于复杂时，可以使用类型别名</li></ul></li></ul></li><li>参考<ul><li><a href=https://harttle.land/2015/09/09/effective-cpp-42.html>https://harttle.land/2015/09/09/effective-cpp-42.html</a></li></ul></li></ul><h1 id=43-使用模板化基类中的成员函数>43： 使用模板化基类中的成员函数<a hidden class=anchor aria-hidden=true href=#43-使用模板化基类中的成员函数>¶</a></h1><ul><li>背景：如果基类是一个模板类，派生类进行继承<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>class</span> <span class=nc>Buff</span> <span class=p>{};</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>RedBuff</span><span class=o>:</span> <span class=k>public</span> <span class=n>Buff</span> <span class=p>{};</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>BlueBuff</span><span class=o>:</span> <span class=k>public</span> <span class=n>Buff</span> <span class=p>{};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>  <span class=c1>// 基类
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>class</span> <span class=nc>Container</span> <span class=p>{</span> <span class=cm>/* 假设有成员函数func() */</span><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>//template &lt;&gt; // 全特化基类
+</span></span></span><span class=line><span class=cl><span class=c1>//class Container&lt;Buff*&gt; { /* 假设没有成员函数func() */ };
+</span></span></span><span class=line><span class=cl><span class=c1>// template &lt;typename T=Buff*&gt; // 使用默认模板实参，同全特化基类
+</span></span></span><span class=line><span class=cl><span class=c1>// class Container&lt;T&gt; { /* 假设没有成员函数func() */ }
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>PlayerContainer</span><span class=o>:</span> <span class=k>public</span> <span class=n>Container</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span> <span class=p>{</span> <span class=c1>// 派生类继承模板化基类
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=kt>void</span> <span class=n>test</span><span class=p>()</span> <span class=p>{</span> <span class=n>func</span><span class=p>();</span> <span class=p>}</span> <span class=c1>// 这里编译报错
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>};</span> 
+</span></span></code></pre></td></tr></table></div></div><ul><li>对于模板化基类，可能有特化版本，且其中可能有不同的接口</li><li>对于派生类而言，也无法确定类型T，因此C++规定派生类不在模板化基类中查找继承而来的接口</li></ul></li><li>解决方法：向编译器承诺所有的特化版本都遵循模板化基类的接口（或者说使用非特化版本的模板化基类中的接口）<ul><li>使用<code>this</code>显式指出访问基类的成员函数<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>PlayerContainer</span><span class=o>:</span> <span class=k>public</span> <span class=n>Container</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span> <span class=p>{</span> <span class=c1>// 派生类继承模板化基类
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=kt>void</span> <span class=n>test</span><span class=p>()</span> <span class=p>{</span> <span class=k>this</span><span class=o>-&gt;</span><span class=n>func</span><span class=p>();</span> <span class=p>}</span> <span class=c1>// this指针可以访问所有成员函数
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>};</span> 
+</span></span></code></pre></td></tr></table></div></div></li><li>使用<code>using</code>声明<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>PlayerContainer</span><span class=o>:</span> <span class=k>public</span> <span class=n>Container</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span> <span class=p>{</span> <span class=c1>// 派生类继承模板化基类
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>using</span> <span class=n>Container</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;::</span><span class=n>func</span><span class=p>;</span> <span class=c1>// 告诉编译器，func在模板化基类中
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kt>void</span> <span class=nf>test</span><span class=p>()</span> <span class=p>{</span> <span class=n>func</span><span class=p>();</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>};</span> 
+</span></span></code></pre></td></tr></table></div></div></li><li>使用作用域运算符<code>::</code>明确指出，不推荐使用，因为如果func是虚函数，使用这种方法不会产生多态<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>PlayerContainer</span><span class=o>:</span> <span class=k>public</span> <span class=n>Container</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span> <span class=p>{</span> <span class=c1>// 派生类继承模板化基类
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=kt>void</span> <span class=n>test</span><span class=p>()</span> <span class=p>{</span> <span class=n>Container</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;::</span><span class=n>func</span><span class=p>();</span> <span class=p>}</span> <span class=c1>// 明确指出
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>};</span> 
+</span></span></code></pre></td></tr></table></div></div></li></ul></li></ul><h1 id=44-将与参数无关的代码抽离模板>44： 将与参数无关的代码抽离模板<a hidden class=anchor aria-hidden=true href=#44-将与参数无关的代码抽离模板>¶</a></h1><ul><li>背景：代码膨胀<ul><li>模板提供的是编译期多态，不同的类型参数会生成不同的模板</li><li>比如一个模板类接受一个类型参数T与一个非类型参数N，大部分成员都使用类型参数T，只有极少部分成员使用非类型参数N</li><li>如果使用相同的类型type、但是不同的非类型参数n进行实例化，生成的代码中大部分都相同，只有极少部分不同</li></ul></li><li>抽取公共代码：<ul><li>模板中生成的冗余代码是隐式的，因为模板只有一份，生成不同实例后才可能产生冗余</li><li>比如可以将与参数无关的代码（成员函数，数据成员）放入基类中，然后private继承</li></ul></li><li>参考<ul><li><a href=https://harttle.land/2015/09/12/effective-cpp-44.html>https://harttle.land/2015/09/12/effective-cpp-44.html</a></li></ul></li></ul><h1 id=45-运用成员函数模板接受所有兼容类型>45： 运用成员函数模板接受所有兼容类型<a hidden class=anchor aria-hidden=true href=#45-运用成员函数模板接受所有兼容类型>¶</a></h1><ul><li>背景：假如类型参数T存在继承关系，但是模板实例化后是完全不同的两个类<ul><li>比如有一个继承体系，基类Base，派生类Derived</li><li>指向派生类的指针可以转换为指向基类的指针：<code>Base* p = new Derived();</code></li><li>但是指向派生类的智能指针无法转换为指向基类的智能指针： <code>shared_ptr&lt;Base*> sp = make_shared&lt;Derived*>(new Derived());</code></li></ul></li><li>重载构造函数<ul><li>接受同一模板的其他实例的构造函数称为通用构造函数</li><li>兼容类型检查：将<code>MySmartPtr&lt;U></code>转换为<code>MySmartPtr&lt;T></code>，前提是类型U可以转换为类型T</li><li>如果没有声明拷贝构造函数，编译器会自己生成一个，而非使用通用构造函数去进行成员模板实例化</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>MySmartPtr</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>MyShartPtr</span><span class=p>(</span><span class=n>T</span><span class=o>*</span> <span class=n>p</span><span class=p>)</span><span class=o>:</span> <span class=n>ptr</span><span class=p>(</span><span class=n>p</span><span class=p>)</span> <span class=p>{}</span>
+</span></span><span class=line><span class=cl>        <span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>U</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=n>MySmartPtr</span><span class=p>(</span><span class=k>const</span> <span class=n>MySmartPtr</span><span class=o>&lt;</span><span class=n>U</span><span class=o>&gt;&amp;</span> <span class=n>other</span><span class=p>)</span><span class=o>:</span> <span class=n>ptr</span><span class=p>(</span><span class=n>other</span><span class=p>.</span><span class=n>get</span><span class=p>())</span> <span class=p>{};</span> <span class=c1>// 带类型兼容检查的通用构造函数，可以实现隐式类型转换（因为不带explicit）
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>T</span><span class=o>*</span> <span class=nf>get</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span><span class=k>return</span> <span class=n>ptr</span><span class=p>;}</span>
+</span></span><span class=line><span class=cl>    <span class=k>private</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>T</span> <span class=o>*</span><span class=n>ptr</span><span class=p>;</span>    
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>MySmartPtr</span><span class=o>&lt;</span><span class=n>Derived</span><span class=o>*&gt;</span> <span class=n>dp</span><span class=p>(</span><span class=k>new</span> <span class=n>Derived</span><span class=p>());</span> <span class=c1>// 隐式类型转换
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>MySmartPtr</span><span class=o>&lt;</span><span class=n>Base</span><span class=o>*&gt;</span> <span class=n>bp</span> <span class=o>=</span> <span class=n>MySmartPtr</span><span class=o>&lt;</span><span class=n>Derived</span><span class=o>*&gt;</span><span class=p>(</span><span class=k>new</span> <span class=n>Derived</span><span class=p>());</span> <span class=c1>// T=Base*, U=Derived*
+</span></span></span></code></pre></td></tr></table></div></div></li><li>参考<ul><li><a href=https://harttle.land/2015/09/13/effective-cpp-45.html>https://harttle.land/2015/09/13/effective-cpp-45.html</a></li></ul></li></ul><h1 id=46需要类型转换时请将模板定义为非成员函数>46：需要类型转换时请将模板定义为非成员函数<a hidden class=anchor aria-hidden=true href=#46需要类型转换时请将模板定义为非成员函数>¶</a></h1><ul><li>背景：<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>Rational</span> <span class=p>{};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>const</span> <span class=n>Rational</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span> <span class=k>operator</span><span class=o>*</span><span class=p>(</span><span class=k>const</span> <span class=n>Rational</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;&amp;</span> <span class=n>lhs</span><span class=p>,</span> <span class=k>const</span> <span class=n>Rational</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;&amp;</span> <span class=n>rhs</span><span class=p>)</span> <span class=p>{}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>Rational</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=n>oneHalf</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span><span class=mi>2</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=n>Rational</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=n>result</span> <span class=o>=</span> <span class=n>oneHalf</span> <span class=o>*</span> <span class=mi>2</span><span class=p>;</span> <span class=c1>// Error
+</span></span></span></code></pre></td></tr></table></div></div></li><li>模板函数的调用过程：<ul><li>首先推导出类型T，将函数进行实例化：此时无法从2推导得出类型T</li><li>在调用时，有的参数可能需要隐式类型转换</li></ul></li><li>解决方法：将模板函数定义为类的友元，因此类模板实例化后类型T已知<ul><li>如果仅仅是声明，编译器不会对友元函数进行实例化，因此需要进行定义</li><li>定义在类内部的函数是inline的，可以在类外部定义一个辅助函数（也是模板函数，但是不需要隐式类型转换）</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span> <span class=k>class</span> <span class=nc>Rational</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span> <span class=k>const</span> <span class=n>Rational</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span> <span class=n>func</span><span class=p>(</span><span class=k>const</span> <span class=n>Rational</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;&amp;</span> <span class=n>lhs</span><span class=p>,</span> <span class=k>const</span> <span class=n>Rational</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;&amp;</span> <span class=n>rhs</span><span class=p>)</span> <span class=p>{}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>Rational</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>friend</span> <span class=n>Rational</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span> <span class=k>operator</span><span class=o>*</span><span class=p>(</span><span class=k>const</span> <span class=n>Rational</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;&amp;</span> <span class=n>lhs</span><span class=p>,</span> <span class=k>const</span> <span class=n>Rational</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;&amp;</span> <span class=n>rhs</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>            <span class=n>func</span><span class=p>(</span><span class=n>lhs</span><span class=p>,</span> <span class=n>rhs</span><span class=p>);</span> <span class=c1>// 可以推导出类型T，而且不需要进行隐式类型转换
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li></ul><h1 id=47-请使用traits-classes表现类型信息>47： 请使用traits classes表现类型信息<a hidden class=anchor aria-hidden=true href=#47-请使用traits-classes表现类型信息>¶</a></h1><blockquote><ul><li>使用Traits的特点：<ul><li>可以同时支持自定义类型和基础类型</li><li>在编译期就获取信息</li></ul></li></ul></blockquote><p>C++中的Traits类可以在编译期提供类型信息，是通过Traits模板及其特化来实现的
+C++标准库中提供了不同的Traits：<code>iterator_traits</code>,<code>char_traits</code>,<code>numeric_limits</code>等（以<code>iterator_traits</code>为例）</p><ul><li>背景：容器与算法通过迭代器联系在一起，算法中可能需要知道迭代器的类型、迭代器中元素的类型，由此有不同的处理方法<ul><li>比如算法<code>advance</code>可以让一个迭代器移动n步（负数则反向移动）<ul><li>迭代器有五种：其中随机访问迭代器可以直接使用<code>+=</code>操作<ul><li>C++提供了五个类标识迭代器类型：<code>input_iterator_tag</code>，<code>output_iterator_tag</code>，<code>forward_iterator_tag</code>，<code>bidirectional_iterator_tag</code>，<code>random_access_iterator_tag</code></li></ul></li><li>传入的参数也可能是基本类型的指针</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=p>,</span> <span class=k>typename</span> <span class=n>DistT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=n>advance</span><span class=p>(</span><span class=n>IterT</span><span class=o>&amp;</span> <span class=n>iter</span><span class=p>,</span> <span class=n>DistT</span> <span class=n>d</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 判断迭代器类型
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span><span class=p>(</span><span class=n>iter</span> <span class=n>is</span> <span class=n>random</span> <span class=n>access</span> <span class=n>iterator</span><span class=p>)</span> <span class=n>iter</span> <span class=o>+=</span> <span class=n>d</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span> <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 判断迭代器中元素类型
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span><span class=p>(</span><span class=n>iter</span><span class=p>.</span><span class=n>value_type</span> <span class=n>is</span> <span class=n>MyVector</span><span class=p>)</span> <span class=n>cout</span><span class=o>&lt;&lt;</span><span class=s>&#34;MyVector&#34;</span><span class=o>&lt;&lt;</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li>分析：<ul><li>如果<code>IterT</code>是类类型，因此可以在类中携带数据成员，表示迭代器类型和元素类型</li><li>但是<code>IterT</code>也可能是基本类型的指针类型，无法在其中携带信息</li></ul></li><li>Traits技法：使用Traits可以通过一个模板类间接获取<code>IterT</code>的相关信息<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>my_iterator_traits</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div></li></ul></li><li>Traits是C++中一种编程惯例，允许在编译期得到类型的信息<ul><li>traits是一个用来携带信息的很小的类，需要实现两个部分：<ul><li>traits中的类型可能是用户自定义的类型，<ul><li>自定义类型中需要实现相应的迭代器，对具体的类型信息起一个通用的别名</li><li>traits中包装相应的信息</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>MyVector</span><span class=p>{</span> <span class=c1>// 自定义类
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>class</span> <span class=nc>iterator</span><span class=p>{</span> <span class=c1>// 自定义类中的迭代器
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>                <span class=k>using</span> <span class=n>value_type</span> <span class=o>=</span> <span class=n>T</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>                <span class=k>using</span> <span class=n>iterator_category</span> <span class=o>=</span> <span class=n>my_random_access_iterator_tag</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// iterator_traits可以获取迭代器（或指针类型）的元素类型和迭代器类型（指针类型视为随机访问迭代器）
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>iterator_traits</span><span class=p>{</span> <span class=c1>// IterT是类类型
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>using</span> <span class=n>iterator_category</span> <span class=o>=</span> <span class=k>typename</span> <span class=n>IterT</span><span class=o>::</span><span class=n>iterator_category</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>using</span> <span class=n>value_type</span> <span class=o>=</span> <span class=k>typename</span> <span class=n>IterT</span><span class=o>::</span><span class=n>value_type</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div></li><li>traits中的类型可能是基本数据类型，遵循相同的名称，包装一下相应的信息<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>iterator_traits</span><span class=o>&lt;</span><span class=n>IterT</span><span class=o>*&gt;</span><span class=p>{</span> <span class=c1>// 特化版本：IterT是基本类型，IterT是基本类型的指针
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>using</span> <span class=n>iterator_category</span> <span class=o>=</span> <span class=n>my_random_access_iterator_tag</span><span class=p>;</span> <span class=c1>// 指针可以使用+=操作，因此视为随机访问迭代器
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>using</span> <span class=n>value_type</span> <span class=o>=</span> <span class=n>IterT</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div></li></ul></li></ul></li><li>使用<ul><li>不好的写法：使用<code>typeid</code>在运行时判断类型<ul><li>但是IterT类型在编译期就可以确定，对象iter的类型需要在运行时确定</li><li>更严重的问题：静态类型检查（编译期必须确保所有源码都有效，即使是不会执行的源码） ^826df6<ul><li>比如即使迭代器不是<code>my_random_access_iterator_tag</code>类型，编译期也会进入if语句测试该迭代器是否支持+=运算，不支持的话编译报错</li></ul></li></ul></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=p>,</span> <span class=k>typename</span> <span class=n>DistT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=n>advance</span><span class=p>(</span><span class=n>IterT</span><span class=o>&amp;</span> <span class=n>iter</span><span class=p>,</span> <span class=n>DistT</span> <span class=n>d</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span><span class=p>(</span> <span class=k>typeid</span><span class=p>(</span><span class=k>typename</span> <span class=n>std</span><span class=o>::</span><span class=n>iterator_traits</span><span class=o>&lt;</span><span class=n>IterT</span><span class=o>&gt;::</span><span class=n>iterator_category</span><span class=p>)</span> <span class=o>==</span> <span class=k>typeid</span><span class=p>(</span><span class=n>my_random_access_iterator_tag</span><span class=p>)</span> <span class=p>)</span> 
+</span></span><span class=line><span class=cl>        <span class=n>iter</span> <span class=o>+=</span> <span class=n>d</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>推荐实现方法：根据不同的类型创建不同的重载方法（worker），然后在一个master函数中调用，依据traits类型进行重载调用</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=p>,</span> <span class=k>typename</span> <span class=n>DistT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=n>advance</span><span class=p>(</span><span class=n>IterT</span><span class=o>&amp;</span> <span class=n>iter</span><span class=p>,</span> <span class=n>DistT</span> <span class=n>d</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 将IterT中迭代器类型和元素类型萃取出来
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>std</span><span class=o>::</span><span class=n>cout</span><span class=o>&lt;&lt;</span><span class=k>typeid</span><span class=p>(</span><span class=k>typename</span> <span class=n>my_iterator_traits</span><span class=o>&lt;</span><span class=n>IterT</span><span class=o>&gt;::</span><span class=n>iterator_category</span><span class=p>).</span><span class=n>name</span><span class=p>()</span><span class=o>&lt;&lt;</span><span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>cout</span><span class=o>&lt;&lt;</span><span class=k>typeid</span><span class=p>(</span><span class=k>typename</span> <span class=n>my_iterator_traits</span><span class=o>&lt;</span><span class=n>IterT</span><span class=o>&gt;::</span><span class=n>value_type</span><span class=p>).</span><span class=n>name</span><span class=p>()</span><span class=o>&lt;&lt;</span><span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 错误使用：如果iter是指针类型，则IterT为基本类型，无iterator_category属性
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// std::cout&lt;&lt;typeid(IterT::iterator_category).name()&lt;&lt;std::endl;
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>    <span class=n>doAdvance</span><span class=p>(</span><span class=n>iter</span><span class=p>,</span> <span class=n>d</span><span class=p>,</span> <span class=k>typename</span> <span class=n>my_iterator_traits</span><span class=o>&lt;</span><span class=n>IterT</span><span class=o>&gt;::</span><span class=n>iterator_category</span><span class=p>());</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 最后默认初始化一个iterator_category的对象，进行重载匹配，调用对应的函数
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 随机访问迭代器版本
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=p>,</span> <span class=k>typename</span> <span class=n>DistT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=n>doAdvance</span><span class=p>(</span><span class=n>IterT</span><span class=o>&amp;</span> <span class=n>iter</span><span class=p>,</span> <span class=n>DistT</span> <span class=n>d</span><span class=p>,</span> <span class=n>my_random_access_iterator_tag</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>    <span class=n>iter</span> <span class=o>+=</span> <span class=n>d</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 前向迭代器版本
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=p>,</span> <span class=k>typename</span> <span class=n>DistT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=n>doAdvance</span><span class=p>(</span><span class=n>IterT</span><span class=o>&amp;</span> <span class=n>iter</span><span class=p>,</span> <span class=n>DistT</span> <span class=n>d</span><span class=p>,</span> <span class=n>my_forward_iterator_tag</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>    <span class=n>assert</span><span class=p>(</span><span class=n>d</span> <span class=o>&gt;=</span> <span class=mi>0</span> <span class=o>&amp;&amp;</span> <span class=s>&#34;d must be not less then 0&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=n>d</span><span class=o>--</span><span class=p>)</span> <span class=o>++</span><span class=n>iter</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li>测试代码</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;iostream&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;memory&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;list&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;cassert&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span><span class=c1>// using namespace std;
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>my_random_access_iterator_tag</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// my_random_access_iterator_tag() { std::cout&lt;&lt;&#34;my_random_access_iterator_tag ctor&#34;&lt;&lt;std::endl; }
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>my_forward_iterator_tag</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// my_forward_iterator_tag() {std::cout&lt;&lt;&#34;my_forward_iterator_tag&#34;&lt;&lt;std::endl;}
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>MyVector</span><span class=p>{</span> <span class=c1>// 自定义类
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>class</span> <span class=nc>iterator</span><span class=p>{</span> <span class=c1>// 自定义类中的迭代器
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>                <span class=k>using</span> <span class=n>value_type</span> <span class=o>=</span> <span class=n>T</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>                <span class=k>using</span> <span class=n>iterator_category</span> <span class=o>=</span> <span class=n>my_random_access_iterator_tag</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// iterator_traits可以获取迭代器（或指针类型）的元素类型和迭代器类型（指针类型视为随机访问迭代器）
+</span></span></span><span class=line><span class=cl><span class=c1>// 输入：使用类类型的迭代器或指针类型进行实例化
+</span></span></span><span class=line><span class=cl><span class=c1>// 输出：萃取出元素类型和迭代器类型
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>my_iterator_traits</span><span class=p>{</span> <span class=c1>// IterT是类类型
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>using</span> <span class=n>iterator_category</span> <span class=o>=</span> <span class=k>typename</span> <span class=n>IterT</span><span class=o>::</span><span class=n>iterator_category</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>using</span> <span class=n>value_type</span> <span class=o>=</span> <span class=k>typename</span> <span class=n>IterT</span><span class=o>::</span><span class=n>value_type</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>my_iterator_traits</span><span class=o>&lt;</span><span class=n>IterT</span><span class=o>*&gt;</span><span class=p>{</span> <span class=c1>// 特化版本：IterT是基本类型，IterT是基本类型的指针
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>using</span> <span class=n>iterator_category</span> <span class=o>=</span> <span class=n>my_random_access_iterator_tag</span><span class=p>;</span> <span class=c1>// 指针可以使用+=操作，因此视为随机访问迭代器
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>using</span> <span class=n>value_type</span> <span class=o>=</span> <span class=n>IterT</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// std双向迭代器版本
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=p>,</span> <span class=k>typename</span> <span class=n>DistT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=n>doAdvance</span><span class=p>(</span><span class=n>IterT</span><span class=o>&amp;</span> <span class=n>iter</span><span class=p>,</span> <span class=n>DistT</span> <span class=n>d</span><span class=p>,</span> <span class=n>std</span><span class=o>::</span><span class=n>bidirectional_iterator_tag</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span><span class=p>(</span><span class=n>d</span> <span class=o>&gt;</span> <span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>while</span><span class=p>(</span><span class=n>d</span><span class=o>--</span><span class=p>)</span> <span class=o>++</span><span class=n>iter</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span> 
+</span></span><span class=line><span class=cl>        <span class=nf>while</span><span class=p>(</span><span class=o>++</span><span class=n>d</span><span class=p>)</span> <span class=o>--</span><span class=n>iter</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// std随机访问迭代器版本
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=p>,</span> <span class=k>typename</span> <span class=n>DistT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=n>doAdvance</span><span class=p>(</span><span class=n>IterT</span><span class=o>&amp;</span> <span class=n>iter</span><span class=p>,</span> <span class=n>DistT</span> <span class=n>d</span><span class=p>,</span> <span class=n>std</span><span class=o>::</span><span class=n>random_access_iterator_tag</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>    <span class=n>iter</span> <span class=o>+=</span> <span class=n>d</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 自定义随机访问迭代器版本
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=p>,</span> <span class=k>typename</span> <span class=n>DistT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=n>doAdvance</span><span class=p>(</span><span class=n>IterT</span><span class=o>&amp;</span> <span class=n>iter</span><span class=p>,</span> <span class=n>DistT</span> <span class=n>d</span><span class=p>,</span> <span class=n>my_random_access_iterator_tag</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>    <span class=n>iter</span> <span class=o>+=</span> <span class=n>d</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 自定义前向迭代器版本
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=p>,</span> <span class=k>typename</span> <span class=n>DistT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=n>doAdvance</span><span class=p>(</span><span class=n>IterT</span><span class=o>&amp;</span> <span class=n>iter</span><span class=p>,</span> <span class=n>DistT</span> <span class=n>d</span><span class=p>,</span> <span class=n>my_forward_iterator_tag</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>    <span class=n>assert</span><span class=p>(</span><span class=n>d</span> <span class=o>&gt;=</span> <span class=mi>0</span> <span class=o>&amp;&amp;</span> <span class=s>&#34;d must be not less then 0&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=n>d</span><span class=o>--</span><span class=p>)</span> <span class=o>++</span><span class=n>iter</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>IterT</span><span class=p>,</span> <span class=k>typename</span> <span class=n>DistT</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=n>myAdvance</span><span class=p>(</span><span class=n>IterT</span><span class=o>&amp;</span> <span class=n>iter</span><span class=p>,</span> <span class=n>DistT</span> <span class=n>d</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 将IterT中迭代器类型和元素类型萃取出来
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>std</span><span class=o>::</span><span class=n>cout</span><span class=o>&lt;&lt;</span><span class=k>typeid</span><span class=p>(</span><span class=k>typename</span> <span class=n>my_iterator_traits</span><span class=o>&lt;</span><span class=n>IterT</span><span class=o>&gt;::</span><span class=n>iterator_category</span><span class=p>).</span><span class=n>name</span><span class=p>()</span><span class=o>&lt;&lt;</span><span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>cout</span><span class=o>&lt;&lt;</span><span class=k>typeid</span><span class=p>(</span><span class=k>typename</span> <span class=n>my_iterator_traits</span><span class=o>&lt;</span><span class=n>IterT</span><span class=o>&gt;::</span><span class=n>value_type</span><span class=p>).</span><span class=n>name</span><span class=p>()</span><span class=o>&lt;&lt;</span><span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// 错误使用：如果iter是指针类型，则IterT为基本类型，无iterator_category属性
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// std::cout&lt;&lt;typeid(IterT::iterator_category).name()&lt;&lt;std::endl;
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// std::cout&lt;&lt; (typeid(typename my_iterator_traits&lt;IterT&gt;::iterator_category) == typeid(std::bidirectional_iterator_tag)) &lt;&lt;std::endl;
+</span></span></span><span class=line><span class=cl><span class=c1></span>    
+</span></span><span class=line><span class=cl>    <span class=c1>// 不好的写法：
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// 静态类型检查，即使iter不是随机访问迭代器，也会进入if语句块内进行检查
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// if( typeid(typename my_iterator_traits&lt;IterT&gt;::iterator_category) == typeid(std::random_access_iterator_tag) )
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>//     iter += d;
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>    <span class=n>doAdvance</span><span class=p>(</span><span class=n>iter</span><span class=p>,</span> <span class=n>d</span><span class=p>,</span> <span class=k>typename</span> <span class=n>my_iterator_traits</span><span class=o>&lt;</span><span class=n>IterT</span><span class=o>&gt;::</span><span class=n>iterator_category</span><span class=p>());</span> 
+</span></span><span class=line><span class=cl>    <span class=c1>// 最后默认初始化一个iterator_category的对象，进行重载匹配，调用对应的函数
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>a</span><span class=p>[</span><span class=mi>10</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span><span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=mi>10</span><span class=p>;</span> <span class=o>++</span><span class=n>i</span><span class=p>)</span> <span class=n>a</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>=</span> <span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span><span class=o>*</span> <span class=n>p</span> <span class=o>=</span> <span class=o>&amp;</span><span class=n>a</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=n>myAdvance</span><span class=p>(</span><span class=n>p</span><span class=p>,</span> <span class=mi>2</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>cout</span><span class=o>&lt;&lt;*</span><span class=n>p</span><span class=o>&lt;&lt;</span><span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>list</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=n>lst</span><span class=p>{</span><span class=mi>1</span><span class=p>,</span><span class=mi>2</span><span class=p>,</span><span class=mi>3</span><span class=p>,</span><span class=mi>4</span><span class=p>,</span><span class=mi>5</span><span class=p>,</span><span class=mi>6</span><span class=p>,</span><span class=mi>7</span><span class=p>,</span><span class=mi>8</span><span class=p>,</span><span class=mi>9</span><span class=p>,</span><span class=mi>10</span><span class=p>};</span>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>list</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;::</span><span class=n>iterator</span> <span class=n>it</span> <span class=o>=</span> <span class=n>lst</span><span class=p>.</span><span class=n>begin</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=n>myAdvance</span><span class=p>(</span><span class=n>it</span><span class=p>,</span> <span class=mi>2</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>cout</span><span class=o>&lt;&lt;*</span><span class=n>it</span><span class=o>&lt;&lt;</span><span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h1 id=48-认识模板元编程>48： 认识模板元编程<a hidden class=anchor aria-hidden=true href=#48-认识模板元编程>¶</a></h1><ul><li>模板元编程（template metaprogramming，TMP）：编写模板，执行于编译期，生成具象化的代码<ul><li>优点：可以将很多工作从运行期转移到编译期<ul><li>一些错误可以提前发现</li><li>运行时更高效：可执行文件体积小，运行期短，内存需求少</li><li>避免了[[ch07-模板与泛型编程#^826df6|静态类型检查]]的问题</li></ul></li><li>缺点：编译时间变长</li></ul></li><li>模板元编程<ul><li>图灵完备</li><li>循环由递归实现</li></ul></li></ul></div><footer class=post-footer><nav class=paginav><a class=prev href=https://qinganzhang.github.io/posts/effective-cpp/ch08-%E5%AE%9A%E5%88%B6new%E5%92%8Cdelete/><span class=title><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left" style="user-select:text"><line x1="19" y1="12" x2="5" y2="12" style="user-select:text"/><polyline points="12 19 5 12 12 5" style="user-select:text"/></svg>&nbsp;Prev Page</span><br><span>[Effective Cpp Notes] Ch08 定制new和delete</span>
+</a><a class=next href=https://qinganzhang.github.io/posts/effective-cpp/ch06-%E7%BB%A7%E6%89%BF%E4%B8%8E%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1/><span class=title>Next Page&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right" style="user-select:text"><line x1="5" y1="12" x2="19" y2="12" style="user-select:text"/><polyline points="12 5 19 12 12 19" style="user-select:text"/></svg></span><br><span>[Effective Cpp Notes] Ch06 继承与面向对象设计</span></a></nav></footer><div class=comments-separator></div></article></main><footer class=footer><span>&copy; 2024 <a href=https://qinganzhang.github.io/>Paul's Blog</a></span><span style=display:inline-block;margin-left:1em>
+<a href=https://creativecommons.org/licenses/by-sa/4.0/>CC BY-SA</a>
+</span><span style=display:inline-block;margin-left:1em>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+    <a href=https://github.com/reorx/hugo-PaperModX/ rel=noopener target=_blank>PaperModX</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>(function(){const t=""=="1";if(t)return;let e=document.getElementById("theme-toggle");e.removeEventListener("click",toggleThemeListener),e.addEventListener("click",toggleThemeListener)})()</script><script>(function(){let e=document.getElementById("menu");e&&(e.scrollLeft=localStorage.getItem("menu-scroll-position"),e.onscroll=function(){localStorage.setItem("menu-scroll-position",e.scrollLeft)});const t=""=="1",n=""=="1";if(window.matchMedia("(prefers-reduced-motion: reduce)").matches||t||n)return;document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})})()</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>if(window.scrollListeners)for(const e of scrollListeners)window.removeEventListener("scroll",e);window.scrollListeners=[]</script><script src=/js/medium-zoom.min.js data-no-instant></script><script>document.querySelectorAll("pre > code").forEach(e=>{const n=e.parentNode.parentNode,t=document.createElement("button");t.classList.add("copy-code"),t.innerText="copy";function s(){t.innerText="copied!",setTimeout(()=>{t.innerText="copy"},2e3)}t.addEventListener("click",t=>{if("clipboard"in navigator){navigator.clipboard.writeText(e.textContent),s();return}const n=document.createRange();n.selectNodeContents(e);const o=window.getSelection();o.removeAllRanges(),o.addRange(n);try{document.execCommand("copy"),s()}catch{}o.removeRange(n)}),n.classList.contains("highlight")?n.appendChild(t):n.parentNode.firstChild==n||(e.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName=="TABLE"?e.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(t):e.parentNode.appendChild(t))})</script><script>(function(){const a="1"=="1";if(!a)return;if(!document.querySelector(".toc")){console.log("no toc found, ignore toc scroll");return}const r=window.scrollListeners,t=document.querySelectorAll("h1[id],h2[id],h3[id],h4[id],h5[id]"),n="active";let e=t[0];o(e).classList.add(n);const c=()=>{const s=[];for(const e of t)if(l(e)<5)s.push(e);else break;s.length>0?newActiveHeading=s[s.length-1]:newActiveHeading=t[0],e!=newActiveHeading&&(o(e).classList.remove(n),e=newActiveHeading,o(e).classList.add(n))};let s=null;const i=()=>{s!==null&&clearTimeout(s),s=setTimeout(c,50)};window.addEventListener("scroll",i,!1),r.push(i);function o(e){const t=encodeURI(e.getAttribute("id")).toLowerCase();return document.querySelector(`.toc ul li a[href="#${t}"]`)}function l(e){if(!e.getClientRects().length)return 0;let t=e.getBoundingClientRect();return t.top}})()</script></body></html>

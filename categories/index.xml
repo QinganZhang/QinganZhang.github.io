@@ -1,33 +1,41 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>categories on Paul&#39;s Blog</title>
-    <link>/categories/</link>
+    <link>https://qinganzhang.github.io/categories/</link>
     <description>Recent content in categories on Paul&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 01 Feb 2024 21:56:31 +0800</lastBuildDate>
-    <atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 01 Feb 2024 21:56:31 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>effective-modern-cpp-notes</title>
-      <link>/categories/effective-modern-cpp-notes/</link>
+      <link>https://qinganzhang.github.io/categories/effective-modern-cpp-notes/</link>
       <pubDate>Thu, 01 Feb 2024 21:56:31 +0800</pubDate>
-      <guid>/categories/effective-modern-cpp-notes/</guid>
+      
+      <guid>https://qinganzhang.github.io/categories/effective-modern-cpp-notes/</guid>
       <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
     </item>
+    
     <item>
       <title>effective-cpp</title>
-      <link>/categories/effective-cpp/</link>
+      <link>https://qinganzhang.github.io/categories/effective-cpp/</link>
       <pubDate>Thu, 01 Feb 2024 21:54:24 +0800</pubDate>
-      <guid>/categories/effective-cpp/</guid>
+      
+      <guid>https://qinganzhang.github.io/categories/effective-cpp/</guid>
       <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
     </item>
+    
     <item>
       <title>effective-cpp-notes</title>
-      <link>/categories/effective-cpp-notes/</link>
+      <link>https://qinganzhang.github.io/categories/effective-cpp-notes/</link>
       <pubDate>Thu, 01 Feb 2024 21:14:41 +0800</pubDate>
-      <guid>/categories/effective-cpp-notes/</guid>
+      
+      <guid>https://qinganzhang.github.io/categories/effective-cpp-notes/</guid>
       <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
     </item>
+    
   </channel>
 </rss>

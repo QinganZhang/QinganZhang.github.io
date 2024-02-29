@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>tags on Paul&#39;s Blog</title>
-    <link>/tags/</link>
+    <link>https://qinganzhang.github.io/tags/</link>
     <description>Recent content in tags on Paul&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 01 Feb 2024 21:56:31 +0800</lastBuildDate>
-    <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 01 Feb 2024 21:56:31 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>cpp</title>
-      <link>/tags/cpp/</link>
+      <link>https://qinganzhang.github.io/tags/cpp/</link>
       <pubDate>Thu, 01 Feb 2024 21:56:31 +0800</pubDate>
-      <guid>/tags/cpp/</guid>
+      
+      <guid>https://qinganzhang.github.io/tags/cpp/</guid>
       <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
     </item>
+    
   </channel>
 </rss>
