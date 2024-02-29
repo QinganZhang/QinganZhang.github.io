@@ -1,0 +1,779 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>other on Paul&#39;s Blog</title>
+    <link>https://qinganzhang.github.io/categories/other/</link>
+    <description>Recent content in other on Paul&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 29 Feb 2024 14:52:29 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/categories/other/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>计算机架构科普和梳理</title>
+      <link>https://qinganzhang.github.io/posts/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%9E%B6%E6%9E%84%E7%A7%91%E6%99%AE%E5%92%8C%E6%A2%B3%E7%90%86/</link>
+      <pubDate>Thu, 29 Feb 2024 14:52:29 +0800</pubDate>
+      
+      <guid>https://qinganzhang.github.io/posts/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%9E%B6%E6%9E%84%E7%A7%91%E6%99%AE%E5%92%8C%E6%A2%B3%E7%90%86/</guid>
+      <description>指令集架构 指令集 说明了操作种类、指令格式（操作码和地址码，地址码个数，操作码定长与拓展）、寻址方式、地址空间大小和寄存器个数等。简单可以理解</description>
+      <content:encoded><![CDATA[<h2 id="指令集架构">指令集架构</h2>
+<h3 id="指令集">指令集</h3>
+<p>说明了操作种类、指令格式（操作码和地址码，地址码个数，操作码定长与拓展）、寻址方式、地址空间大小和寄存器个数等。简单可以理解为汇编指令用01表示。</p>
+<blockquote>
+<p>CPU位数=CPU中寄存器的位数=数据总线宽度</p>
+</blockquote>
+<ul>
+<li>
+<p>硬件厂商开发某种指令集的CPU，需要该指令集专利持有者进行授权</p>
+<ul>
+<li>
+<p>比如ARM公司自己的研发指令集叫ARM指令集，对外授权（同时ARM公司还进行微架构的授权）</p>
+</li>
+<li>
+<p>一些大型公司都获得ARM公司针对ARM指令集的授权，开发兼容ARM指令集的不同的微架构</p>
+<ul>
+<li>比如Intel授权AMD可以生产兼容x86指令集的CPU</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>编译：高级语言翻译成特定ISA的机器码</p>
+</li>
+<li>
+<p>参考</p>
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/19893066">关于CPU、指令集、架构、芯片的一些科普</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="复杂指令集cisc">复杂指令集CISC</h3>
+<ul>
+<li>
+<p>x86：在1978年的Intel 8086 CPU（16位）指令集基础上，发展而来的一些列指令集的泛称</p>
+<ul>
+<li>桌面级CPU一般都是x86的，兼容8086指令集</li>
+</ul>
+</li>
+<li>
+<p>IA-32(x86,i386)：Intel将16位的x86拓展为32位的IA-32，但是由于IA-32的统治地位，x86也一般指IA-32的CPU</p>
+<ul>
+<li>Intel 80386是第一款i386 CPU（第一款IA-32架构的CPU）
+<ul>
+<li>i386，i486：即Intel 80386， Intel 80486</li>
+<li>Pentium（i586）：Intel 80586</li>
+<li>Pentium Pro（Pentium Ⅱ，i686）：Intel 80686</li>
+</ul>
+</li>
+<li>此后，x86成为一些列架构的泛称，不限于16位，32位，64位</li>
+</ul>
+</li>
+<li>
+<p>IA-64：1994年Intel推出的与x86完全无关的新架构（也不兼容之），基于显式并行指令运算（EPIC）的64位指令集架构</p>
+<ul>
+<li>2001年发布第一款基于IA-64的CPU，叫Itanium安腾，IA-64也称为Intel Itanium</li>
+<li>但是由于软件环境的缺乏和AMD的竞争，导致市场不好</li>
+</ul>
+</li>
+<li>
+<p>x86-64(x64)：1999年，AMD推出x86-64架构（简称x64），是对IA-32(x86)的兼容和拓展</p>
+<ul>
+<li>
+<p>2003年AMD发布的一款基于x86-64的CPU，x86-64也称为AMD64</p>
+</li>
+<li>
+<p>后来Intel也用AMD64架构，称为IA-32e(IA-32 extension)，后来又叫Intel64</p>
+</li>
+<li>
+<p>x86-64, x64, AMD64, Intel64, IA-32e(IA-32 extension)基本是一个东西</p>
+<ul>
+<li>
+<p>苹果公司和 <code>RPM</code> 包管理员以 <code>x86-64</code> 或 <code>x86_64</code> 称呼此 <code>64</code> 位架构。甲骨文公司及 <code>Microsoft</code> 称之为<code>x64</code>。<code>BSD</code> 家族及其他 <code>Linux</code> 发行版则使用 <code>amd64</code>，<code>32</code> 位版本则称为<code>i386</code>（或 <code>i486/586/686</code>），<code>Arch Linux</code> 用<code>x86_64</code> 称呼此 <code>64</code> 位架构。</p>
+<blockquote>
+<p><a href="https://zhuanlan.zhihu.com/p/113157931#:~:text=CPU%20%E6%8C%87%E4%BB%A4%E9%9B%86%E6%9E%B6%E6%9E%84%E7%9B%AE%E5%89%8D%E4%B8%BB%E8%A6%81%E6%98%AF%E4%B8%A4%E5%A4%A7%E7%B1%BB%E3%80%82%20%E5%A4%8D%E6%9D%82%E6%8C%87%E4%BB%A4%E9%9B%86%E6%98%AF%20x86%20%E3%80%81%20x64%20%28%E4%B9%9F%E5%8F%AB%20x86-64%2C,%E4%B8%80%E7%A7%8D%E6%9E%B6%E6%9E%84%EF%BC%8C%E4%B8%93%E5%88%A9%E5%9C%A8%20ARM%20%E5%85%AC%E5%8F%B8%E6%89%8B%E9%87%8C%EF%BC%8C%E8%AF%A5%E6%9E%B6%E6%9E%84%20CPU%20%E4%B8%BB%E8%A6%81%E6%9C%89%E9%AB%98%E9%80%9A%E3%80%81%E4%B8%89%E6%98%9F%E3%80%81%E8%8B%B9%E6%9E%9C%E3%80%81%E5%8D%8E%E4%B8%BA%E6%B5%B7%E6%80%9D%E3%80%81%E8%81%94%E5%8F%91%E7%A7%91%E7%AD%89%E5%85%AC%E5%8F%B8%E3%80%82%20%E8%BF%99%E7%A7%8D%20CPU%20%E5%B8%B8%E7%94%A8%E5%9C%A8%E6%89%8B%E6%9C%BA%E4%B8%8A%EF%BC%8C%E5%8C%85%E6%8B%AC%E5%AE%89%E5%8D%93%E5%92%8C%E8%8B%B9%E6%9E%9C%E3%80%82">x86,x64,x86-64,amd64,arm指令集架构之间的关系</a>中x86 架构发展</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>参考</p>
+<ul>
+<li><a href="https://www.jianshu.com/p/70872b91ab46">i386、i486、i586、 i686、 x86、x86_64、x64、amd_64详解【写的很好】</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="精简指令集risc">精简指令集RISC</h3>
+<ul>
+<li>ARM
+<ul>
+<li>ARMv3~ARMv7都是32位</li>
+<li>ARMv8：向前兼容32位指令，同时
+<ul>
+<li>AArch64：64位执行状态，使用全新的ARM 64位指令集</li>
+<li>AArch32：32位执行状态</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>RISC-V：伯克利发明的一种基于RISC的开源指令集架构
+<ul>
+<li><a href="https://www.sohu.com/a/225906734_132567">一文看懂RISC-V</a></li>
+</ul>
+</li>
+<li>MIPS</li>
+<li>PowerPC</li>
+</ul>
+<h2 id="微架构">微架构</h2>
+<ul>
+<li>微架构：硬件电路（或CPU单个核心core）的结构和实现</li>
+<li>CPU研发能力一般指的是独立的微架构研发能力，是否使用自行研发的指令集关系不大
+<ul>
+<li>研发兼容的指令集可以没有获得授权，指令集的研发不是很难，但是之后获得授权后才能合法销售</li>
+<li>微架构的设计细节是保密且复杂的</li>
+<li>SoC（System on Chip）封装相对简单</li>
+</ul>
+</li>
+<li>商业模式
+<ul>
+<li>之前在PC时代，CPU研发厂商自己的微架构只有自己用</li>
+<li>后来在智能设备时代，ARM公司将自己的微架构出售，其他厂商可以拿来组装，比如Cortex系列核心</li>
+<li>由于ARM公司的成功，ARM公司针对PC领域发布了ARM v8 64位指令集
+<ul>
+<li>以前ARM适合低功耗的场景，随着技术进步，指令集对微架构的影响越来越小</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>指令集的选择：倾向于选择软件生态良好的指令集
+<ul>
+<li>以前获得指令集的授权很困难，主要通过技术交换的形式（指令集多授权一家，就多一个对手）</li>
+<li>后来ARM对指令集授权略微放松</li>
+</ul>
+</li>
+<li>参考：
+<ul>
+<li><a href="https://www.jianshu.com/p/c80850ccfb27">指令集、微架构、手机芯片(Soc)及ARM的介绍(偏硬件科普)</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="计算机架构">计算机架构</h2>
+<ul>
+<li>冯.诺伊曼架构：程序和指令存储在一起</li>
+<li>哈佛架构：程序和指令分开存储
+<ul>
+<li>比如单片机（51单片机，STM32单片机），Cortex-M系列</li>
+</ul>
+</li>
+<li>现代处理器架构一般指令和数据共享存储，但是CPU内部缓存分开</li>
+</ul>
+<h2 id="特别介绍arm">特别介绍：ARM</h2>
+<h3 id="arm商业发展">ARM商业发展</h3>
+<ul>
+<li>
+<p>由于商业需要，1985年，Acorn公司基于RISC，自研CPU（包括指令集和微架构），称为ARM（Acorn RISC Machine），型号命名为ARM1（对标80286）</p>
+</li>
+<li>
+<p>后来，Acorn公司和苹果公司联合成立了一家叫ARM（Advanced RISC Machines）的公司，开启新的产品策略：授权</p>
+<blockquote>
+<p>传统商业模式：</p>
+<ul>
+<li>IDM(Integrated Design and Manufacture)：从设计，到制造、封装测试以及投向消费市场一条龙全包，比如Intel</li>
+<li>无工厂模式Fabless：自己设计，制造交给代工厂，比如AMD，NVIDIA</li>
+<li>Foundry：只做代工</li>
+</ul>
+</blockquote>
+<ul>
+<li>使用层级授权（处理器授权）：只能买来已经封装好的CPU，不能更改原来设计，可以配置的地方不多</li>
+<li>内核层级授权（POP授权）：以一个内核（或IP核）为基础然后在加上自己的外设</li>
+<li>架构层级授权：授权使用ARM指令集，可以修改指令集，但是比较贵
+<ul>
+<li>比如华为基于ARMv8，自研达芬奇架构</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>后来ARM公司越来越成功，苹果公司逐渐卖掉其股份，开发ipod（基于ARM指令集）。</p>
+<ul>
+<li>2007年，苹果公司发布iphone，基于ARM指令集</li>
+<li>2008年，谷歌发布Android系统，也是基于ARM指令集</li>
+</ul>
+</li>
+<li>
+<p>2016年，ARM公司被软银集团收购</p>
+</li>
+<li>
+<p>参考</p>
+<ul>
+<li><a href="https://www.zhihu.com/question/296178433/answer/692275926">如何看待观点「华为没有核心技术，因为芯片用的是ARM（安谋）架构，一旦被停止授权，就会做不出芯片」？</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/266092621">【推荐】到底什么是Cortex、ARMv8、arm架构、ARM指令集、soc？一文帮你梳理基础概念【科普】</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="arm处理器">ARM处理器</h3>
+<blockquote>
+<p>一般处理器就是指CPU</p>
+<p>但是ARM处理器指的是单个核（或IP核，或内核），因为厂商可以在IP核上进一步封装，最终CPU不尽相同</p>
+<blockquote>
+<p>IP核，全称知识产权核（英语：intellectual property core），是在集成电路的可重用设计方法学中，指某一方提供的、形式为逻辑单元、芯片设计的可重用模组。IP核通常已经通过了设计验证，设计人员以IP核为基础进行设计，可以缩短设计所需的周期。</p>
+</blockquote>
+<p>参考：</p>
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/362648496">armv7-A系列0 - arm 处理器架构发展史</a>中的处理器到底指的是什么</li>
+<li><a href="https://zhuanlan.zhihu.com/p/266092621">到底什么是Cortex、ARMv8、arm架构、ARM指令集、soc？一文帮你梳理基础概念【科普】</a>中的ARM内核与架构</li>
+<li><a href="https://www.jianshu.com/p/c80850ccfb27">指令集、微架构、手机芯片(Soc)及ARM的介绍(偏硬件科普)</a></li>
+</ul>
+</blockquote>
+<ul>
+<li>
+<p>指令集架构：</p>
+<ul>
+<li>ARMv1~ARMv9（可以有一定的变种比如ARMv8-A）</li>
+<li>ARMv8是首款64位的ARM指令集</li>
+</ul>
+</li>
+<li>
+<p>处理器架构</p>
+<ul>
+<li>ARMv3~ARMv6：
+<ul>
+<li>ARM6, ARM7, ARM9, ARM11系列</li>
+</ul>
+</li>
+<li>ARMv7及以后
+<ul>
+<li>Cortex-A：大型嵌入式系统（手机）</li>
+<li>Cortex-R：实时处理器</li>
+<li>Cortex-M：单片机</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>参考：</p>
+<ul>
+<li>
+<p><a href="https://zhuanlan.zhihu.com/p/494924815#:~:text=ARM%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B%20%7C%20ARM%E5%91%BD%E5%90%8D%E8%A7%84%E5%88%99%201%201.%E6%8C%87%E4%BB%A4%E9%9B%86%E6%9E%B6%E6%9E%84%20%E6%8C%87%E4%BB%A4%E9%9B%86%E6%9E%B6%E6%9E%84%E5%91%BD%E5%90%8D%E6%A0%BC%E5%BC%8F%3A%20Armv%EF%BC%9A%E5%9B%BA%E5%AE%9A%E5%AD%97%E7%AC%A6%2C%20%E5%8D%B3ARM,x%EF%BC%9A%E5%A4%84%E7%90%86%E5%99%A8%E7%B3%BB%E5%88%97%2C%20%E6%9C%896%2C%207%2C%209%20%2C%2011%E7%AD%89%E5%A4%9A%E4%B8%AA%E7%B3%BB%E5%88%97%20y%EF%BC%9A%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%2F%E4%BF%9D%E6%8A%A4%E5%8D%95%E5%85%83%20">ARM基础教程 | ARM命名规则</a></p>
+</li>
+<li>
+<p><a href="https://zhuanlan.zhihu.com/p/25681832">ARM 命名规则——指令架构、CPU的历史回顾</a></p>
+</li>
+</ul>
+</li>
+</ul>
+<p>参考：</p>
+<p><a href="https://dongka.github.io/2018/11/17/cpu/arm%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84%E7%9A%84%E5%8F%91%E5%B1%95/">ARM体系架构概述</a></p>
+<h3 id="android">Android</h3>
+<h4 id="简介">简介</h4>
+<ul>
+<li>
+<p>Android是一个开源的，基于Linux的移动设备操作系统，主要使用于移动设备</p>
+</li>
+<li>
+<p>谷歌在2007年发布了第一个测试版本的 Android 软件开发工具包（SDK），第一个商业版本的 Android 1.0，则发布于2008年9月。</p>
+</li>
+<li>
+<p>Android 应用程序一般使用 Android 软件开发工具包，采用 Java 语言来开发。</p>
+</li>
+</ul>
+<h4 id="版本">版本</h4>
+<ul>
+<li>
+<p><a href="https://developer.android.com/about/versions?hl=zh-cn">Android版本</a>（版本代号）</p>
+<ul>
+<li>每个Android 版本对应一个Android SDK，可以类比JDK</li>
+</ul>
+</li>
+<li>
+<p>Android API版本：有利于设置和解决兼容性问题</p>
+<p><a href="https://developer.android.com/about/versions/13/get?hl=zh-cn">Android API级别官方说明</a></p>
+<p><a href="https://apilevels.com/">Android版本和 Android API level的对应关系</a></p>
+</li>
+<li>
+<p>Android NKD</p>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2023-09-04-15:56:07.png" alt="image-20230710173808296" style="zoom:80%;" />
+</li>
+</ul>
+<h2 id="工具链">工具链</h2>
+<p>背景：</p>
+<ul>
+<li>使用GCC编译，很多时候需要手动链接（只有标准库才默认链接）</li>
+<li>当需要链接的文件很多时，一来每次在命令行中写一遍繁琐容易出错，二来无法使用增量编译</li>
+</ul>
+<h3 id="makefile">Makefile</h3>
+<ul>
+<li>
+<p>背景：make命令根据编译规则进行编译，而且可以进行增量编译，makefile用于写编译规则</p>
+</li>
+<li>
+<p>简要语法：</p>
+<ul>
+<li><a href="http://ruanyifeng.com/blog/2015/02/make.html">阮一峰make教程</a></li>
+<li><a href="https://blog.csdn.net/Nire_Yeyu/article/details/106373974">简明make教程</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/376493209">GNU make/Makefile 简明实用教程</a></li>
+</ul>
+</li>
+<li>
+<p>语法笔记</p>
+<ul>
+<li>
+<p>make：即制作出某个指定的文件（默认makefile中第一个文件）</p>
+<ul>
+<li>越是接近目标文件的命令，就越是要写在前面。因为程序是按照递归的方式进行依赖文件查找的，看到第一行有一个没见过的依赖文件，就往下一行进行查找，以此类推。</li>
+</ul>
+</li>
+<li>
+<p>核心概念：目标target，前置条件prerequisite，命令command</p>
+</li>
+<li>
+<p>伪目标的使用</p>
+<ul>
+<li>
+<p>伪目标是一个命令，且没有前置条件：比如clean，显式使用内置目标名指定为伪目标，主要用于执行命令</p>
+</li>
+<li>
+<p>伪目标是一个文件，但是前置条件有多个，且没有命令：比如生成多个文件</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="cmake">CMake</h3>
+<ul>
+<li>背景：
+<ul>
+<li>当工程很大的时候，手写Makefile也不简单</li>
+<li>Makefile与平台相关，无法实现跨平台</li>
+</ul>
+</li>
+<li>cmake：跨平台的项目管理工具，自动生成makefile文件，然后make构建
+<ul>
+<li>手写CMakeLists.txt文件，cmake生成Makefile，然后再make构建</li>
+</ul>
+</li>
+<li>cmake简要语法
+<ul>
+<li>
+<p>指令大小写无关，变量大小写相关</p>
+</li>
+<li>
+<p>可以使用双引号将文件名或目录名包含其中</p>
+</li>
+<li>
+<p><code>add_executable</code>：将源文件编译成可执行文件</p>
+</li>
+<li>
+<p><code>add_library</code>：将源文件编译为库文件</p>
+<ul>
+<li>在构建时，静态库和动态库重名会导致后面的构建失败，<a href="https://blog.csdn.net/qq_34796146/article/details/108877159">参考</a></li>
+<li><code>SET_TARGET_PROPERTIES</code>：同时构建同名的静态库和动态库</li>
+</ul>
+</li>
+<li>
+<p><code>aux_source_directory(&lt;dir&gt; &lt;variable&gt;)</code>：将dir目录下所有源文件的文件名存放到variable变量中</p>
+</li>
+<li>
+<p><code>add_subdirectory</code>：包含一个子目录，该子目录中也有一个CMakeLists.txt文件和代码文件，它们也会被处理，同时可以指定编译输出（包含编译中间结果）的路径</p>
+</li>
+<li>
+<p><code>link_directories</code>：添加共享库搜索目录</p>
+<ul>
+<li><code>CMAKE_LIBRARY_PATH</code>：设置库文件搜索目录，这不是cmake变量（需要在bash中设置），通过<code>FIND_LIBRARY</code>找到相应库文件</li>
+</ul>
+</li>
+<li>
+<p><code>target_link_libraries(&lt;target&gt; &lt;items&gt;)</code>：为库或可执行文件加入库链接</p>
+</li>
+<li>
+<p><code>include_directories</code>：添加头文件搜索目录</p>
+<ul>
+<li><code>CMAKE_INCLUDE_PATH</code>：设置头文件搜索目录，这不是cmake变量（需要在bash中设置），通过<code>find_path</code>找到相应头文件</li>
+</ul>
+</li>
+<li>
+<p><code>target_include_directories</code>：在编译目标文件时指定头文件</p>
+</li>
+<li>
+<p><code>find_</code>系列</p>
+<ul>
+<li><code>find_package</code>：加载外部库到项目中</li>
+</ul>
+</li>
+<li>
+<p><code>configure_file</code>：默认定义了一些编译选项的值</p>
+</li>
+<li>
+<p><code>option</code>：添加编译选项（更准确是代码中的宏定义）</p>
+</li>
+<li>
+<p>变量</p>
+<ul>
+<li>创建变量：<code>set()</code>，获取变量的值：<code>${variable}</code>，调用环境变量：<code>$ENV{}</code></li>
+<li>追加变量的值：<code>set(SRC_LIST ${SRC_LIST} test.cpp)</code></li>
+<li><code>PROJECT_NAME</code></li>
+<li><code>PROJECT_BINARY_DIR、CMAKE_BINARY_DIR</code>：编译路径，当前工程的二进制路径（即编译产物会存放到该路径，一般为build所在路径）</li>
+<li><code>PROJECT_SOURCE_DIR、CMAKE_SOURCE_DIR</code>：工程根目录，即顶层CMakeLists.txt文件的路径</li>
+<li><code>EXECUTABLE_OUTPUT_PATH</code>：编译生成的可执行文件的路径</li>
+<li><code>LIBRARY_OUTPUT_PATH</code>：编译生成的共享库文件的路径</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="最佳实践">最佳实践</h3>
+<h4 id="项目配置">项目配置</h4>
+<ul>
+<li>在源文件同级目录下建立目录build，在build中
+<ul>
+<li><code>cmake ..</code>：将cmake得到的中间文件保存在build文件夹中，需要重新构建直接删除文件夹</li>
+<li><code>make</code>：构建，可以使用<code>make clean</code>清除中间文件，重新构建</li>
+</ul>
+</li>
+</ul>
+]]></content:encoded>
+    </item>
+    
+    <item>
+      <title>Hugo&#43;Github Pages搭建个人博客</title>
+      <link>https://qinganzhang.github.io/posts/hugo&#43;github_pages%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</link>
+      <pubDate>Thu, 29 Feb 2024 14:50:20 +0800</pubDate>
+      
+      <guid>https://qinganzhang.github.io/posts/hugo&#43;github_pages%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</guid>
+      <description>本地搭建博客 本地环境：windows10 使用主题：PaperModX 安装过程 安装Go并配置环境 下载prebuilt版本的hugo 注意hugo</description>
+      <content:encoded><![CDATA[<h1 id="本地搭建博客">本地搭建博客</h1>
+<blockquote>
+<p>本地环境：windows10</p>
+<p>使用主题：PaperModX</p>
+</blockquote>
+<h2 id="安装过程">安装过程</h2>
+<ul>
+<li>
+<p>安装Go并配置环境</p>
+</li>
+<li>
+<p>下载prebuilt版本的hugo</p>
+<ul>
+<li>注意hugo有普通版本和extended版本，最好使用extended版本，因为在使用PaperModX主题时，需要使用到extended版本（但是PaperMod主题使用普通版本就可以）</li>
+</ul>
+</li>
+<li>
+<p>新建站点：<code>hugo new site myblog</code></p>
+</li>
+<li>
+<p>下载主题：在<code>myblog/themes/</code>下<code>git clone git@github.com:reorx/hugo-PaperModX.git</code></p>
+<ul>
+<li>也可以使用<code>git submodule</code>的方式添加主题，此时方便进行版本控制和管理</li>
+</ul>
+</li>
+</ul>
+<h2 id="本地配置">本地配置</h2>
+<p><code>myblog/</code>下的配置文件参考<a href="https://www.sulvblog.cn/posts/blog/build_hugo/#4%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6">sulvblog&rsquo;s config.yaml</a>和<a href="https://github.com/reorx/hugo-PaperModX/blob/master/exampleSite/config.default.yml">PaperModX example&rsquo;s config.yaml</a>进行配置，自己慢慢调吧（papermodx在papermod的基础上添加了一些特性，比如侧边目录）</p>
+<p>个人主要进行的修改有：</p>
+<ul>
+<li>在<code>archetypes/posts.md</code>中设定默认的meta内容</li>
+<li>修改为posts、archive、search、tags、categories、about六个menu，其中posts、categories、tags在<code>content</code>下为目录，archive、search、about在<code>content</code>下为md文件
+<ul>
+<li>在文件夹下创建<code>_index.md</code>文件可以在里面添加Front Matter，用来设置当前文件夹下的meta信息</li>
+<li>在配置时留意是posts还是post，是archive还是archives</li>
+</ul>
+</li>
+<li><a href="https://blog.csdn.net/WongSSH/article/details/126962069">加入数学公式的支持</a>
+<ul>
+<li>但是当使用带有<code>/begin{} /end{}</code>的多行公式，或者多行公式中含有若干下划线时，此时可能无法正确渲染，我的解决办法是将没有正确渲染的多行数学公式放在<code>&lt;span&gt;&lt;/span&gt;</code>标签对中，这样在网页博客和本地typora中都可以正常显示。考虑到平时不怎么写复杂的多行数学公式，因此手动修改也不多。</li>
+<li>在<a href="https://du33169.tech/posts/notes/hugomath/">Hugo中优雅地使用数学公式</a>中，博主的方法三自己编译一份加入了goldmark数学插件的hugo版本，但是注意编译过程中gcc版本不宜过高（我的gcc原来是8.1.0，编译不过，后来改到5.1.0，编译通过）。但是最终使用好像针对原生latex的多行公式支持不足（？不确定，可能是自己后面配置不正确？），最后没有使用这个方案</li>
+</ul>
+</li>
+<li>调整了主页中Welcome部分的高度，在<code>themes/hugo-PaperModX/assets/css/common/main.css</code>的<code>.first-entry</code>中<code>min-height</code>修改为80px</li>
+<li>调整了页面中内容的宽度（原来侧边留空感觉有点多，可以适当减小），<code>themes/hugo-PaperModX/assets/css/common/main.css</code>的<code>.main.post</code>中添加<code>right: 60px;</code></li>
+<li>在<code>themes/hugo-PaperModX/assets/css/common/post-single.css</code>中调整h1~h6标题的高度</li>
+</ul>
+<h2 id="内容管理">内容管理</h2>
+<ul>
+<li>
+<p>写文章：<code>hugo new posts/文章名称.md</code>，注意写对md文件的路径</p>
+</li>
+<li>
+<p>本地预览：<code>hugo server -D</code>在<code>localhost:1313</code>上进行预览</p>
+<ul>
+<li><code>-D</code>表示<code>draft: true</code>的内容在预览时展示</li>
+<li>有时将draft改为false，使用<code>hugo server</code>进行预览时，对应文章没有出现，此时关掉PowerShell重开一个，重新运行一下命令</li>
+</ul>
+</li>
+<li>
+<p>构建：<code>hugo</code>会将构建的网站内容保存到public文件夹中，默认只会向public中添加内容，而不会删除外部不存在但是public中还存在的文件</p>
+<ul>
+<li><code>hugo -F --cleanDestinationDir</code>表示每次生成的public都是全新的，会覆盖原来的</li>
+<li><code>--theme</code>指定主题，<code>--baseURL=&quot;xxx&quot;</code>指定url</li>
+</ul>
+</li>
+</ul>
+<h2 id="将内容发布到github-pages上">将内容发布到GitHub Pages上</h2>
+<ul>
+<li>
+<p>将public文件夹转换为git库：</p>
+<ul>
+<li>进入到public文件夹，<code>git init -b main</code> 生成的默认主分支名字为main</li>
+</ul>
+</li>
+<li>
+<p>将git库关联到远程库：</p>
+<ul>
+<li><code>git remote add origin git@github.com:QinganZhang/QinganZhang.github.io.git</code></li>
+<li>检查是否关联成功：<code>cat .git/config </code>
+<ul>
+<li>如果<code>[remote &quot;origin&quot;]</code>信息正常显示，说明本地git库已经成功关联到远程库</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>将修改commit到本地库</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">git status # 查看当前修改状态
+</span></span><span class="line"><span class="cl">git add . # 添加所有修改过的文件，也可以只添加某个文件
+</span></span><span class="line"><span class="cl">git commit -m &#34;add a new post&#34; # 
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>将修改push到远程库</p>
+<ul>
+<li><code>git push -u origin main --force</code></li>
+<li>报错： <code>error: src refspec main does not match any</code>
+<ul>
+<li>本地的branch为master，但是远程库默认branch是main，先将本地branch的名字修改为main</li>
+<li><code>git branch -m master main </code></li>
+</ul>
+</li>
+<li>报错：<code> ! [rejected]        main -&gt; main (fetch first)</code>
+<ul>
+<li>提交冲突，远程库和本地库不一致。通常出现在初始化仓库有readme而本地没有等情况。<a href="https://cloud.tencent.com/developer/article/2145265">参考</a></li>
+<li><code>git pull --rebase origin main</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>查看是否部署成功</p>
+<ul>
+<li>
+<p>网页样式（css）丢失，但是内容还在，浏览器F12控制台报错：<code>Failed to find a vlid digest in the 'integrity' attribute for source 'xxx.css' with computed SHA-256 integrity '***'. The resource has been blocked. </code>（关键词：”integrity“）</p>
+<ul>
+<li>
+<p>尝试方法一：<a href="https://smc.im/post/resolve-integrity-error-in-hugo/">解决 hugo 中关于 integrity 的错误</a>，仍然出现原来的错误</p>
+</li>
+<li>
+<p>尝试方法二：<a href="https://qing.shuncs.com/post/tech/hugo/">解决Hugo无法加载css文件</a>，仍然出现原来的错误，而且第一遍文章会覆盖在h1标题Posts上，</p>
+</li>
+<li>
+<p>最终方法：在<code>themes/hugo-PaperModX/layouts/partial/head.html</code>中，将</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">{{- if not site.Params.assets.disableFingerprinting }}
+</span></span><span class="line"><span class="cl">{{- $stylesheet := $stylesheet | fingerprint }}
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">link</span> <span class="na">crossorigin</span><span class="o">=</span><span class="s">&#34;anonymous&#34;</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;{{ $stylesheet.RelPermalink }}&#34;</span> <span class="na">integrity</span><span class="o">=</span><span class="s">&#34;{{ $stylesheet.Data.Integrity }}&#34;</span> <span class="na">rel</span><span class="o">=</span><span class="s">&#34;preload stylesheet&#34;</span> <span class="na">as</span><span class="o">=</span><span class="s">&#34;style&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">{{- else }}
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">link</span> <span class="na">crossorigin</span><span class="o">=</span><span class="s">&#34;anonymous&#34;</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;{{ $stylesheet.RelPermalink }}&#34;</span> <span class="na">rel</span><span class="o">=</span><span class="s">&#34;preload stylesheet&#34;</span> <span class="na">as</span><span class="o">=</span><span class="s">&#34;style&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">{{- end }}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注释掉，只保留<code>&lt;link crossorigin=&quot;anonymous&quot; href=&quot;{{ $stylesheet.RelPermalink }}&quot; rel=&quot;preload stylesheet&quot; as=&quot;style&quot;&gt;</code>这一行。猜想可能是与使用的主题相关，但是暂时没有找到使用相同主题类似错误的信息。</p>
+</li>
+<li>
+<p>更多参考：<a href="https://stackoverflow.com/questions/65040931/hugo-failed-to-find-a-valid-digest-in-the-integrity-attribute-for-resource">Hugo - Failed to find a valid digest in the &lsquo;integrity&rsquo; attribute for resource - The resource has been blocked - Host on Github</a></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="使用github-actions自动构建博客">使用GitHub Actions自动构建博客</h1>
+<p>使用上面的方式（手动构建），在本地写好博客之后，然后使用hugo在本地构建好静态博客，生成public目录，最终是将public目录push到GitHub仓库，构建静态博客。</p>
+<p>还有一种方式，看起来更加高级，那就是基于GitHub Action自动构建博客。大致流程为：在本地写好博客之后，直接push到远程GitHub仓库，在远端而非本地构建博客。这个方式只是节省了自己使用hugo手动进行构建的这一步，但是如果当自己手工进行操作的步骤比较繁琐且固定时，使用GitHub Action自动化就很方便了。</p>
+<p>在实际配置过程中，这里使用了两个仓库。一个是private的myblog仓库，本地写好博客后就push到这个myblog仓库；另一个仓库是public的、作为GitHub Pages的仓库，myblog仓库使用GitHub Action自动进行构建，将最终得到的public文件就放到这个仓库中。下面简要介绍基于Github Action自动构建博客的过程，着重介绍与上面手动构架不同的地方。</p>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-02-29-14:30:09.png" alt="image-20240229143009260" style="zoom: 60%;" />
+<p>具体过程：</p>
+<ul>
+<li>
+<p>在Github远程新建一个仓库，比如命名为myblog</p>
+</li>
+<li>
+<p>在本地使用hugo新建站点时（比如<code>hugo new site myblog</code>），在本地<code>myblog</code>目录下<code>git init -b main</code>，并且使用<code>git remote add</code>将本地的<code>myblog</code>目录关联到远程<code>myblog</code>仓库</p>
+<ul>
+<li>注意之前手动构建的方式中，是在public目录下<code>git init</code>，并关联到远程仓库的，而且该远程仓库即为Github Pages</li>
+</ul>
+</li>
+<li>
+<p>在下载主题时，可以直接git clone源码，也可以使用<code>git submodule</code>的方式将主题作为子项目添加进来</p>
+<ul>
+<li>注意<code>git submodule</code>的子模块和原来的主模块是两个单独的项目，所以进入到子模块和主模块中进行git操作，是针对不同仓库的。<a href="https://cloud.tencent.com/developer/article/2136829">Git Submodules介绍</a></li>
+<li>但是这里想将主题添加进来，自己进行一些修改，因此使用了另一种方法将主题添加进来：<code>git subtree</code>，这样可以直接将子项目作为主仓库的一个目录添加进来
+<ul>
+<li><a href="https://daief.tech/post/git-subtree/"><code>git subtree</code>的使用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>在myblog根目录下，创建<code>.github/workflows/deploy.yaml</code>，个人的<code>deploy.yaml</code>配置文件为：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">deploy</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="c"># 表示GitHub Action的触发条件（即push）</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">push</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">main</span><span class="w"> </span><span class="c"># 设定触发的分支为main</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">workflow_dispatch</span><span class="p">:</span><span class="w"> </span><span class="c"># 可以在Github项目仓库的Action工具栏手动调用</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">permissions</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">contents</span><span class="p">:</span><span class="w"> </span><span class="l">read</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">pages</span><span class="p">:</span><span class="w"> </span><span class="l">write</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">id-token</span><span class="p">:</span><span class="w"> </span><span class="l">write</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">jobs</span><span class="p">:</span><span class="w"> </span><span class="c"># 表示GitHub Action的任务，这里定义了一个build的任务</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">build</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l">ubuntu-latest</span><span class="w"> </span><span class="c"># 指定GitHub Action的运行环境</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">env</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">HUGO_VERSION</span><span class="p">:</span><span class="w"> </span><span class="m">0.122.0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">steps</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># 其中run表示执行的命令，uses时GitHub Action中的一个插件</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Checkout</span><span class="w"> </span><span class="c"># 使用actions/checkout插件检出GitHub仓库</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">actions/checkout@v2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c"># with:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="c"># submodules: false # 同时检出子模块</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="c"># fetch-depth: 0 # 完整检出所有历史记录</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Setup Hugo</span><span class="w"> </span><span class="c"># 使用peaceiris/actions-hugo插件来安装Hugo</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">peaceiris/actions-hugo@v2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">hugo-version</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;0.122.0&#34;</span><span class="w"> </span><span class="c"># 0.122.0 </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">extended</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Build Web</span><span class="w"> </span><span class="c"># 运行hugo命令生成博客的静态文件</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">env</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">HUGO_ENVIRONMENT</span><span class="p">:</span><span class="w"> </span><span class="l">production</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">HUGO_ENV</span><span class="p">:</span><span class="w"> </span><span class="l">production</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l">hugo --gc --minify </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="c"># --baseURL &#34;${{ steps.pages.outputs.base_url }}/&#34; </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Upload artifact</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">actions/upload-pages-artifact@v2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">./public</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Deploy Web</span><span class="w"> </span><span class="c"># 使用peaceiris/actions-gh-pages插件将静态网页部署到GitHub Pages上</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">peaceiris/actions-gh-pages@v3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">PERSONAL_TOKEN</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.PERSONAL_BLOG_TOKEN }}</span><span class="w"> </span><span class="c"># 个人访问令牌</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">EXTERNAL_REPOSITORY</span><span class="p">:</span><span class="w"> </span><span class="l">QinganZhang/QinganZhang.github.io</span><span class="w"> </span><span class="c"># 部署到的GitHub Pages仓库</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">PUBLISH_BRANCH</span><span class="p">:</span><span class="w"> </span><span class="l">main</span><span class="w"> </span><span class="c"># Github Pages分支</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">PUBLISH_DIR</span><span class="p">:</span><span class="w"> </span><span class="l">./public</span><span class="w"> </span><span class="c"># hugo静态文件的目录</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">commit_message</span><span class="p">:</span><span class="w"> </span><span class="l">${{ github.event.head_commit.message }}</span><span class="w"> </span><span class="c"># 提交更改时使用的提交消息</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="c"># cname: ${{ secrets.DOMAIN }} # 自定义域名，默认使用github pages域名</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># reference1: https://blog.csdn.net/m0_51993913/article/details/132657065   </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># reference2: https://blog.csdn.net/freeking101/article/details/135515958使用Github Actions自动化部署部分</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># reference3: https://github.com/reorx/hugo-PaperModX/blob/master/.github/workflows/gh-pages.yml</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>然后生成Token，<a href="https://blog.csdn.net/m0_51993913/article/details/132657065">参考</a></p>
+<ul>
+<li>因为需要从myblog仓库推送public目录到Github Pages仓库，所以需要向myblog仓库添加身份验证凭据</li>
+</ul>
+</li>
+<li>
+<p>最后将本地博客push到myblog远程仓库，然后myblog远程仓库下使用GitHub Actions将public目录推送到Github Pages仓库中</p>
+</li>
+</ul>
+<p>其他问题：</p>
+<ul>
+<li>如何将obsidian双链转换为HTML的<code>&lt;a&gt;&lt;/a&gt;</code>标签对？
+<ul>
+<li>目前发现的一个方案是<a href="https://github.com/manunamz/jekyll-wikilinks#header-level-wikilinks">jekyll-wililinks</a>，但是这个方案需要使用jeklly搭建静态博客</li>
+</ul>
+</li>
+</ul>
+]]></content:encoded>
+    </item>
+    
+  </channel>
+</rss>

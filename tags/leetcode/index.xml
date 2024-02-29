@@ -1,0 +1,2027 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>leetcode on Paul&#39;s Blog</title>
+    <link>https://qinganzhang.github.io/tags/leetcode/</link>
+    <description>Recent content in leetcode on Paul&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 29 Feb 2024 14:54:23 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/tags/leetcode/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Leetcode刷题记录</title>
+      <link>https://qinganzhang.github.io/posts/leetcode%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/</link>
+      <pubDate>Thu, 29 Feb 2024 14:54:23 +0800</pubDate>
+      
+      <guid>https://qinganzhang.github.io/posts/leetcode%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/</guid>
+      <description>[toc] tags：【双指针】，【前缀和】，【原地哈希】 【好题】，【不会】，【重要】 方法 双指针 前后定长双指针 前后快慢双指针 左右双向双指针 611.有效</description>
+      <content:encoded><![CDATA[<p>[toc]</p>
+<p>tags：【双指针】，【前缀和】，【原地哈希】</p>
+<p>【好题】，【不会】，【重要】</p>
+<h2 id="方法">方法</h2>
+<h3 id="双指针">双指针</h3>
+<h4 id="前后定长双指针">前后定长双指针</h4>
+<h4 id="前后快慢双指针">前后快慢双指针</h4>
+<h4 id="左右双向双指针">左右双向双指针</h4>
+<ul>
+<li><a href="https://leetcode.cn/problems/valid-triangle-number/description/">611.有效三角形的个数</a>
+<ul>
+<li>方法一：二重循环a、b，对c进行二分查找（查找最后一个满足<code>a+b&lt;c</code>的c）</li>
+<li>方法二：遍历c，左右双指针表示<code>a(nums[i])</code>和<code>b(nums[j])</code>，<a href="https://leetcode.cn/problems/valid-triangle-number/solutions/2432875/zhuan-huan-cheng-abcyong-xiang-xiang-shu-1ex3">参考</a>
+<ul>
+<li><code>if(nums[i] + nums[j] &gt; c)</code> ，此时有j-i个三角形，j向左走（i向右走无用）</li>
+<li><code>if(nums[i] + nums[j] &lt;= c)</code> ，此时有0个三角形，i向右走（j向左走无用）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/container-with-most-water/description/">11.盛最多水的容器</a>：盛水体积只取决于左右两隔板的高度（木桶理论）
+<ul>
+<li>区别于接雨水，雨水可能分布在不连续的凹陷处</li>
+</ul>
+</li>
+</ul>
+<h4 id="两分支双指针">两分支双指针</h4>
+<ul>
+<li><a href="https://leetcode.cn/problems/compare-version-numbers/description/">165.比较版本号</a></li>
+</ul>
+<h3 id="滑动窗口">滑动窗口</h3>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/fruit-into-baskets/">904. 水果成篮</a></p>
+<ul>
+<li>基于双指针的滑动窗口</li>
+<li>必须使用滑动窗口保证水果是连续的，如果只使用哈希表，则可能出现中间有中断的情况</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/minimum-window-substring/">76. 最小覆盖子串</a>：<a href="https://leetcode.cn/problems/minimum-window-substring/submissions/498126388">代码</a></p>
+<ul>
+<li>对t统计词频，得到相同的两个ump：<code>tump</code>和<code>tmp_ump</code></li>
+<li>只移动右指针，找到s中第一个包含t的区间
+<ul>
+<li>移动右指针的过程中，逐步递减并erase<code>tmp_ump</code>中的元素，直到<code>tmp_ump</code>为空，此时就找到了s中第一个包含t的区间，同时维护区间的词频<code>win_ump</code></li>
+</ul>
+</li>
+<li>窗口进行移动：将<code>c=s[left++]</code>从<code>win_ump</code>中减一，同时左指针向右移动了一位，
+<ul>
+<li>如果此时<code>win_ump[c] &gt;= tump[c]</code>，说明c不在t中，或者c是t中是多余重复的，因此continue</li>
+<li>如果此时<code>win_ump[c] &lt; tump[c]</code>，说明c是t中的，需要右指针向右移动，再次找到c字符，因此得到了新的窗口</li>
+<li>技巧：可以<code>s+=' '</code>，避免最后跳出循环还要移动左指针，</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/longest-substring-without-repeating-characters/">3.无重复字符的最长子串</a> 【重要】</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/max-consecutive-ones-iii/description/">1004.最大连续1的个数Ⅲ</a></p>
+<ul>
+<li>两种思路
+<ul>
+<li><a href="https://leetcode.cn/problems/max-consecutive-ones-iii/submissions/496425055/">复杂的代码</a>：维护窗口内0的数量，但同时也分情况讨论左右断点的情况</li>
+<li><a href="https://leetcode.cn/problems/max-consecutive-ones-iii/submissions/496458757">简洁的代码</a>：找出一个最长的子数组，该子数组中最多有k个0，因此只需要维护窗口内0的数量即可</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="数组二刷">数组【二刷】</h2>
+<h3 id="模拟题">模拟题</h3>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/diagonal-traverse/description/">498.对角线遍历</a>：<code>i+j==level</code></p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/rotate-image/description/">48.旋转图像</a></p>
+<ul>
+<li>最重要的是找到原来<code>(i,j)</code>位置的元素，旋转之后在什么位置（<code>(j,n-i-1)</code>）</li>
+<li>矩阵变换的方法也是从上面的对应关系来的
+<ul>
+<li>先转置<code>(j,i)</code>，再水平翻转<code>(j,n-i-1)</code></li>
+<li>或者先垂直翻转<code>(n-i-1,j)</code>，再转置<code>(j,n-i-1)</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/spiral-matrix/description/">54.螺旋矩阵</a> 和 <a href="https://leetcode.cn/problems/spiral-matrix-ii/">59. 螺旋矩阵 II</a></p>
+<ul>
+<li>按圈遍历，设定四个逐步减小的边界</li>
+<li>每圈遍历中，判断新到达的位置是否超出边界，若是则改变方向</li>
+</ul>
+</li>
+</ul>
+<h3 id="二分查找">(二分)查找</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 假设v非递减
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="nf">find_first_ge</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">v</span><span class="p">,</span> <span class="kt">int</span> <span class="n">target</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 返回第一个&gt;=target的元素的索引（lower_bound）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">v</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">mid</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span><span class="p">(</span><span class="n">left</span> <span class="o">&lt;</span> <span class="n">right</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">mid</span> <span class="o">=</span> <span class="n">left</span> <span class="o">+</span> <span class="p">(</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">target</span><span class="p">)</span> <span class="n">right</span> <span class="o">=</span> <span class="n">mid</span><span class="p">;</span> <span class="c1">// target is in left part
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">target</span><span class="p">)</span> <span class="n">left</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// target is in right part
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">else</span> <span class="n">right</span> <span class="o">=</span> <span class="n">mid</span><span class="p">;</span> <span class="c1">// v[mid] == target, 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">left</span><span class="p">;</span> <span class="c1">// now left == right
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">find_first_gt</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">v</span><span class="p">,</span> <span class="kt">int</span> <span class="n">target</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 返回第一个&gt;target的元素的索引（upper_bound）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">v</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">mid</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span><span class="p">(</span><span class="n">left</span> <span class="o">&lt;</span> <span class="n">right</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">mid</span> <span class="o">=</span> <span class="n">left</span> <span class="o">+</span> <span class="p">(</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">target</span><span class="p">)</span> <span class="n">right</span> <span class="o">=</span> <span class="n">mid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">target</span><span class="p">)</span> <span class="n">left</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span> <span class="n">left</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// difference
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">left</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">find_last_le</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">v</span><span class="p">,</span> <span class="kt">int</span> <span class="n">target</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 返回最后一个&lt;=target的元素的索引
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="n">find_first_gt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// 即第一个&gt;target的元素的前一个位置
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">find_last_lt</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">v</span><span class="p">,</span> <span class="kt">int</span> <span class="n">target</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 返回最后一个&lt;target的元素的索引
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="n">find_first_ge</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// 即第一个&gt;=target的元素的前一个位置
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><a href="https://leetcode.cn/problems/search-a-2d-matrix-ii/description/">240.搜索二维矩阵Ⅱ</a>
+<ul>
+<li>方法一：从右上开始，按照搜索二叉树的逻辑查找</li>
+<li>方法二：每行进行一次二分查找</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/find-peak-element/">162.寻找峰值</a>
+<ul>
+<li>方法一：分治，类似归并排序，递归找最大值</li>
+<li>方法二：类似二分查找，判断nums[mid]与nums[mid+1]的大小关系（即判断中点是上坡还是下坡），从而修改左右索引
+<ul>
+<li>原理是因为开始时left和right都是最小值，此后mid部分永远是高点</li>
+<li>细节：在函数体中，left与right不相等，因此mid永远不会等于right，同时left与right是左闭右闭，<a href="https://leetcode.cn/problems/find-peak-element/submissions/494663427">代码</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>搜索旋转排序数组系列：是否有重复数字
+<ul>
+<li><a href="https://leetcode.cn/problems/search-in-rotated-sorted-array/description/">33.搜索旋转排序数组</a>：首先二分找到分界点，然后在左边或者右边再次进行二分（此时范围是有序的）</li>
+<li><a href="https://leetcode.cn/problems/search-in-rotated-sorted-array-ii/solutions/704686/sou-suo-xuan-zhuan-pai-xu-shu-zu-ii-by-l-0nmp/">81.搜索旋转排序数组Ⅱ</a>：尝试将问题转换到<a href="https://leetcode.cn/problems/search-in-rotated-sorted-array/description/">33.搜索旋转排序数组</a>，<a href="https://leetcode.cn/problems/search-in-rotated-sorted-array-ii/solutions/2606169/luo-ji-qing-xi-de-81sou-suo-xuan-zhuan-p-34qr/">我的题解</a></li>
+<li><a href="https://leetcode.cn/problems/find-minimum-in-rotated-sorted-array-ii/">154.寻找旋转排序数组中的最小值Ⅱ</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="排序">排序</h3>
+<ul>
+<li>
+<p>快排：在partition时，如果选left作为pivot，则需要先移动右边的指针，<a href="https://www.cnblogs.com/MAKISE004/p/16909610.html">原理</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">qSort</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">){</span> <span class="c1">// [left, right]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">left</span> <span class="o">&gt;=</span> <span class="n">right</span><span class="p">)</span> <span class="k">return</span> <span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">left</span><span class="o">+</span><span class="mi">1</span> <span class="o">==</span> <span class="n">right</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="p">])</span> <span class="k">return</span> <span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span> <span class="p">{</span><span class="n">swap</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="p">]);</span> <span class="k">return</span> <span class="p">;}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 左中右，取中间大小的值，放在最左边
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">int</span> <span class="n">begin</span> <span class="o">=</span> <span class="n">left</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">right</span><span class="p">,</span> <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">pivot</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">min</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="p">]),</span> <span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="p">]</span> <span class="o">==</span> <span class="n">pivot</span><span class="p">)</span> <span class="n">swap</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">==</span> <span class="n">pivot</span><span class="p">)</span> <span class="n">swap</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 注意元素是覆盖的
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">while</span><span class="p">(</span><span class="n">left</span> <span class="o">&lt;</span> <span class="n">right</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">while</span><span class="p">(</span><span class="n">left</span> <span class="o">&lt;</span> <span class="n">right</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">pivot</span><span class="p">)</span> <span class="o">--</span><span class="n">right</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="k">while</span><span class="p">(</span><span class="n">left</span> <span class="o">&lt;</span> <span class="n">right</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">pivot</span><span class="p">)</span> <span class="o">++</span><span class="n">left</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="c1">// now: left == right
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">]</span> <span class="o">=</span> <span class="n">pivot</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 缩小中轴范围，尤其针对重复元素多的数组
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">while</span><span class="p">(</span><span class="n">left</span> <span class="o">&gt;</span> <span class="n">begin</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">]</span> <span class="o">==</span> <span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">--</span><span class="n">left</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span><span class="p">(</span><span class="n">right</span> <span class="o">&lt;</span> <span class="n">end</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="p">]</span> <span class="o">==</span> <span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="o">++</span><span class="n">right</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">qSort</span><span class="p">(</span><span class="n">nums</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">left</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">qSort</span><span class="p">(</span><span class="n">nums</span><span class="p">,</span> <span class="n">right</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">end</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>归并排序</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 归并排序需要辅助数组，因为前后两个有序数组是连着的，
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">mergeSort</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">out</span><span class="p">,</span> <span class="kt">int</span> <span class="n">begin</span><span class="p">,</span> <span class="kt">int</span> <span class="n">end</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">in</span><span class="p">){</span> <span class="c1">// [begin, end)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">begin</span> <span class="o">&gt;=</span> <span class="n">end</span> <span class="o">||</span> <span class="n">begin</span><span class="o">+</span><span class="mi">1</span> <span class="o">==</span> <span class="n">end</span><span class="p">)</span> <span class="k">return</span> <span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">begin</span> <span class="o">+</span> <span class="n">end</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">mergeSort</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">mid</span><span class="p">,</span> <span class="n">in</span><span class="p">);</span> <span class="c1">// [begin, mid)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">mergeSort</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">mid</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">in</span><span class="p">);</span> <span class="c1">// [mid, end)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// now left part and right part are all sorted, merge them into out
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">begin</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">mid</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">mid</span> <span class="o">&amp;&amp;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">in</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">in</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">in</span><span class="p">[</span><span class="n">i</span><span class="o">++</span><span class="p">];</span> <span class="c1">// stable
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">else</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">in</span><span class="p">[</span><span class="n">j</span><span class="o">++</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">mid</span><span class="p">)</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">in</span><span class="p">[</span><span class="n">i</span><span class="o">++</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span><span class="p">(</span><span class="n">j</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">)</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">in</span><span class="p">[</span><span class="n">j</span><span class="o">++</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// copy out back to in
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">s</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span> <span class="n">s</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">s</span><span class="p">)</span> <span class="n">in</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">s</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>堆排序</p>
+<ul>
+<li>
+<p>第一种方法：数组原地构建最大堆，数组原地进行排序</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">heapSort</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">buildMaxHeap</span><span class="p">(</span><span class="n">nums</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">len</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;</span><span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">i</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">swap</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span> <span class="c1">// 将最大堆的首元素（最大元素）放在数组后面位置
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">adjust</span><span class="p">(</span><span class="n">nums</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">--</span><span class="n">len</span><span class="p">);</span> <span class="c1">// 首元素变了，因此需要调整，同时堆的长度减一
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">buildMaxHeap</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">i</span><span class="p">){</span> <span class="c1">// n/2-1是最后一个非叶节点，依次向上检测和调整每个非叶节点
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">adjust</span><span class="p">(</span><span class="n">nums</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>    
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">adjust</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">,</span> <span class="kt">int</span> <span class="n">idx</span><span class="p">,</span> <span class="kt">int</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 当前节点的索引为idx，在[0, len)范围内是最大堆
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">while</span><span class="p">(</span><span class="n">idx</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span> <span class="n">leftSon</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span> <span class="n">rightSon</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span> <span class="n">largeIdx</span> <span class="o">=</span> <span class="n">idx</span><span class="p">;</span> <span class="c1">// largeIdx指向{根节点，左孩子，右孩子}中较大的值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">if</span><span class="p">(</span><span class="n">leftSon</span> <span class="o">&lt;</span> <span class="n">len</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="p">[</span><span class="n">leftSon</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">nums</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="n">largeIdx</span> <span class="o">=</span> <span class="n">leftSon</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">rightSon</span> <span class="o">&lt;</span> <span class="n">len</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="p">[</span><span class="n">rightSon</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">nums</span><span class="p">[</span><span class="n">largeIdx</span><span class="p">])</span> <span class="n">largeIdx</span> <span class="o">=</span> <span class="n">rightSon</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">largeIdx</span> <span class="o">!=</span> <span class="n">idx</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">            <span class="n">swap</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="n">largeIdx</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">idx</span> <span class="o">=</span> <span class="n">largeIdx</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span><span class="k">else</span> <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>第二种方法：数组构建最小堆，依次弹出</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 手写堆
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">minHeap</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">heap</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">minHeap</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span><span class="o">:</span> <span class="n">heap</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span> <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">        <span class="n">len</span> <span class="o">=</span> <span class="n">heap</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// build minHeap
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">i</span><span class="p">)</span> <span class="n">adjust</span><span class="p">(</span><span class="n">i</span><span class="p">);</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">adjust</span><span class="p">(</span><span class="kt">int</span> <span class="n">idx</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">while</span><span class="p">(</span><span class="n">idx</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">            <span class="kt">int</span> <span class="n">leftSon</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="kt">int</span> <span class="n">rightSon</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="kt">int</span> <span class="n">largeIdx</span> <span class="o">=</span> <span class="n">idx</span><span class="p">;</span> <span class="c1">// largeIdx指向{根节点，左孩子，右孩子}中较大的值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="k">if</span><span class="p">(</span><span class="n">leftSon</span> <span class="o">&lt;</span> <span class="n">len</span> <span class="o">&amp;&amp;</span> <span class="n">heap</span><span class="p">[</span><span class="n">leftSon</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">heap</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="n">largeIdx</span> <span class="o">=</span> <span class="n">leftSon</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span><span class="p">(</span><span class="n">rightSon</span> <span class="o">&lt;</span> <span class="n">len</span> <span class="o">&amp;&amp;</span> <span class="n">heap</span><span class="p">[</span><span class="n">rightSon</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">heap</span><span class="p">[</span><span class="n">largeIdx</span><span class="p">])</span> <span class="n">largeIdx</span> <span class="o">=</span> <span class="n">rightSon</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span><span class="p">(</span><span class="n">largeIdx</span> <span class="o">!=</span> <span class="n">idx</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">                <span class="n">swap</span><span class="p">(</span><span class="n">heap</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">heap</span><span class="p">[</span><span class="n">largeIdx</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">                <span class="n">idx</span> <span class="o">=</span> <span class="n">largeIdx</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span><span class="k">else</span> <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>        
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="nf">top</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">heap</span><span class="p">[</span><span class="mi">0</span><span class="p">];}</span> <span class="c1">// return min value
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="kt">void</span> <span class="nf">pop</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">swap</span><span class="p">(</span><span class="n">heap</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">heap</span><span class="p">[</span><span class="o">--</span><span class="n">len</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">adjust</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 或者调用优先队列
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">heapSort</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">priority_queue</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">greater</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">pq</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="nl">n</span><span class="p">:</span> <span class="n">nums</span><span class="p">)</span> <span class="n">pq</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">ans</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="n">pq</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="p">{</span><span class="n">ans</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">pq</span><span class="p">.</span><span class="n">top</span><span class="p">());</span> <span class="n">pq</span><span class="p">.</span><span class="n">pop</span><span class="p">();}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">ans</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/largest-number/description/">179.最大数</a></p>
+<ul>
+<li>巧妙的自定义排序规则：<code>a+b&lt;b+a</code></li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/kth-largest-element-in-an-array/description/">215.数组中的第k个最大元素</a> 【重要】</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">findKthLargest</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">,</span> <span class="kt">int</span> <span class="n">begin</span><span class="p">,</span> <span class="kt">int</span> <span class="n">end</span><span class="p">,</span> <span class="kt">int</span> <span class="n">k</span><span class="p">){</span> <span class="c1">// [begin, end), 快排逻辑
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">begin</span><span class="o">+</span><span class="mi">1</span> <span class="o">==</span> <span class="n">end</span><span class="p">)</span> <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="n">begin</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">begin</span><span class="o">+</span><span class="mi">2</span> <span class="o">==</span> <span class="n">end</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="n">begin</span><span class="p">)</span> <span class="k">return</span> <span class="n">max</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">begin</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="n">begin</span><span class="o">+</span><span class="mi">1</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="n">begin</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="n">min</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">begin</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="n">begin</span><span class="o">+</span><span class="mi">1</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="n">begin</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">end</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="c1">// [left, right]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">int</span> <span class="n">pivot</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">while</span><span class="p">(</span><span class="n">left</span> <span class="o">&lt;</span> <span class="n">right</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">while</span><span class="p">(</span><span class="n">left</span> <span class="o">&lt;</span> <span class="n">right</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">pivot</span><span class="p">)</span> <span class="o">--</span><span class="n">right</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="k">while</span><span class="p">(</span><span class="n">left</span> <span class="o">&lt;</span> <span class="n">right</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">pivot</span><span class="p">)</span> <span class="o">++</span><span class="n">left</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">mid</span> <span class="o">=</span> <span class="n">left</span><span class="p">;</span> <span class="c1">// now left == right        
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">=</span> <span class="n">pivot</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">mid</span><span class="p">)</span> <span class="k">return</span> <span class="n">pivot</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span> <span class="o">&lt;</span> <span class="n">mid</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">while</span><span class="p">(</span><span class="n">mid</span> <span class="o">&gt;</span> <span class="n">k</span><span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">==</span> <span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">--</span><span class="n">mid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">findKthLargest</span><span class="p">(</span><span class="n">nums</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">mid</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">);</span> <span class="c1">// 注意这里还是传入[begin, mid+1)而非[begin, mid)，因为经过while优化，此时mid可以退到和begin位置相同
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">{</span> <span class="c1">// k-1 &gt; mid
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">while</span><span class="p">(</span><span class="n">mid</span> <span class="o">&lt;</span> <span class="n">k</span><span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">==</span> <span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="o">++</span><span class="n">mid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">findKthLargest</span><span class="p">(</span><span class="n">nums</span><span class="p">,</span> <span class="n">mid</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">k</span><span class="p">);</span> <span class="c1">// 注意这里还是传入[mid, end)而非[mid+1, end)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p><a href="https://leetcode.cn/problems/smallest-k-lcci/description/">剑指40.最小k个数</a>：快排逻辑</p>
+</li>
+</ul>
+<h3 id="套路题">套路题</h3>
+<ul>
+<li><a href="https://leetcode.cn/problems/longest-common-prefix/description/">14.最长公共前缀</a>
+<ul>
+<li>按行比，按列比，都行</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/minimum-size-subarray-sum/">209.长度最小的子数组</a>
+<ul>
+<li>方法一：贪心+双指针</li>
+<li>方法二：前缀和+二分
+<ul>
+<li>细节较多：前缀和是inclusive的还是exculsive的（<a href="https://leetcode.cn/problems/minimum-size-subarray-sum/submissions/494871477">这里</a>用的是exculsive的），二分找的是第一个大于val的位置</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/diao-zheng-shu-zu-shun-xu-shi-qi-shu-wei-yu-ou-shu-qian-mian-lcof/description/">剑指21.调整数组顺序使奇数位于偶数前面</a>
+<ul>
+<li>如果不需要保持奇数/偶数内部的相对顺序，左右双指针向内走</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/majority-element/description/">169.多数元素</a>
+<ul>
+<li>投票法：维护一个元素值value和计数值cnt，数组元素等于value时累加cnt，不等于value时递减cnt，当cnt==0时更新value</li>
+<li>可以保证最后众数的cnt至少为1</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/longest-consecutive-sequence/description/">128.最长连续序列</a>
+<ul>
+<li>哈希表<code>unordered_map&lt;int, bool&gt;</code>（bool表示是否使用过该数字），元素往前往后分别试探</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/next-permutation/description/">31.下一个排列</a> ： <a href="https://leetcode.cn/problems/next-permutation/solutions/2547378/jiao-ni-yi-bu-yi-bu-xie-chu-zui-jian-dai-saaz">题解</a>  与<a href="https://leetcode.cn/problems/next-greater-element-iii/description/">556.下一个更大元素Ⅲ</a>相同
+<ul>
+<li>从后往前遍历，找到一个最长的后缀，这个后缀是逆序的（即该后缀从前往后看递减，从后往前看递增）</li>
+<li>该最长后缀前面一个元素<code>nums[idx]</code>，是小于最长后缀的第一个元素的</li>
+<li>在该最长后缀中，找到最后一个<code>&gt;nums[idx]</code>的元素<code>nums[pos]</code>，然后交换（因此最长后缀又变长了一位）</li>
+<li>最后<code>reverse[idx+1, end)</code>，因此数组前面部分不动，后面部分得到了下一个排列</li>
+</ul>
+</li>
+</ul>
+<h3 id="综合">综合</h3>
+<ul>
+<li><a href="https://leetcode.cn/problems/subarray-sum-equals-k/description/">560.和为K的子数组</a>：【前缀和】+【哈希表】
+<ul>
+<li>通过前缀和可以将区间和转换为两个点的查询</li>
+<li>通过哈希表记录遍历过的位置的前缀和（value是特定前缀和的计数）</li>
+<li>现在已知一个点和中间差值，通过哈希找到另一个点</li>
+<li>区别<a href="https://leetcode.cn/problems/minimum-size-subarray-sum/">209.长度最小的子数组</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="字符串">字符串</h3>
+<h4 id="模拟">模拟</h4>
+<ul>
+<li><a href="https://leetcode.cn/problems/add-strings/">415.字符串相加</a>  <a href="https://leetcode.cn/problems/multiply-strings/description/">43.字符串相乘</a></li>
+<li><a href="https://leetcode.cn/problems/string-compression/description/">443.压缩字符串</a></li>
+<li><a href="https://leetcode.cn/problems/zigzag-conversion/description/">6.Z字形变换</a></li>
+<li><a href="https://leetcode.cn/problems/validate-ip-address/description/">468.验证IP地址</a>：先判断有<code>.</code>还是<code>:</code>，然后根据<code>.</code>或者<code>:</code>分割之后，逐段判断</li>
+<li><a href="https://leetcode.cn/problems/reverse-integer/description/">7.整数反转</a>：用字符串表示数字</li>
+<li><a href="https://leetcode.cn/problems/fraction-to-recurring-decimal/description/">166.分数到小数</a>：首先注意符号问题，然后注意能否整除，最后逐次<code>*10</code>模拟竖式除法</li>
+</ul>
+<h4 id="套路">套路</h4>
+<ul>
+<li>
+<p>翻转字符串的妙用：局部翻转后再整体反转（或反过来），达到子串位置颠倒的效果</p>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/reverse-words-in-a-string/">151. 反转字符串中的单词</a></p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/zuo-xuan-zhuan-zi-fu-chuan-lcof/">LCR 182. 动态口令</a></p>
+</li>
+</ul>
+</li>
+<li>
+<p>KMP系列</p>
+<ul>
+<li><a href="https://www.programmercarl.com/0028.%E5%AE%9E%E7%8E%B0strStr.html#%E7%AE%97%E6%B3%95%E5%85%AC%E5%BC%80%E8%AF%BE">实现strStr</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="链表二刷">链表【二刷】</h2>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/reverse-linked-list/">206. 反转链表</a></p>
+<ul>
+<li>
+<p>注意递归写法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">ListNode</span><span class="o">*</span> <span class="nf">reverseList</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 递归，返回反转链表的头
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">head</span><span class="o">==</span><span class="k">nullptr</span> <span class="o">||</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">==</span><span class="k">nullptr</span><span class="p">)</span> <span class="k">return</span> <span class="n">head</span><span class="p">;</span> <span class="c1">// 当前是空节点，或者是最后一个节点    
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">newHead</span> <span class="o">=</span> <span class="n">reverseList</span><span class="p">(</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">);</span> <span class="c1">// 已经将head-&gt;next部分的链表处理完毕
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span>  <span class="o">=</span> <span class="n">head</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">    <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">newHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>迭代写法1：遍历，修改相邻节点的指针指向</p>
+</li>
+<li>
+<p>迭代写法2：创建<strong>虚拟头节点</strong>，进行<strong>头插法</strong>（遍历链表，插入到虚拟头节点之后）</p>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/linked-list-cycle-ii/">142. 环形链表 II</a> 【好题】</p>
+<ul>
+<li>快慢指针可以判断有环</li>
+<li><a href="https://www.programmercarl.com/0142.%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8II.html#%E6%80%9D%E8%B7%AF">如何找到这个环的入口</a></li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/sort-list/description/">148.排序链表</a></p>
+<ul>
+<li>递归方法：（自顶向下的）归并排序，时间复杂度O(n logn)，空间复杂度O(logn)</li>
+<li>迭代方法：自底向上的归并排序，时间复杂度O(n logn)，空间复杂度O(1)</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/reorder-list/description/">143.重排链表</a> 【好题】</p>
+<ul>
+<li>先快慢指针寻找中点，然后后半段链表原地反转，最后两个链表合并</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/merge-k-sorted-lists/description/">23.合并K个升序链表</a></p>
+<ul>
+<li>最小堆：<code>priority_queue&lt;ListNode*, vector&lt;ListNode*&gt;, decltype(cmp)&gt; pq;</code></li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/add-two-numbers-ii/description/">445.两数相加Ⅱ</a></p>
+<ul>
+<li>一种方法是反转链表，另一种是使用栈进行计算</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/lru-cache-lcci/description/">LRU缓存</a> 【好题】</p>
+<ul>
+<li>两点注意：
+<ul>
+<li>设置dummyHead与dummyTail，可以避免专门判断head与tail是否为空（因为是双向链表，所以要设置头尾两个dummyNode）</li>
+<li>在Node中需要同时包含key和value，因为当删除某个node时，需要知道其对应的key，从而删除哈希表中对应的表项</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="递归">递归</h3>
+<p>递归写法代码量一般比较少，也比较优雅，尤其在没有头节点的情况下避免对头节点另外判断</p>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/copy-list-with-random-pointer/description/">138.随机链表的复制</a></p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/merge-two-sorted-lists/">21.合并两个有序链表</a></p>
+</li>
+</ul>
+<h2 id="哈希表二刷">哈希表【二刷】</h2>
+<ul>
+<li>
+<p>有时可以直接使用数组进行哈希，有时需要使用map（unordered_map）或set（unordered_set）进行哈希，注意如果键无法进行哈希，则无法使用unordered_map或unordered_set（比如vector容器就没有hash方法，不能作为unordered_map或unordered_set的键）</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/happy-number/description/">202.快乐数</a>：使用哈希表空间复杂度为O(n)，将其视为快慢指针此时空间复杂度为O(1)</p>
+</li>
+<li>
+<p>n数之和系列：给定n数之和</p>
+<ul>
+<li>
+<p>给定一个数组，要求返回其中一个元组下标：哈希</p>
+<ul>
+<li><a href="https://leetcode.cn/problems/two-sum/">1. 两数之和</a></li>
+</ul>
+</li>
+<li>
+<p>给定一个数组，要求返回所有元组下标：先排序，外层遍历，内层左右指针向中移动，根据当前三数之和确定左指针还是右指针移动，同时注意跳过相同的数字</p>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/3sum/">15. 三数之和</a></p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/4sum/">18. 四数之和</a>：注意四数之和可能超过int的范围</p>
+</li>
+</ul>
+</li>
+<li>
+<p>给定多个数组，要求返回元组的个数：哈希</p>
+<ul>
+<li><a href="https://leetcode.cn/problems/4sum-ii/">454. 四数相加 II</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>【原地哈希】</p>
+<ul>
+<li>
+<p>例题：<a href="https://leetcode.cn/problems/shu-zu-zhong-zhong-fu-de-shu-zi-lcof/description/">LCR 120.寻找文件副本</a>：可能有多个重复数字，返回任意其一</p>
+<ul>
+<li>调整数组为<code>nums[i]==i</code>，如果将i写入到nums[i]时发现原来已经<code>nums[i]==i</code>，说明i就是重复数字</li>
+<li>方法：<a href="https://leetcode.cn/problems/shu-zu-zhong-zhong-fu-de-shu-zi-lcof/submissions/494982727/">通过交换实现调整</a></li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/find-all-duplicates-in-an-array/description/">442.数组中重复的数据</a>：数字出现1或2次，返回所有出现两次的数字</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/find-the-duplicate-number/description/">287.寻找重复数</a>：只有一个重复数，返回之；但是不能修改原数组</p>
+<ul>
+<li>Floyd判圈</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/missing-number/description/">268.丢失的数字</a>：只有一个缺失的数字，返回之</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/first-missing-positive/submissions/495038497">41.缺失的第一个正数 </a>：首先要判断数字是否在<code>[0,n]</code>的范围内</p>
+</li>
+<li>
+<p>总结：虽然原地哈希的核心部分都是判断当前位置j的元素<code>j=nums[i]</code>为索引时，是否已经写入<code>j?=nums[j]</code>，但是中间很多细节略微不同</p>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/subarray-sums-divisible-by-k/">974.和可被K整除的子数组</a>：前缀和+哈希表</p>
+<ul>
+<li>前缀和实际上是前缀和的取模，使用哈希表记录模和其计数</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/integer-to-roman/description/">12.整数转罗马数字</a></p>
+<ul>
+<li>哈希表记录数字到字符串的映射，注意使用<code>map&lt;int, string, greater&lt;int&gt;&gt;</code>将key从大到小排列</li>
+</ul>
+</li>
+</ul>
+<h2 id="栈与队列二刷">栈与队列【二刷】</h2>
+<ul>
+<li>用栈模拟队列：一个输入栈，一个输出栈</li>
+<li>用队列模拟栈：只需要一个队列，将元素进行循环弹入弹出</li>
+<li>优先队列
+<ul>
+<li>注意优先队列如何自定义比较顺序</li>
+</ul>
+</li>
+</ul>
+<h3 id="栈">栈</h3>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/basic-calculator-ii/description/">基本计算器Ⅱ</a>：遇到加减法入栈（即栈内都进行加法运算），有两种不太相同的写法：比如<code>a+b*c</code></p>
+<ul>
+<li>方法一：<a href="https://leetcode.cn/problems/basic-calculator-ii/submissions/497469850">暂存数字</a>。比如解析<code>+</code>时，暂存的是数字a，此时可以入栈；比如解析<code>*</code>时，暂存的是数字b（运算符前面的数字），此时先不能入栈，需要继续向后解析完c之后，更新暂存的数字</li>
+<li>方法二：<a href="https://leetcode.cn/problems/basic-calculator-ii/submissions/497709896">暂存数字前的运算符</a>，更简洁。比如解析b时，当前暂存的运算符是<code>+</code>（数字前面的运算符），因此遇到新的运算符<code>*</code>时，根据需要出栈入栈
+<ul>
+<li>技巧：将<code>a+b*c</code>处理成<code>a+b*c+0</code>，且开始时暂存的运算符是<code>+</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/decode-string/">394.字符串解码</a>：【重要】</p>
+<ul>
+<li>方法一：【双栈】<a href="https://leetcode.cn/problems/decode-string/submissions/497922753">写法</a>，数字栈与string栈
+<ul>
+<li>字符串出栈时，每个元素需要先reverse，连起来字符串之后要再次reverse（因为出栈是逆序的，每个元素内部有时顺序的）</li>
+<li>数字栈使用<code>stack&lt;int&gt;</code>，string栈使用<code>deque&lt;string&gt;</code>进行模拟，方便最后进行出栈</li>
+</ul>
+</li>
+<li>方法二：<a href="https://leetcode.cn/problems/decode-string/submissions/497938583">递归写法</a>
+<ul>
+<li>全局的索引<code>idx</code>，函数传参<code>string</code>和重复数量<code>cnt</code></li>
+<li>如果遇到<code>[</code>，则进入递归；如果遇到<code>]</code>，则退出递归</li>
+<li>递归就是顺着累加字符串，不需要reverse</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/valid-parenthesis-string/description/">678.有效的括号字符串</a>：</p>
+<ul>
+<li>方法一：【双栈】
+<ul>
+<li>括号一个栈<code>st</code>，星号一个栈<code>star_st</code>，栈内存放下标</li>
+<li>括号按照传统方法出入栈，星号直接入星号栈</li>
+<li>在遍历完成之后，括号栈依次出栈，
+<ul>
+<li>如果当前是<code>(</code>，需要保证<code>star_st.top()</code>大于<code>(</code>的下标</li>
+<li>如果当前是<code>)</code>，需要保证<code>star_st.top()</code>小于<code>)</code>的下标（极其注意需要当前<code>star_st.top()</code>可能大于<code>)</code>的下标，需要while依次出栈，与上面逻辑不同）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>方法二：贪心
+<ul>
+<li>维护未匹配的<code>(</code>的数量可能的最大值和最小值，遇到星号时，最小值减一，最大值加一
+<ul>
+<li>如果最大值<code>&lt;0</code>，则字符串无效</li>
+</ul>
+</li>
+<li>遍历完成后，只有最小值=0时，字符串才可能有效</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/min-stack/description/">最小栈</a>  <a href="https://leetcode.cn/problems/min-stack/solutions/42521/xiang-xi-tong-su-de-si-lu-fen-xi-duo-jie-fa-by-38/">参考</a></p>
+<ul>
+<li>方法一：【双栈】
+<ul>
+<li>一个普通栈，一个最小栈（用来记录最小值）</li>
+<li>如果当前元素<code>==minStack.top()</code>，也要push/pop最小栈</li>
+</ul>
+</li>
+<li>方法二：使用一个栈，并维护当前最小值<code>minVal</code>
+<ul>
+<li>入栈：如果当前元素<code>&lt;=minVal</code>，则先将minVal入栈，然后再将当前元素入栈，同时更新minVal的值；否则直接入栈</li>
+<li>技巧：minVal初始值设定为最大值</li>
+</ul>
+</li>
+<li>方法三：使用一个栈
+<ul>
+<li>每次入栈元素为<code>当前元素-minVal -&gt; st.top()</code>，如果结果是负数，说明minVal需要更新<code>minVal=当前元素</code></li>
+<li>每次出栈或top，如果栈顶元素是正数，则<code>原来的元素=minVal+st.top()</code>；如果栈顶元素是负数，则说明当前minVal经过更新变得更小，<code>原来的元素=minVal</code>，复原原来的<code>minVal=原来的元素(即旧的minVal)-st.top()</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="单调队列">单调队列</h3>
+<ul>
+<li><a href="https://leetcode.cn/problems/sliding-window-maximum/">239. 滑动窗口最大值</a>
+<ul>
+<li>方法一：大根堆，维护一个大根堆，里面存放数组索引，但是比较方法是按照对应元素大小进行比较，出队列时肯定是当前最大元素，而且可以判断该元素是否在窗口范围内
+<ul>
+<li>最坏情况如果是一个递增序列，每次push都是<code>log(i)</code>的复杂度，总的复杂度为<code>sum(log(i))=O(n log(n))</code></li>
+</ul>
+</li>
+<li>方法二：单调队列，维护一个<strong>递增的<code>deque</code></strong>，里面存放数组索引，从后面<code>pop_back</code>可以比较当前元素与队尾元素，保持队列递增；从前面<code>pop_front</code>可以保持元素位于窗口范围内
+<ul>
+<li>最坏情况是<code>O(n)</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="单调栈">单调栈</h3>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/daily-temperatures/">739. 每日温度</a>：从左往右，找到第一个比当前元素大的元素</p>
+</li>
+<li>
+<p>单调递增栈（从栈顶到栈底递增，栈顶元素为已经遍历过部分的最小值），如果当前元素nums[i]大于栈顶元素nums[top]，则从左往右nums[top]第一个比它大的元素是nums[i]</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/next-greater-element-i/">496. 下一个更大元素 I</a>：单调栈+哈希表</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/next-greater-element-ii/">503. 下一个更大元素 II</a>：朴素想法是将循环数组展开，但是可以相同的单调栈代码跑两遍（第二遍继续使用第一遍剩下的单调栈）</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/trapping-rain-water/">42. 接雨水</a>  【重要】</p>
+</li>
+<li>
+<p>方法一：单调栈，从栈顶到栈底递增（反映到柱子上就是往下的台阶）</p>
+<ul>
+<li>横着接水：如果当前元素<code>height[i]</code>高于栈顶的柱子<code>H=height[st.top()]</code>，则栈顶的柱子<code>H</code>为最低高度，pop之后的栈顶为左边比H更高的位置，当前位置i为右边比H更高的位置，横着按层累加</li>
+<li>时间复杂度O(n)，空间复杂度O(n)</li>
+</ul>
+</li>
+<li>
+<p>方法二：双指针</p>
+<ul>
+<li>竖着接水：维护左右边历史最高柱子，往中间移动的过程中：
+<ul>
+<li>如果右边低，当前水位最高只能按照低的来，<code>ans += rightHeight - height[right--]</code></li>
+<li>左边同理</li>
+</ul>
+</li>
+<li>时间复杂度O(n)，空间复杂度O(1)</li>
+</ul>
+</li>
+<li>
+<p>方法三：两个数组，分别从左向右和从右向左记录当前最高水位，也是竖着接水</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/largest-rectangle-in-histogram/">84. 柱状图中最大的矩形 </a> 【重要】</p>
+</li>
+<li>
+<p>单调栈，从栈顶到栈底递减（反应到柱子上就是往上的台阶）</p>
+<ul>
+<li>找每个柱子左右两边第一个低于该柱子的位置：如果当前元素<code>height[i]</code>低于栈顶的柱子<code>H=height[st.top()]</code>，有：
+<ul>
+<li><code>i-1</code>位置的柱子一定不低于H</li>
+<li>pop之后的栈顶位置+1一定不低于H（注意与接雨水的细微区别）</li>
+<li>因此可以算面积</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>时间复杂度O(n)，空间复杂度O(n)</p>
+</li>
+<li>
+<p>技巧：在原来height数组开头<code>height.insert(heights.begin(), 0)</code>，在结尾<code>height.push_back(0)</code>，可以保证最后栈中无元素</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/maximal-rectangle/description/">85.最大矩形</a></p>
+<ul>
+<li>每行统计高度，因此每行跑一个<a href="https://leetcode.cn/problems/largest-rectangle-in-histogram/">84. 柱状图中最大的矩形 </a></li>
+<li>时间/空间复杂度均为O(mn)</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/remove-k-digits/">402. 移掉 K 位数字</a></p>
+<ul>
+<li>单调栈：从栈底到栈顶递增，同时维护栈的顺序和<code>k&gt;0</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="优先队列">优先队列</h3>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/top-k-frequent-elements/description/">347.前K个高频元素</a>：小根堆，遍历过程中逐步弹出堆顶，剩下的就是高频元素</p>
+<ul>
+<li>
+<p>注意优先队列的写法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">cmp</span> <span class="o">=</span> <span class="p">[](</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">p1</span><span class="p">,</span> <span class="n">pair</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">p2</span><span class="p">){</span><span class="k">return</span> <span class="n">p1</span><span class="p">.</span><span class="n">second</span> <span class="o">&gt;</span> <span class="n">p2</span><span class="p">.</span><span class="n">second</span><span class="p">;};</span>
+</span></span><span class="line"><span class="cl"><span class="n">priority_queue</span><span class="o">&lt;</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="k">decltype</span><span class="p">(</span><span class="n">cmp</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">pq</span><span class="p">(</span><span class="n">cmp</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+</li>
+<li>
+<p>手写堆</p>
+</li>
+</ul>
+<h2 id="二叉树二刷">二叉树【二刷】</h2>
+<h3 id="遍历">遍历</h3>
+<h4 id="dfs">DFS</h4>
+<ul>
+<li>
+<p>递归写法：</p>
+<ul>
+<li>确定递归函数的参数和返回值</li>
+<li>确定终止条件</li>
+<li>确定单层递归的逻辑</li>
+</ul>
+</li>
+<li>
+<p>迭代写法：</p>
+<ul>
+<li>
+<p>道理：当前arrive（或access）的节点，未必就是要add进数组的节点</p>
+<ul>
+<li>前序：第一次arrive的节点，就是add进数组的节点</li>
+<li>中序：第二次arrive的节点，就是add进数组的节点</li>
+</ul>
+</li>
+<li>
+<p>前序：空节点不入栈</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">preorderTraversal</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">v</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">stack</span><span class="o">&lt;</span><span class="n">TreeNode</span><span class="o">*&gt;</span> <span class="n">st</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">root</span> <span class="o">==</span> <span class="k">nullptr</span><span class="p">)</span> <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">st</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="n">st</span><span class="p">.</span><span class="n">empty</span><span class="p">()){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">TreeNode</span><span class="o">*</span> <span class="n">now</span> <span class="o">=</span> <span class="n">st</span><span class="p">.</span><span class="n">top</span><span class="p">();</span> <span class="n">st</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">v</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">now</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">now</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span> <span class="n">st</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">now</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">now</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span> <span class="n">st</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">now</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>中序：空节点可以入栈，使用now指向当前arrive的节点</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">inorderTraversal</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">v</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">stack</span><span class="o">&lt;</span><span class="n">TreeNode</span><span class="o">*&gt;</span> <span class="n">st</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TreeNode</span><span class="o">*</span> <span class="n">now</span> <span class="o">=</span> <span class="n">root</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span><span class="p">(</span><span class="n">now</span> <span class="o">!=</span> <span class="k">nullptr</span> <span class="o">||</span> <span class="o">!</span><span class="n">st</span><span class="p">.</span><span class="n">empty</span><span class="p">()){</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 比如中间-&gt;可能now指向空指针，此时stack不能为空
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//         -&gt;可能stack为空，但是now指向右节点
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// 最后now指向某个节点的右空树，且stack都出栈已经为空，此时就是结束
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">if</span><span class="p">(</span><span class="n">now</span> <span class="o">==</span> <span class="k">nullptr</span><span class="p">){</span> 
+</span></span><span class="line"><span class="cl">            <span class="n">now</span> <span class="o">=</span> <span class="n">st</span><span class="p">.</span><span class="n">top</span><span class="p">();</span> <span class="n">st</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span> <span class="c1">// st.top()是第二次访问，可以add进数组
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">v</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">now</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">now</span> <span class="o">=</span> <span class="n">now</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">{</span> <span class="c1">// now != nullptr
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">st</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">now</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">now</span> <span class="o">=</span> <span class="n">now</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>后序：可以按照【根右左】的顺序遍历，然后reverse（即左右根）</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="bfs">BFS</h4>
+<p>迭代写法：注意是否要分层；如果不用分层，则不用计算每层的size，更简单一些</p>
+<p>递归写法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">levelOrder</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">vv</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bfs</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">vv</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">bfs</span><span class="p">(</span><span class="n">TreeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;&amp;</span> <span class="n">vv</span><span class="p">,</span> <span class="kt">int</span> <span class="n">depth</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">root</span> <span class="o">==</span> <span class="k">nullptr</span><span class="p">)</span> <span class="k">return</span> <span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">vv</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="n">depth</span><span class="p">)</span> <span class="n">vv</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">vv</span><span class="p">[</span><span class="n">depth</span><span class="p">].</span><span class="n">push_back</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span> <span class="n">bfs</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">depth</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span> <span class="n">bfs</span><span class="p">(</span><span class="n">root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">vv</span><span class="p">,</span> <span class="n">depth</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><a href="https://leetcode.cn/problems/binary-tree-right-side-view/description/">199.二叉树的右视图</a>：注意递归的写法，将深度和当前数组的size比较</li>
+</ul>
+<h3 id="二叉树">二叉树</h3>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/count-complete-tree-nodes/description/">222.完全二叉树的节点个数 </a> 【好题】</p>
+<ul>
+<li>如何判断满二叉树？向左递归深度==向右递归深度</li>
+<li>完全二叉树中，某个节点左子树和右子树中，至少有一个是满二叉树，<a href="https://leetcode.cn/problems/count-complete-tree-nodes/solutions/2076036/labuladong-ru-he-ji-suan-wan-quan-er-cha-f55d/">参考</a></li>
+<li>复杂度分析：
+<ul>
+<li>每次递归需要计算当前节点的高度，O(log n)</li>
+<li>最多需要调用“树的高度”次，O(log n)</li>
+<li>相乘，O(log n) * O(log n)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://www.programmercarl.com/0110.%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91.html#%E9%A2%98%E5%A4%96%E8%AF%9D">110.平衡二叉树</a></p>
+<ul>
+<li>注意二叉树节点【深度】和【高度】的差异
+<ul>
+<li>高度：该节点到叶子节点的最长，求高度适合用前序遍历</li>
+<li>深度：根节点到该节点的路径，求深度适合用后序遍历</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://www.programmercarl.com/0112.%E8%B7%AF%E5%BE%84%E6%80%BB%E5%92%8C.html#%E6%80%9D%E8%B7%AF">112.路径总和</a></p>
+<ul>
+<li>注意分辨递归什么时候有返回值
+<ul>
+<li>不用完整搜索整棵二叉树，找到其中一条路径即可，需要返回值（比如本题），比如if判断当前节点后直接返回。或者说<strong>遍历</strong>的思维</li>
+<li>需要完整搜索整棵二叉树，或者说二叉树与回溯的结合
+<ul>
+<li>需要返回值（比如递归求深度）</li>
+<li>不需要返回值</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/description/">124.二叉树中的最大路径和 </a> 【好题】，【不会】</p>
+<ul>
+<li><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/submissions/493249101/">递归写法</a></li>
+</ul>
+</li>
+<li>
+<p><a href="https://www.programmercarl.com/0236.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E8%BF%91%E5%85%AC%E5%85%B1%E7%A5%96%E5%85%88.html">236.二叉树的最近公共祖先</a> 【好题】</p>
+<ul>
+<li>递归方法：
+<ul>
+<li>后序遍历：分别在左右子树中找p和q的最近公共祖先，然后根据找到的情况进行处理
+<ul>
+<li>如果子树递归返回nullptr，说明子树不包含p或者q</li>
+<li>如果子树递归返回非nullptr，说明子树包含p、或q、或pq</li>
+</ul>
+</li>
+<li>理解返回值：返回值是以root为根的子树中，p或q的最近公共祖先，如果该子树不包含p或者q，则返回nullptr
+<ul>
+<li>如果<code>root==p || root==q</code>，则当前root至少为一个节点祖先，另一个节点可能在这个子树上，也可能不在这个子树上，但至少返回root</li>
+<li>如果当前root为根的子树，没有p或者q（左右子树都是nullptr），只能返回nullptr</li>
+<li>如果当前root为根的子树，左右子树分别有p和q，则root为最近公共祖先，返回root</li>
+<li>如果当前root为根的左子树或右子树其中一个，同时有p和q，则只能将其最近公共祖先向上返回</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>迭代方法：使用map记录子节点到父节点的映射，再使用一个map记录p到root的路径，最后q向上回到root过程中找到最近同时访问的节点</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/diameter-of-binary-tree/">543.二叉树的直径</a></p>
+<ul>
+<li>维护一个计算每个节点最大深度的递归函数deepest</li>
+<li>在计算节点左右子树的过程中，更新树的直径</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/maximum-width-of-binary-tree/description/">662.二叉树最大宽度</a>：中间nullptr也算</p>
+<ul>
+<li><code>pair&lt;TreeNode*, unsigned long long&gt;</code>保存节点和其id，×2得到其左节点id，×2+1得到其右节点id，最后id相减</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/populating-next-right-pointers-in-each-node/description/">116.填充每个节点的下一个右侧节点指针</a></p>
+<ul>
+<li>常规方法：使用队列进行迭代</li>
+<li>递归方法：递归函数中传入两个节点指针</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/second-minimum-node-in-a-binary-tree/description/">671.二叉树中第二小的节点</a>：root是最小的，遍历一遍，比root大的其中最小的</p>
+</li>
+<li>
+<p>区分<a href="https://leetcode.cn/problems/subtree-of-another-tree/">572.另一棵树的子树</a> 和 <a href="https://leetcode.cn/problems/shu-de-zi-jie-gou-lcof/description/">LCR 143.子结构判断</a>(这个题目关于空节点本身没有说清楚)</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/all-nodes-distance-k-in-binary-tree/description/">863.二叉树中所有距离为K的结点</a></p>
+<ul>
+<li>遍历一遍得到子节点到父节点的map，从而变树为图，然后dfs</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/xu-lie-hua-er-cha-shu-lcof/description/">297.二叉树的序列化与反序列化</a> 【好题】</p>
+<ul>
+<li>第一种方法：使用括号表示编码（BNF编码）进行序列化，使用递归函数进行反序列化，<a href="https://leetcode.cn/problems/serialize-and-deserialize-binary-tree/submissions/494473198">代码</a>
+<ul>
+<li>BNF编码：比如postOrder BNF编码<code>(左)(右)(根)</code></li>
+<li>反序列化时，递归函数中需要使用栈，从而确定左右子树在字符串中的范围</li>
+</ul>
+</li>
+<li>第二种方法：使用逗号表示编码按照层序遍历进行序列化，使用迭代方法进行反序列化，<a href="https://leetcode.cn/problems/serialize-and-deserialize-binary-tree/submissions/494466348">代码</a>
+<ul>
+<li>序列化方式与leetcode样例给出方式相同，不需要特殊表示换层</li>
+<li>反序列化同样使用队列，字符串遍历的过程中入栈出栈</li>
+</ul>
+</li>
+<li>第三种方法：使用逗号表示编码进行序列化，使用递归函数进行反序列化，<a href="https://leetcode.cn/problems/serialize-and-deserialize-binary-tree/submissions/494514519">代码</a>
+<ul>
+<li>序列化表示形式与第二种方法相同，但是好像只能使用前序遍历
+<ul>
+<li>如果使用中序/后序，字符串中第一个元素解码后是nullptr，在反序列化的递归函数中第一个元素就直接返回，不会处理后面的字符串了</li>
+<li>如果使用前序，字符串中第一个元素肯定不为nullptr，可以递归下去</li>
+</ul>
+</li>
+<li>反序列化过程需要维护一个全局的索引，从而在不同的递归函数之间确定当前处理的元素的位置</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/find-duplicate-subtrees/description/">652.寻找重复的子树</a></p>
+<ul>
+<li>使用基于后序遍历的二叉树序列化，模板类似<a href="https://leetcode.cn/problems/xu-lie-hua-er-cha-shu-lcof/description/">297.二叉树的序列化与反序列化</a>中第一种方法，但是序列化格式可以简化</li>
+<li>在后序遍历进行序列化的过程中，同时维护<code>unordered_map&lt;string, pair&lt;TreeNode*, int&gt;&gt;</code>的映射</li>
+</ul>
+</li>
+</ul>
+<h3 id="二叉搜索树">二叉搜索树</h3>
+<ul>
+<li>
+<p><a href="https://www.programmercarl.com/0098.%E9%AA%8C%E8%AF%81%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91.html#%E9%80%92%E5%BD%92%E6%B3%95">98.验证二叉搜索树</a> <a href="https://www.programmercarl.com/0530.%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E7%9A%84%E6%9C%80%E5%B0%8F%E7%BB%9D%E5%AF%B9%E5%B7%AE.html">530.二叉搜索树中的最小绝对差 </a> <a href="https://www.programmercarl.com/0501.%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E4%B8%AD%E7%9A%84%E4%BC%97%E6%95%B0.html#%E9%80%92%E5%BD%92%E6%B3%95">501.二叉搜索树中的众数</a></p>
+<ul>
+<li>原理：二叉搜索树中序遍历是有序的
+<ul>
+<li>可以是递归写法：维护一个全局变量，记录上一个节点的指针pre</li>
+<li>可以是迭代写法：中序迭代写法</li>
+</ul>
+</li>
+<li><a href="https://www.programmercarl.com/0098.%E9%AA%8C%E8%AF%81%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91.html#%E9%80%92%E5%BD%92%E6%B3%95">98.验证二叉搜索树</a>极易想成简单左右子树判断，但此时根节点和右子树的左孩子的关系是无法判断的，只能中序遍历判断有序</li>
+</ul>
+</li>
+<li>
+<p><a href="https://www.programmercarl.com/0450.%E5%88%A0%E9%99%A4%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E4%B8%AD%E7%9A%84%E8%8A%82%E7%82%B9.html#%E9%80%92%E5%BD%92">450.删除二叉搜索树中的节点</a> 【好题】</p>
+<ul>
+<li>对比递归方法与迭代方法：都是五种情况
+<ul>
+<li>迭代方法：小心删除根节点时的特判</li>
+<li><a href="https://www.programmercarl.com/0450.%E5%88%A0%E9%99%A4%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E4%B8%AD%E7%9A%84%E8%8A%82%E7%82%B9.html#%E9%80%92%E5%BD%92">递归方法</a>：使用root-&gt;left或root-&gt;right接受返回值，避免记录pre节点（同时也避免了删除根节点时pre==nullptr的判断）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/er-cha-sou-suo-shu-de-di-kda-jie-dian-lcof/description/">LCR 174.二叉搜索树的第k大节点</a></p>
+<ul>
+<li>中序倒序，维护全局变量的计数器</li>
+</ul>
+</li>
+<li>
+<p><a href="https://www.nowcoder.com/practice/947f6eb80d944a84850b0538bf0ec3a5?tpId=13&amp;&amp;tqId=11179&amp;qru=/ta/coding-interviews/question-ranking">426.将二叉搜索树转换为有序的双向链表</a></p>
+<ul>
+<li>递归函数返回有序双向链表的头</li>
+</ul>
+</li>
+<li>
+<p><a href="http://leetcode.cn/problems/er-cha-sou-suo-shu-de-hou-xu-bian-li-xu-lie-lcof/description/">LCR 152.验证二叉搜索树的后序遍历序列</a></p>
+<ul>
+<li>注意是二叉搜索树，因此可以确定根与左右子树，从而递归判断</li>
+<li>第二种方法：单调栈+后序逆序，<a href="https://leetcode.cn/problems/er-cha-sou-suo-shu-de-hou-xu-bian-li-xu-lie-lcof/submissions/494227458/">代码</a>，<a href="https://leetcode.cn/problems/er-cha-sou-suo-shu-de-hou-xu-bian-li-xu-lie-lcof/solutions/150225/mian-shi-ti-33-er-cha-sou-suo-shu-de-hou-xu-bian-6/">参考</a>，不太会
+<ul>
+<li>比如当前是根节点（栈顶）</li>
+<li>如果下一个节点大于栈顶元素，则在右侧，因此入栈</li>
+<li>如果下一个节点小于栈顶元素，则出栈（该节点在其祖先节点的右边），找到其祖先节点，后序节点应该都在该祖先节点的左边</li>
+<li>假设有一个极大的虚拟根节点，整棵树都在其左边</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/recover-binary-search-tree/description/">99.恢复二叉搜索树</a></p>
+<ul>
+<li>遍历过程中，记录这两个节点，<a href="https://leetcode.cn/problems/recover-binary-search-tree/solutions/1429782/by-richard-az-j904">参考</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="综合-1">综合</h3>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/path-sum-iii/description/">437.路径总和Ⅲ</a> 【好题】，【二叉树】+【前缀和】+【回溯】</p>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/path-sum-iii/submissions/494355245">递归方法</a>：以每个节点为root（O(n)），再计算包含root时的路径数量（O(n)），复杂度O(n^2)</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/path-sum-iii/submissions/494373044">前缀和</a>：在前序遍历的过程中，记录当前节点的前缀和，并遍历过的节点的前缀和保存到map中（value是特定前缀和的个数）</p>
+<ul>
+<li>根据当前前缀和和root-&gt;val，可以得到当前分支上符合要求的路径的个数</li>
+<li>当当前root返回时，当前的前缀和也需要从map中复原</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="回溯">回溯</h2>
+<ul>
+<li>
+<p>回溯</p>
+<ul>
+<li>
+<p>思路：二叉树/多叉树的递归遍历</p>
+<ul>
+<li>视为二叉树的话，每个元素选择或不选，每个dfs中有两条路径</li>
+<li>视为多叉树的话，在每个for循环中进行选择，注意选择之后的回溯复原就表示没有选择当前元素，然后可以选择后面的元素</li>
+</ul>
+</li>
+<li>
+<p>写法：数组直接作为全局变量，进行多叉树的遍历时使用一个<code>startIdx</code>来表示当前搜索数组的位置</p>
+</li>
+<li>
+<p>细节问题：</p>
+<ul>
+<li>使用startIdx还是从0开始</li>
+<li>能否对数组排序？
+<ul>
+<li>能，如果需要去重，维护一个全局的used数组
+<ul>
+<li>used数组的索引，表示nums的下标（一般是这个），还是nums元素的值</li>
+</ul>
+</li>
+<li>不能，如果需要去重，则每一层应该维护一个局部的set</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>组合问题：从N个数中选k个数，有几种选法</p>
+<ul>
+<li><a href="https://leetcode.cn/problems/combinations/description/">77.组合</a>：模板题</li>
+<li><a href="https://leetcode.cn/problems/combination-sum-iii/">216.组合总数Ⅲ</a>：直接在for循环中进行剪枝</li>
+<li><a href="https://leetcode.cn/problems/letter-combinations-of-a-phone-number/">17.电话号码的字母组合</a>：使用字符串数组（或者二维数组）来进行数字到字符串的对应</li>
+<li><a href="https://leetcode.cn/problems/combination-sum/">39.组合总和</a>：</li>
+<li><a href="https://leetcode.cn/problems/combination-sum-ii/description/">40.组合总和Ⅱ</a>：使用<code>used</code>数组进行去重，初始化used=false：
+<ul>
+<li>当数组中相邻两个元素相等且used=true时，表示这两个元素在同一个树枝上（在一个分支上），此时不用去重（即组合内部使用了相同的元素）</li>
+<li>当数组中相邻两个元素相等且user=false时，表示这两个元素在递归的同一层（同一树层上），此时表示后面会有相同的组合出现，因此需要去重（continue）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>切割问题：一个字符串不同切割方式，有几种方式</p>
+<ul>
+<li><a href="https://leetcode.cn/problems/palindrome-partitioning/description/">131.分割回文串</a>：逐个分割每个元素进行判断，同样是递归的树形结构</li>
+<li><a href="https://leetcode.cn/problems/restore-ip-addresses/description/">93.复原IP地址</a>：感觉写成三叉树的递归方式，而非是for循环的递归方式更直观和易于理解
+<ul>
+<li>三叉树方式：从当前位置开始的子串，分别作为一个字符、两个字符、三个字符进行匹配</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>子集问题：N个数中相关子集的个数</p>
+<ul>
+<li><a href="https://leetcode.cn/problems/subsets/description/">78.子集</a>：递归的树形结构的所有节点</li>
+<li><a href="https://leetcode.cn/problems/subsets-ii/">90.子集Ⅱ</a>：理解“树枝去重”与“树层去重”的逻辑，对于相同的数字，前面的可以选或不选，后面的必须不能选</li>
+<li><a href="https://leetcode.cn/problems/non-decreasing-subsequences/description/">491.递增子序列</a>：同样需要去重，但不能使用全局的used数组来去重
+<ul>
+<li>90.子集Ⅱ中数组是有序的，可以保证相同的数字都是挨着的，</li>
+<li>491.递增子序列中数组无序，如果按上面的方式，只能保证相同的连着的数字是去重的，相同的不挨着的数字会重复，因此只能每一层维护一个局部的used数组，动态判断该数字之前是否出现过</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>排列问题：N个数的不同排列方式</p>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/permutations/description/">46.全排列</a>：</p>
+<ul>
+<li>方法一：使用used数组记录该数字是否使用过，仔细考虑for循环和回溯（回退）的过程</li>
+<li>方法二：使用swap和startIdx，每次减小排列的规模</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/permutations-ii/">47.全排列Ⅱ</a>：对比491.递增子序列</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/reconstruct-itinerary/description/">332.重新安排行程</a>：</p>
+<ul>
+<li>错误理解和写法：每个机场只到一次（因此使用一个数组记录该节点是否到过）</li>
+<li>正确理解：所有路径都走且只走一次（可能比如北京到上海有好几张票，都要使用，因此使用<code>unordered_map&lt;string, map&lt;string, int&gt;&gt;</code>来进行建图，然后dfs,回溯更新int的值）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>棋盘问题：</p>
+<ul>
+<li><a href="https://leetcode.cn/problems/n-queens/description/">51.N皇后</a>：画出搜索的树形结构，dfs中逐层放置皇后</li>
+<li><a href="https://leetcode.cn/problems/sudoku-solver/description/">37.解数独</a>：
+<ul>
+<li>二维的递归，注意最外层for循环的是数组/棋盘，而不是各种可能性或组合（即选或不选）</li>
+<li>判断合法性时，只是判断当前元素是否行、列、方格重复</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="贪心">贪心</h2>
+<h3 id="区间贪心">区间贪心</h3>
+<ul>
+<li><a href="https://leetcode.cn/problems/jump-game/">55. 跳跃游戏</a>：维护一个当前可以跳跃到的最右边界</li>
+<li><a href="https://leetcode.cn/problems/jump-game-ii/">45.跳跃游戏Ⅱ</a></li>
+<li><a href="https://leetcode.cn/problems/non-overlapping-intervals/">435.无重叠区域</a>
+<ul>
+<li>当有重叠区域时，更新右端点<code>right = min(right, v[1]);</code>的含义：如果重叠，使得右端点最小
+<ul>
+<li>如果旧的right更小，则移除掉新来的区间</li>
+<li>如果新来的区间<code>v[1]</code>更小，则移除原来的区间</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/minimum-number-of-arrows-to-burst-balloons/description/">452.用最少数量的箭引爆气球 </a> 对比<a href="https://leetcode.cn/problems/non-overlapping-intervals/">435.无重叠区域</a>
+<ul>
+<li>按照每个点的start进行排序，当前重叠范围为<code>[start, right]</code>，start递增，维护逐渐缩小的重叠区间<code>right = min(right, points[i][1])</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="两个维度贪心">两个维度贪心</h3>
+<ul>
+<li><a href="https://leetcode.cn/problems/queue-reconstruction-by-height/description/">406.根据身高重建队列</a>：先从高到低排队，再插队，复杂度O(n^2)</li>
+</ul>
+<h3 id="上下坡">上下坡</h3>
+<ul>
+<li><a href="https://leetcode.cn/problems/wiggle-subsequence/description/">376.摆动序列</a>
+<ul>
+<li>方法一：<a href="https://leetcode.cn/problems/wiggle-subsequence/submissions/498171028">贪心</a>，也就是统计一共有几次变化</li>
+<li>方法二：<a href="https://leetcode.cn/problems/wiggle-subsequence/submissions/498176392">带空间优化的动规</a>，<code>up[i], down[i]</code>为以<code>nums[i]</code>为结尾（最后一个是上升或下降）的摆动序列长度</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/candy/description/">135.分发糖果</a>：正着统计上坡，反着统计上坡</li>
+<li><a href="https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-ii/description/">122.买卖股票的最佳时机Ⅱ</a>：直接累加上坡的差值</li>
+<li><a href="https://leetcode.cn/problems/gas-station/description/">134.加油站</a>：找剩余油量的前缀和中最小的位置</li>
+</ul>
+<h2 id="动态规划">动态规划</h2>
+<h3 id="总结">总结</h3>
+<p>动规五部曲：</p>
+<ul>
+<li>确定dp数组的含义和下标的含义</li>
+<li>确定递推公式</li>
+<li>确定dp数组的初始化</li>
+<li>确定遍历顺序</li>
+<li>举个例子</li>
+</ul>
+<h3 id="单纯动规">单纯动规</h3>
+<h4 id="直接寻找使用最优子结构">直接寻找/使用最优子结构</h4>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/interleaving-string/description/?show=1">97.交错字符串</a></p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/decode-ways/description/?show=1">91.解码方法</a></p>
+<ul>
+<li>最优子结构好找（相当于递推），只是中间判断有点多</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/word-break/description/">139.单词拆分</a></p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/coin-change/description/">322.零钱兑换</a></p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/integer-break/description/">343.整数拆分</a></p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/maximal-square/description/">221.最大正方形</a></p>
+<ul>
+<li>子结构需要从三个方向考虑</li>
+<li>使用滚动数组优化，注意有斜向上的依赖，需要使用一个变量记录</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/out-of-boundary-paths/description/?show=1">576.出界的路径数</a>：题目一般，就像递推</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/minimum-falling-path-sum/description/">931.下降路径最小和</a></p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/triangle/description/">120.三角形最小路径和</a></p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/li-wu-de-zui-da-jie-zhi-lcof/?show=1">剑指 Offer 47. 礼物的最大价值 </a>同 <a href="https://leetcode.cn/problems/minimum-path-sum/description/">64.最小路径和</a></p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/JEj789/description/?show=1">剑指Ⅱ 091.粉刷房子</a></p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/dungeon-game/description/">174.地下城游戏</a></p>
+<ul>
+<li>从右下到左上的动规</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/binary-trees-with-factors/description/">823.带因子的二叉树</a></p>
+</li>
+<li></li>
+</ul>
+<h4 id="01背包">01背包</h4>
+<ul>
+<li><a href="https://leetcode.cn/problems/target-sum/description/">494.目标和</a>：要装满背包，有几种方法
+<ul>
+<li>注意，0可以特殊处理，也可以不用特殊处理</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/partition-equal-subset-sum/description/">416.分割等和子集</a>： 给定背包容量，能不能装满这个背包
+<ul>
+<li>方法一：dp[j]就表示背包容量为j时，能否将背包装满</li>
+<li>方法二：视为标准01背包，物品价值和重量相等，最后看容量为j的背包里最大价值
+<ul>
+<li><a href="https://leetcode.cn/problems/last-stone-weight-ii/description/">1049.最后一块石头的重量Ⅱ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/last-stone-weight-ii/description/">1049.最后一块石头的重量Ⅱ</a>：
+<ul>
+<li>首先转换成标准01背包：分成两堆石头，一堆小，一堆大，让小的那堆尽量接近一半</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/ones-and-zeroes/description/">474.一和零</a>：给定背包容量，装满背包最多有多少个物品
+<ul>
+<li>注意背包是二维的（长对应0的数量，宽对应1的数量）</li>
+</ul>
+</li>
+</ul>
+<h4 id="排列数与组合数">排列数与组合数</h4>
+<ul>
+<li><a href="https://leetcode.cn/problems/combination-sum-iv/">377.组合总和Ⅳ</a>：算组合数</li>
+<li><a href="https://leetcode.cn/problems/climbing-stairs/">22.爬楼梯</a>：进阶版爬楼梯（每次可以爬[1 - m]个台阶）其实是一个完全背包下计算组合数的问题
+<ul>
+<li><a href="https://www.programmercarl.com/0070.%E7%88%AC%E6%A5%BC%E6%A2%AF%E5%AE%8C%E5%85%A8%E8%83%8C%E5%8C%85%E7%89%88%E6%9C%AC.html#%E6%80%9D%E8%B7%AF">参考</a></li>
+</ul>
+</li>
+</ul>
+<h4 id="打家劫舍系列">打家劫舍系列</h4>
+<ul>
+<li><a href="https://leetcode.cn/problems/house-robber/description/">198.打家劫舍</a>：
+<ul>
+<li>不要硬套01背包，01背包只是动规中很套路的一个模板；除了直接题目可以直接套模板，剩下的还是要具体分析出来递推公式</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/house-robber-ii/">213.打家劫舍Ⅱ</a>
+<ul>
+<li>拆环为链，拆分成两种情况，各跑一遍</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/house-robber-iii/">337.打家劫舍Ⅲ</a>：<a href="https://www.programmercarl.com/0337.%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8DIII.html#%E6%80%9D%E8%B7%AF">树形DP</a>
+<ul>
+<li>每个节点有一个状态数组</li>
+<li>在后序遍历中，得到左右子树的状态，更新当前节点的状态</li>
+</ul>
+</li>
+</ul>
+<h4 id="买卖股票的最佳时机系列">买卖股票的最佳时机系列</h4>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/description/">121.买卖股票的最佳时机</a></p>
+<ul>
+<li>dp数组表示持有/不持有股票，第0天持有即买入</li>
+<li><strong>划分状态</strong>
+<ul>
+<li>首先为什么标准01背包不需要针对每个背包的容量分成两种状态的数组？
+<ul>
+<li>动规原理是最优子结构，标准01背包中物品之间是相互独立的，不存在某件放入a物品后必须放入b物品这样的关联</li>
+</ul>
+</li>
+<li>其次为什么打家劫舍问题也不需要针对每一间房屋分成两种状态的数组？
+<ul>
+<li>首先可以分，而且公式写出来也很清晰，在比如树形DP中还必须要分</li>
+<li>但是打家劫舍中，只是相邻两个房屋之间有关联，公式中可以直接将关联表示出来</li>
+</ul>
+</li>
+<li>买卖股票中为什么必须要分成两种状态的数组？
+<ul>
+<li>因为买卖股票的两天之间的关联不是固定的</li>
+<li>买卖股票中还需要注意两种状态的定义：是持有/不持有，而非买入/卖出</li>
+</ul>
+</li>
+<li>什么是状态？
+<ul>
+<li>第i天进行第j笔交易，是持有还是不持有</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>注意如何保证只买入一次？区别<a href="https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-ii/">122.买卖股票的最佳时机Ⅱ</a></li>
+<li>加上手续费相同<a href="https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/description/">714.买卖股票的最佳时机含手续费</a></li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-ii/">122.买卖股票的最佳时机Ⅱ</a></p>
+</li>
+<li>
+<p><a href="https://www.programmercarl.com/0123.%E4%B9%B0%E5%8D%96%E8%82%A1%E7%A5%A8%E7%9A%84%E6%9C%80%E4%BD%B3%E6%97%B6%E6%9C%BAIII.html#%E6%80%9D%E8%B7%AF">123.买卖股票的最佳时机Ⅲ</a></p>
+<ul>
+<li>
+<p>每天有多种状态：第i天进行第j笔交易，是持有还是不持有</p>
+</li>
+<li>
+<p>有一个技巧可以将空间复杂度降到O(1)，<a href="https://www.programmercarl.com/0123.%E4%B9%B0%E5%8D%96%E8%82%A1%E7%A5%A8%E7%9A%84%E6%9C%80%E4%BD%B3%E6%97%B6%E6%9C%BAIII.html#%E6%8B%93%E5%B1%95">参考</a></p>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2023-09-07-15:54:21.png" alt="QQ图片20230907155407" style="zoom:80%;" />
+</li>
+<li>
+<p><a href="https://www.programmercarl.com/0188.%E4%B9%B0%E5%8D%96%E8%82%A1%E7%A5%A8%E7%9A%84%E6%9C%80%E4%BD%B3%E6%97%B6%E6%9C%BAIV.html#%E6%80%9D%E8%B7%AF">188.买卖股票的最佳时机Ⅳ</a> 同理</p>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-with-cooldown/">309.最佳买卖股票时机含冷冻期</a></p>
+<ul>
+<li>细化状态（比如不持有股票可以细分为今天卖出还是维持原来不持有的状态）</li>
+<li>画出状态转移图</li>
+</ul>
+</li>
+</ul>
+<h4 id="序列问题">序列问题</h4>
+<h5 id="递增序列数组">递增序列/数组</h5>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/longest-increasing-subsequence/">300.最长递增子序列  </a>LIS</p>
+<ul>
+<li>
+<p>更像是记忆化搜索或者递推，而非动规</p>
+</li>
+<li>
+<p>对比<a href="https://leetcode.cn/problems/longest-continuous-increasing-subsequence/">674.最长连续递增序列</a>（或者可称为最长递增数组？），是否连续决定是否内部要使用一个for循环找到比当前元素小的位置</p>
+</li>
+<li>
+<p>可以使用贪心+二分实现更低的复杂度</p>
+<ul>
+<li>
+<p>贪心：d[len]表示长度为len的LIS，末尾元素的最小值，最小值越小越好</p>
+</li>
+<li>
+<p>二分：d[]数组单调递增</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="c1">// d[len]:长度为len的LIS，末尾元素的最小值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">if</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">d</span><span class="p">[</span><span class="n">len</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">d</span><span class="p">[</span><span class="o">++</span><span class="n">len</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 二分查找：find max l, nums[i] &gt; d[l]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 因此d[l+1]找到一个更小的末尾元素nums[i]：d[l+1]&gt;nums[i]&gt;d[l]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">d</span><span class="p">[</span><span class="n">l</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">return</span> <span class="n">len</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><a href="https://leetcode.cn/problems/longest-increasing-subsequence/solutions/147667/zui-chang-shang-sheng-zi-xu-lie-by-leetcode-soluti/">参考</a></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/number-of-longest-increasing-subsequence/description/">673.最长递增子序列的个数</a></p>
+<ul>
+<li>使用贪心+树状数组实现O(nlogn)的复杂度，<a href="https://leetcode.cn/problems/number-of-longest-increasing-subsequence/solutions/1007341/gong-shui-san-xie-lis-de-fang-an-shu-wen-obuz/">参考</a></li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/russian-doll-envelopes/description/">354.俄罗斯套娃信封问题</a></p>
+<ul>
+<li>先排序，w正排，h倒排（保证相同w时，大h不能包含小h）</li>
+<li>通过排序将二维LIS转换为一维的LIS</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/largest-divisible-subset/description/">368.最大整除子集</a></p>
+<ul>
+<li>与LIS方法差不多</li>
+</ul>
+</li>
+</ul>
+<h5 id="重复数组公共序列子数组序列问题">重复数组、公共序列、子数组/序列问题</h5>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/maximum-length-of-repeated-subarray/">718.最长重复子数组</a></p>
+<ul>
+<li>使用滚动数组进行优化：<a href="https://leetcode.cn/problems/maximum-length-of-repeated-subarray/">代码</a>
+<ul>
+<li>内层逆序：之所以逆序，一是因为不将物品重复放入，二是因为可能依赖是斜向上的，逆序可以直接访问未更新之前的数值</li>
+<li>也可以使用顺序，不过要将原来未更新之间的数值记录下来</li>
+</ul>
+</li>
+<li>其实是这个题目对遍历顺序没有要求，因为if中dp依赖左上旧值，else中dp直接是0
+<ul>
+<li>其他题目中，else中可能需要用到刚才更新过的值，因此只能从前向后遍历</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/longest-common-subsequence/description/">1143.最长公共子序列 </a> 和 <a href="https://leetcode.cn/problems/uncrossed-lines/description/">1035.不相交的线</a></p>
+<ul>
+<li>使用滚动数组进行优化：使用两个数组来回调替，或者直接记录依赖的旧值</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/maximum-subarray/description/">53.最大子数组和</a></p>
+<ul>
+<li>遇到数组和第一直觉总是前缀和，但是这个题目使用动规很简单</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/is-subsequence/description/">392.判断子序列</a></p>
+<ul>
+<li>可以使用双指针</li>
+<li>使用动规：状态转移方程很类似
+<ul>
+<li>dp可以表示相同序列的长度</li>
+<li>dp也可以是bool数组，表示s[0, i]是否为t[0, j]的子序列
+<ul>
+<li>使用滚动数组优化二维数组时，注意将初始化方式从原来的二维情况下转换到一维情况下，比如当i=0时容易记起初始化，但是i=1,2,3&hellip;之后，dp[0]或者dp数组开头几个数字就容易忘记初始化，<a href="https://leetcode.cn/problems/is-subsequence/submissions/464079888/">代码</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/distinct-subsequences/description/">115.不同的子序列</a></p>
+<ul>
+<li>代码模板是<a href="https://leetcode.cn/problems/is-subsequence/description/">392.判断子序列</a>，只是递推公式需要多考虑一下</li>
+</ul>
+</li>
+</ul>
+<h5 id="字符串操作">字符串操作</h5>
+<ul>
+<li><a href="https://leetcode.cn/problems/delete-operation-for-two-strings/description/">583.两个字符串的删除操作</a>
+<ul>
+<li>动规方式1：先求出最长公共子序列，再相减</li>
+<li>动规方式2：dp直接表示删除的最小步数，逻辑相同
+<ul>
+<li>注意原来使用二维数组时，有一定初始化方式；使用一维数组进行优化时，dp[0]很容易忘记初始化，<a href="https://leetcode.cn/problems/delete-operation-for-two-strings/submissions/">代码</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/minimum-ascii-delete-sum-for-two-strings/description/">712.两个字符串的最小ASCII删除和</a></li>
+<li><a href="https://leetcode.cn/problems/edit-distance/">72.编辑距离</a>
+<ul>
+<li>当word1[i]与word2[j]不相同时，如果进行插入和删除，只需要考虑将word1[i]当前字符插入或删除</li>
+</ul>
+</li>
+<li><a href="https://www.nowcoder.com/practice/05fed41805ae4394ab6607d0d745c8e4?tpId=117&amp;tags=&amp;title=&amp;diffculty=0&amp;judgeStatus=0&amp;rp=1&amp;tab=answerKey">牛客NC35 编辑距离二</a>
+<ul>
+<li>有O(nlogn)的算法吗？？？</li>
+</ul>
+</li>
+</ul>
+<h5 id="回文相关">回文相关</h5>
+<ul>
+<li><a href="https://leetcode.cn/problems/palindromic-substrings/">647.回文子串</a>：【好题】，<a href="https://www.programmercarl.com/0647.%E5%9B%9E%E6%96%87%E5%AD%90%E4%B8%B2.html#%E6%9A%B4%E5%8A%9B%E8%A7%A3%E6%B3%95">分析</a>
+<ul>
+<li>有<strong>时dp数组的含义并不是直接求什么，定义什么</strong>
+<ul>
+<li>如果$dp[i][j]$表示$s[i:j]$内的回文子串的数量，当s[i]==s[j]时，此时无法判断$s[i+1:j-1]$是否为回文串，由此无法确定递推公式中是否要+1，<a href="https://leetcode.cn/problems/palindromic-substrings/submissions/465238949/">错误代码</a></li>
+<li>$dp[i][j]$表示$s[i:j]$是否为回文串，在递推公式之后根据true or false进行累加，<a href="https://leetcode.cn/problems/palindromic-substrings/submissions/443143742/">正确代码</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/longest-palindromic-substring/description/">5.最长回文子串</a></li>
+<li><a href="https://leetcode.cn/problems/longest-palindromic-subsequence/">516.最长回文子序列</a>
+<ul>
+<li><strong>注意看是子序列（不必连续）还是子串（必须连续）</strong></li>
+<li>这个回文动规中，dp的含义，就是求什么定义什么</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/minimum-insertion-steps-to-make-a-string-palindrome/description/">1312.让字符串成为回文串的最少插入次数</a></li>
+</ul>
+<h4 id="其他">其他</h4>
+<ul>
+<li><a href="https://leetcode.cn/problems/maximum-product-subarray/description/">152.乘积最大子数组</a>：【好题】，也是分状态，但是其中另一个状态隐含在题目中，需要分析，很巧</li>
+</ul>
+<h4 id="第一次几乎完全不会">第一次几乎完全不会</h4>
+<ul>
+<li><a href="https://leetcode.cn/problems/longest-valid-parentheses/description/">32.最长有效括号</a></li>
+</ul>
+<h3 id="动规单调队列">动规+单调队列</h3>
+<ul>
+<li><a href="https://leetcode.cn/problems/jump-game-vi/description/">1696.跳跃游戏</a>： 模板题</li>
+<li><a href="https://leetcode.cn/problems/constrained-subsequence-sum/description/">14253带限制的子序列和</a>：【好题】
+<ul>
+<li>比1696在动规上多了一点</li>
+</ul>
+</li>
+</ul>
+<h2 id="图论">图论</h2>
+<h3 id="dfs与bfs">DFS与BFS</h3>
+<ul>
+<li>
+<p><a href="https://leetcode.cn/problems/all-paths-from-source-to-target/description/">797.所有可能的路径</a>：DFS+回溯</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/number-of-islands/description/">200.岛屿数量</a>：DFS，BFS模板题</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/number-of-enclaves/">1020.飞地的数量</a>：第一阶段原地修改原来的二维数组标记，第二阶段再次遍历</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/surrounded-regions/description/">130.被围绕的区域</a>：原地修改二维数组标记</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/making-a-large-island/description/">827.最大人工岛</a>：保存中间计算结果（岛屿面积），避免重复计算</p>
+<ul>
+<li>首先遍历，每个岛屿进行编号，同时使用map记录id到岛屿面积的映射</li>
+<li>对于水块，上下左右累加岛屿面积</li>
+</ul>
+</li>
+<li>
+<p><a href="">127.单词接龙</a>：</p>
+<blockquote>
+<p>单词个数n，单词长度m</p>
+</blockquote>
+<ul>
+<li>方法一：BFS内部，对单词进行遍历，找到相邻的单词，最坏情况复杂度O(nnm)</li>
+<li>方法二：BSF内部，对当前单词逐字母进行替换，判断替换后的单词是否在词表中，复杂度O(26*n)</li>
+<li></li>
+</ul>
+</li>
+</ul>
+<h3 id="并查集">并查集</h3>
+<ul>
+<li>
+<p>并查集：一个用数组表示的森林</p>
+<ul>
+<li>当存在u-&gt;v的有向边时，添加到并查集：<code>father[v] = u; // v的father是u</code></li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/find-if-path-exists-in-graph/">1971.寻找图中是否存在路径</a>：模板题</p>
+</li>
+<li></li>
+</ul>
+<h2 id="数学">数学</h2>
+<h3 id="模拟-1">模拟</h3>
+<ul>
+<li><a href="https://leetcode.cn/problems/palindrome-number/description/">9.回文数</a>：
+<ul>
+<li>空间复杂度<code>O(1)</code>的方法：原来数字取模除十的过程中，与反转后的数组比较大小</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/factorial-trailing-zeroes/description/">172.阶乘后的零</a>：实际上就是找因子5的个数</li>
+</ul>
+<h3 id="位运算">位运算</h3>
+<ul>
+<li>
+<p>常用技巧：对于<code>int n</code></p>
+<ul>
+<li>获取n的最低位的1：<code>n &amp; (-n)</code></li>
+<li>将n的最低位1变为0：<code>n &amp; (n-1)</code></li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/number-of-1-bits/description/">191.位1的个数</a>：</p>
+<ul>
+<li>循环检查二进制位：<code>if(n &amp; (1 &lt;&lt; i)) ++cnt</code></li>
+<li>lsb翻转：<code>n &amp; (n-1)</code>结果为将n的二进制lsb变为0，因此：<code>while(n) {n &amp;= (n-1); ++cnt;}</code></li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/single-number/description/">136.只出现一次的数字</a>：数组异或，原理是异或具有交换律</p>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/single-number-ii/description/">137.只出现一次的数字Ⅱ</a>：</p>
+<ul>
+<li>对于32位int，统计每一个bit中1的个数cnt，如果cnt无法整除3，则只出现一次的数字在当前bit为1，<code>ans |= (1 &lt;&lt; i)</code></li>
+</ul>
+</li>
+<li>
+<p><a href="https://leetcode.cn/problems/single-number-iii/description/">260.只出现一次的数字Ⅲ</a>：分组异或</p>
+<ul>
+<li><code>xorsum</code>一定不为0，否则所有数字都出现两次，假设两个出现一次的数字为a和b</li>
+<li><code>xorsum</code>的最低有效位lsb，则一定是a的lsb=1，b的lsb=0（或反过来）</li>
+<li>出现两次的数字，其lsb一定相同；因此根据这个lsb可以将所有数字分成两类，分别进行异或</li>
+</ul>
+</li>
+</ul>
+<h3 id="其他-1">其他</h3>
+<ul>
+<li>快速幂</li>
+<li><a href="https://leetcode.cn/problems/implement-rand10-using-rand7/description/">470.用Rand7()实现Rand10()</a>：拒绝采样
+<ul>
+<li>注意不能直接使用<code>rand7() * rand7()</code>，因为其中元素概率不完全相同，比如14的概率是2/49，1的概率是1/49，6的概率是4/49</li>
+<li>视为行列索引：<code>row=rand7(); col=rand7(); c = (row-1)*7 + col;</code>，这样每个元素等概率</li>
+</ul>
+</li>
+</ul>
+<h2 id="设计">设计</h2>
+<ul>
+<li><a href="https://leetcode.cn/problems/design-hashset/description/">705.设计哈希集合</a>：基于<code>vector&lt;list&lt;int&gt;&gt;</code>的链地址法</li>
+<li><a href="https://leetcode.cn/problems/design-hashmap/description/">706.设计哈希映射</a>：基于<code>vector&lt;list&lt;pair&lt;int,int&gt;&gt;&gt;</code>的链地址法</li>
+<li><a href="https://leetcode.cn/problems/insert-delete-getrandom-o1/description/">380.O(1)时间插入、删除和获取随机元素</a>：
+<ul>
+<li>一个<code>vector</code>用来获取随机元素</li>
+<li>一个<code>unordered_map&lt;int, int&gt;</code>用来记录val到idx的映射</li>
+</ul>
+</li>
+<li><a href="https://leetcode.cn/problems/implement-trie-prefix-tree/description/">208.实现Trie（前缀树）</a>
+<ul>
+<li>类似二叉树，<code>Trie</code>本身就是一个node，里面有<code>vector&lt;Trie*&gt; children(26, nullptr)</code>表示26叉树</li>
+<li><code>Trie</code>节点中包含一个属性<code>isEnd</code>，如果当前节点表示字符串的最后一个字符，则当前节点的下一个节点的<code>isEnd=true</code></li>
+<li>包含一个辅助函数<code>Trie* searchPrefix(string prefix)</code>，返回prefix字符串结尾的下一个节点</li>
+</ul>
+</li>
+</ul>
+<h2 id="继续刷">继续刷</h2>
+<p><a href="https://leetcode.cn/problems/linked-list-cycle-ii/">142.环形链表Ⅱ</a></p>
+<p><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/description/">124.二叉树中的最大路径和 </a></p>
+<p><a href="https://leetcode.cn/problems/path-sum-iii/description/">437.路径总和Ⅲ</a></p>
+<p><a href="https://leetcode.cn/problems/median-of-two-sorted-arrays/solutions/6098/4-xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-shu/">4.寻找两个正序数组的中位数</a></p>
+<p><a href="https://leetcode.cn/problems/maximal-rectangle/description/">85.最大矩形</a></p>
+<p><a href="https://leetcode.cn/problems/find-the-index-of-the-first-occurrence-in-a-string/description/">28.找出字符串中第一个匹配项的下标</a>：KMP模板</p>
+]]></content:encoded>
+    </item>
+    
+  </channel>
+</rss>

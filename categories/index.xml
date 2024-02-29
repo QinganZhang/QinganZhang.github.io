@@ -6,7 +6,37 @@
     <description>Recent content in categories on Paul&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 01 Feb 2024 21:56:31 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 29 Feb 2024 14:56:05 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>git</title>
+      <link>https://qinganzhang.github.io/categories/git/</link>
+      <pubDate>Thu, 29 Feb 2024 14:56:05 +0800</pubDate>
+      
+      <guid>https://qinganzhang.github.io/categories/git/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    
+    <item>
+      <title>leetcode</title>
+      <link>https://qinganzhang.github.io/categories/leetcode/</link>
+      <pubDate>Thu, 29 Feb 2024 14:54:23 +0800</pubDate>
+      
+      <guid>https://qinganzhang.github.io/categories/leetcode/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    
+    <item>
+      <title>other</title>
+      <link>https://qinganzhang.github.io/categories/other/</link>
+      <pubDate>Thu, 29 Feb 2024 14:52:29 +0800</pubDate>
+      
+      <guid>https://qinganzhang.github.io/categories/other/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    
     <item>
       <title>effective-modern-cpp-notes</title>
       <link>https://qinganzhang.github.io/categories/effective-modern-cpp-notes/</link>
