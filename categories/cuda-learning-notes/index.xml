@@ -6,11 +6,11 @@
     <description>Recent content in cuda-learning-notes on Paul&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 01 Feb 2024 22:01:50 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/categories/cuda-learning-notes/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 01 Mar 2024 22:01:50 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/categories/cuda-learning-notes/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>内存模型</title>
+      <title>[cuda-learning-notes] 内存模型</title>
       <link>https://qinganzhang.github.io/posts/cuda-learning-notes/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/</link>
-      <pubDate>Thu, 01 Feb 2024 22:01:50 +0800</pubDate>
+      <pubDate>Fri, 01 Mar 2024 22:01:50 +0800</pubDate>
       
       <guid>https://qinganzhang.github.io/posts/cuda-learning-notes/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/</guid>
       <description>内存模型 全局内存 对全局内存变量的理解： 从主机端看，全局内存变量只是一个指针，主机端不知道其指向何方。主机端也无法进行操作 从设备端看，即为全局</description>
@@ -796,9 +796,9 @@
     </item>
     
     <item>
-      <title>流和同步</title>
+      <title>[cuda-learning-notes] 流和同步</title>
       <link>https://qinganzhang.github.io/posts/cuda-learning-notes/%E6%B5%81%E5%92%8C%E5%90%8C%E6%AD%A5/</link>
-      <pubDate>Thu, 01 Feb 2024 22:01:43 +0800</pubDate>
+      <pubDate>Fri, 01 Mar 2024 22:01:43 +0800</pubDate>
       
       <guid>https://qinganzhang.github.io/posts/cuda-learning-notes/%E6%B5%81%E5%92%8C%E5%90%8C%E6%AD%A5/</guid>
       <description>CUDA事件 事件：标记stream执行过程的某个特定的点，比如用于计时 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 cudaEvent_t start, stop; CHECK(cudaEventCreate(&amp;amp;start)); // 创建cuda 事件对象。 CHECK(cudaEventCreate(&amp;amp;stop)); CHECK(cudaEventRecord(start, 0)); //</description>
@@ -1444,9 +1444,9 @@
     </item>
     
     <item>
-      <title>GPU架构发展、兼容性和编译</title>
+      <title>[cuda-learning-notes] GPU架构发展、兼容性和编译</title>
       <link>https://qinganzhang.github.io/posts/cuda-learning-notes/gpu%E6%9E%B6%E6%9E%84%E5%8F%91%E5%B1%95%E5%85%BC%E5%AE%B9%E6%80%A7%E5%92%8C%E7%BC%96%E8%AF%91/</link>
-      <pubDate>Thu, 01 Feb 2024 22:00:30 +0800</pubDate>
+      <pubDate>Fri, 01 Mar 2024 22:00:30 +0800</pubDate>
       
       <guid>https://qinganzhang.github.io/posts/cuda-learning-notes/gpu%E6%9E%B6%E6%9E%84%E5%8F%91%E5%B1%95%E5%85%BC%E5%AE%B9%E6%80%A7%E5%92%8C%E7%BC%96%E8%AF%91/</guid>
       <description>CUDA编译链和兼容性 兼容性 CPU与GPU的区别 CPU只有少量的计算核心，有更多晶体管用于数据缓存和流程控制， GPU有大量计算能力较弱的计算</description>

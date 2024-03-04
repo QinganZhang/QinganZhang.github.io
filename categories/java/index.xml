@@ -26,7 +26,7 @@
 <h3 id="21-jit运行过程">2.1 JIT运行过程</h3>
 <p>​		传统的Java运行过程是JVM解释器逐条代码翻译运行Java字节码，所以在性能上Java通常不如C++这类编译型语言。为了优化Java的性能，根据“二八定律”（少部分代码占据了程序的大部分运行时间），JVM在解释器之外引入了即时（Just In Time）编译器：当程序运行时，解释器首先发挥作用，代码可以直接执行。随着时间推移，即时编译器逐渐发挥作用，把越来越多的代码编译优化成本地代码，来获取更高的执行效率。解释器这时可以作为编译运行的降级手段，在一些不可靠的编译优化出现问题时，再切换回解释执行，保证程序可以正常运行。</p>
 <p>​		使用JIT后，Java代码的执行过程分为两个部分。第一步同样是进行前端编译，转换成Java字节码。第二部分中，在程序解释运行的过程中，部分代码在一定时间内调用或循环次数超过一定的阈值后，该段代码被认为是热点代码，JIT会编译热点代码并存入codeCache中。当下次要执行该段代码时，直接从codeCache中读取执行，以此来提升运行的性能。简单说，JIT就是将代码经过预热之后，将热点代码进行编译，整体的执行过程大致如  图 1 JIT编译过程  所示。</p>
-<img src="E:\2024-03-04_5a2p0\Java编译技术分析.001.png" alt="JIT编译过程" style="zoom:67%;" />
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-03-04-21:03:39.png" alt="JIT编译过程" style="zoom:67%;" />
 <center>图一 JIT编译过程</center>
 <h2 id="22-分层编译">2.2 分层编译</h2>
 <p>​		JIT大体分为两个部分或两种模式：C1编译模式与C2编译模式，分别对应了两种不同的编译器：Client Compiler和Server Compiler。Client Compiler（或C1编译器）注重启动速度和局部的优化，Server Compiler更关注全局的优化，性能更好但是编译时间也更久。</p>
@@ -42,7 +42,7 @@
 <p>​				路径①：编译的一般情况，热点方法从解释执行到被3层的C1编译，最后被4层的C2编译。</p>
 <p>​				路径②：如果方法比较小（比如Java服务中常见的getter/setter方法），3层的profiling没有收集到有价值的数据，JVM就会断定该方法对于C1代码和C2代码的执行效率相同，在这种情况下，JVM会在3层编译之后，放弃进入C2编译，直接选择用1层的C1编译运行。</p>
 <p>​				路径③：如果C1编译器忙碌，就在解释执行过程中对程序进行profiling ，根据信息直接由第4层的C2编译。</p>
-<img src="E:\2024-03-04_5a2p0\Java编译技术分析.002.png" style="zoom:67%;" />
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-03-04-21:09:48.png" style="zoom:67%;" />
 <center>图二 常见编译路径</center>
 <p>​				路径④：如果C2编译器忙碌，因为C1阶段运行速度快，这时方法会被2层的C1编译，然后再被3层的C1编译，以减少方法在3层C2的执行时间。</p>
 <p>​				路径⑤：如果编译器做了一些比较激进的优化，比如分支预测，在实际运行时发现预测出错，这时就会进行反优化，重新进入解释执行</p>
@@ -65,7 +65,7 @@
 <p>​		Java AOT与C++的编译过程比较类似，它首先仍需要将Java程序进行前端编译，转换为Java字节码。然后使用静态编译器将字节码编译为平台相关的二进制可执行代码，最后执行。</p>
 <p>​		相较于JIT，Java AOT（Ahead Of Time）是一个近年来较新的解决方案，GraalVM Native Image是Oracle官方首推的AOT解决方案，它摈弃了JVM，将Java像C++一样编译成机器代码来执行。GraalVM是Oracle在2019年推出的新一代UVM（通用虚拟机），它在HotSpotVM的基础上进行了大量的优化和改进，主要提供了两大特性：多语言支持（可以在GraalVM中无缝运行多种语言）与高性能（提供了一个高性能的JIT引擎和SubstrateVM）。下面简单介绍一下这个特定的Java AOT方案。</p>
 <p>​		Native Image 是一种将 Java 代码提前编译为独立可执行文件（称为Native executable）的技术，即Native Image是基于GraalVM的AOT。Native Image的输入是整个应用的所有组件，包括应用本身的代码、各种依赖的库、JDK库、以及Substrate VM（Substrate VM是一个包含内存管理、线程调度等的运行时系统），然后会进行三个步骤（如 图三 Native executable构建过程  所示）：</p>
-<img src="E:\2024-03-04_5a2p0\Java编译技术分析.003.png" style="zoom: 80%;" />
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-03-04-21:11:49.png" style="zoom: 80%;" />
 <center>图三 Native executable构建过程</center>
 <h3 id="33-动态特性">3.3 动态特性</h3>
 <p>​		Substrate VM除了实现内存管理、线程映射等底层能力之外，还需要以静态的方式实现Java的动态特性，以保持JDK接口层面的兼容性和功能的等价性。例如反射是Java中使用非常广泛的动态特性，Substrate VM通过预执行、编译时和运行时三个阶段的配合对其实现了有条件的静态化支持。</p>

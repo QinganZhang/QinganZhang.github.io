@@ -6,11 +6,11 @@
     <description>Recent content in cuda on Paul&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 01 Feb 2024 22:02:01 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/tags/cuda/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 01 Mar 2024 22:02:01 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/tags/cuda/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>硬件抽象和执行模型</title>
+      <title>[cuda-learning-notes] 硬件抽象和执行模型</title>
       <link>https://qinganzhang.github.io/posts/cuda-learning-notes/%E7%A1%AC%E4%BB%B6%E6%8A%BD%E8%B1%A1%E5%92%8C%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9E%8B/</link>
-      <pubDate>Thu, 01 Feb 2024 22:02:01 +0800</pubDate>
+      <pubDate>Fri, 01 Mar 2024 22:02:01 +0800</pubDate>
       
       <guid>https://qinganzhang.github.io/posts/cuda-learning-notes/%E7%A1%AC%E4%BB%B6%E6%8A%BD%E8%B1%A1%E5%92%8C%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9E%8B/</guid>
       <description>编程模型 线程组织层次 grid 网格 由一个内核函数启动所产生的所有线程统称为一个网格(grid) grid size和block size都是三维结构，dim3类</description>
@@ -382,9 +382,9 @@
     </item>
     
     <item>
-      <title>内存模型</title>
+      <title>[cuda-learning-notes] 内存模型</title>
       <link>https://qinganzhang.github.io/posts/cuda-learning-notes/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/</link>
-      <pubDate>Thu, 01 Feb 2024 22:01:50 +0800</pubDate>
+      <pubDate>Fri, 01 Mar 2024 22:01:50 +0800</pubDate>
       
       <guid>https://qinganzhang.github.io/posts/cuda-learning-notes/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/</guid>
       <description>内存模型 全局内存 对全局内存变量的理解： 从主机端看，全局内存变量只是一个指针，主机端不知道其指向何方。主机端也无法进行操作 从设备端看，即为全局</description>
@@ -1170,9 +1170,9 @@
     </item>
     
     <item>
-      <title>流和同步</title>
+      <title>[cuda-learning-notes] 流和同步</title>
       <link>https://qinganzhang.github.io/posts/cuda-learning-notes/%E6%B5%81%E5%92%8C%E5%90%8C%E6%AD%A5/</link>
-      <pubDate>Thu, 01 Feb 2024 22:01:43 +0800</pubDate>
+      <pubDate>Fri, 01 Mar 2024 22:01:43 +0800</pubDate>
       
       <guid>https://qinganzhang.github.io/posts/cuda-learning-notes/%E6%B5%81%E5%92%8C%E5%90%8C%E6%AD%A5/</guid>
       <description>CUDA事件 事件：标记stream执行过程的某个特定的点，比如用于计时 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 cudaEvent_t start, stop; CHECK(cudaEventCreate(&amp;amp;start)); // 创建cuda 事件对象。 CHECK(cudaEventCreate(&amp;amp;stop)); CHECK(cudaEventRecord(start, 0)); //</description>
@@ -1818,9 +1818,282 @@
     </item>
     
     <item>
-      <title>GPU架构发展、兼容性和编译</title>
+      <title>[cuda-learning-notes] 工具使用和profile</title>
+      <link>https://qinganzhang.github.io/posts/cuda-learning-notes/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E5%92%8Cprofile/</link>
+      <pubDate>Fri, 01 Mar 2024 22:01:33 +0800</pubDate>
+      
+      <guid>https://qinganzhang.github.io/posts/cuda-learning-notes/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E5%92%8Cprofile/</guid>
+      <description>工具 nvidia-smi -L：显示设备名称，精简信息 -q -i 0：显示0号设备详细状态信息 -q -i 0 -d MEMORY：从详细状态信息中提取某类信息（比如MEMORY、CO</description>
+      <content:encoded><![CDATA[<h2 id="工具">工具</h2>
+<h3 id="nvidia-smi">nvidia-smi</h3>
+<ul>
+<li>
+<p><code>-L</code>：显示设备名称，精简信息</p>
+</li>
+<li>
+<p><code>-q -i 0</code>：显示0号设备详细状态信息</p>
+</li>
+<li>
+<p><code>-q -i 0 -d MEMORY</code>：从详细状态信息中提取某类信息（比如MEMORY、COMPUTE、UTILIZATION等）</p>
+</li>
+<li>
+<p>部分字段含义：</p>
+<ul>
+<li><code>GPU-util</code>：For a given time period, it reports what percentage of time one or more GPU kernel(s) was active (i.e. running).
+<ul>
+<li><a href="https://stackoverflow.com/questions/40937894/nvidia-smi-volatile-gpu-utilization-explanation">nvidia-smi Volatile GPU-Utilization explanation?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="nsight-systemnsys">Nsight System(nsys)</h3>
+<ul>
+<li>
+<p><code>nsys profile ./hello_world</code></p>
+</li>
+<li>
+<p><code>--trace cuda</code></p>
+</li>
+<li>
+<p><code>--gpu-metrics-device 0</code></p>
+</li>
+<li>
+<p><code>--stats true</code></p>
+</li>
+<li>
+<p>如何检测achieved_occupancy活跃线程束比例， gld_throughput内存利用率</p>
+</li>
+<li>
+<p><a href="https://face2ai.com/CUDA-F-3-3-%E5%B9%B6%E8%A1%8C%E6%80%A7%E8%A1%A8%E7%8E%B0/">https://face2ai.com/CUDA-F-3-3-%E5%B9%B6%E8%A1%8C%E6%80%A7%E8%A1%A8%E7%8E%B0/</a></p>
+</li>
+<li>
+<p><a href="https://zhuanlan.zhihu.com/p/589120507">https://zhuanlan.zhihu.com/p/589120507</a></p>
+</li>
+<li>
+<p>nvprof是旧的分析工具，不支持8.0以上的GPU，其功能拆分给nsys和ncu</p>
+<ul>
+<li><code>nsys nvprof</code>：统计cuda api和cuda kernel的耗时和相关配置</li>
+<li><code>ncu --metrics</code>：统计得到metrics</li>
+</ul>
+</li>
+</ul>
+<h3 id="nsight-computencu">Nsight Compute(ncu)</h3>
+<ul>
+<li>几种常规用法：很可能需要sudo权限
+<ul>
+<li>分析某几个指标：<code>ncu --metrics </code>
+<ul>
+<li><code>ncu --query-metrics</code>可以列出分析的指标</li>
+</ul>
+</li>
+<li>得到profile的全部信息：<code>ncu --set full --import-source yes --target-processes all -o profile_file</code>
+<ul>
+<li><code>--set full</code>：profile全部信息
+<ul>
+<li><code>ncu --list-sets</code>可以查看支持的section，每个section是一些metric的集合</li>
+</ul>
+</li>
+<li><code>--import-source yes</code>：在服务器端跑出profile，然后copy到本地gui中进行查看</li>
+<li><code>-o &lt;output_file_name&gt;</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="metrics">metrics</h4>
+<ul>
+<li>
+<p>metrics：performance counter，性能统计的指标</p>
+</li>
+<li>
+<p><a href="https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-structure">metrics structure</a></p>
+<ul>
+<li>peak rete：每个counter都有两类peak rete
+<ul>
+<li>burst rate：the maximum rate reportable in a single clock cycle</li>
+<li>sustained rate：the maximum rate achievable over an infinitely long measurement period</li>
+</ul>
+</li>
+<li>metrics entities
+<ul>
+<li>counter：直接从GPU而来的统计量
+<ul>
+<li>每个counter都有四个sub-metrics，叫做roll-ups
+<ul>
+<li>sum，avg，min，max</li>
+</ul>
+</li>
+<li>有一些可以从counter roll-ups计算而来的sub-metrics
+<ul>
+<li>比如<code>.peak_sustained</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ratio：有三个sub-metrics
+<ul>
+<li>pct，ratio，max_rate</li>
+</ul>
+</li>
+<li>throughputs：标识一个portion接近peak rate的程度，有四个sub-metrics
+<ul>
+<li>比如<code>.pct_of_peak_sustained_active</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ncu的metrics与nvprof的metrics不相同，存在一定的<a href="https://docs.nvidia.com/nsight-compute/NsightComputeCli/index.html#nvprof-metric-comparison">对应关系</a>。常用的对应关系
+<table>
+<thead>
+<tr>
+<th style="text-align:center">nvprof</th>
+<th style="text-align:center">ncu</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">achieved_occupancy</td>
+<td style="text-align:center">sm__warps_active.avg.pct_of_peak_sustained_active</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">gld_throughput</td>
+<td style="text-align:center">l1tex__t_bytes_pipe_lsu_mem_global_op_ld.sum.per_second</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">gst_throughput</td>
+<td style="text-align:center">l1tex__t_bytes_pipe_lsu_mem_global_op_st.sum.per_second</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">gld_efficiency</td>
+<td style="text-align:center">smsp__sass_average_data_bytes_per_sector_mem_global_op_ld.pct</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">gst_efficiency</td>
+<td style="text-align:center">smsp__sass_average_data_bytes_per_sector_mem_global_op_st.pct</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">gld_transactions</td>
+<td style="text-align:center">l1tex__t_sectors_pipe_lsu_mem_global_op_ld.sum</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">gst_transactions</td>
+<td style="text-align:center">l1tex__t_sectors_pipe_lsu_mem_global_op_st.sum</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">gld_transactions_per_request</td>
+<td style="text-align:center">l1tex__average_t_sectors_per_request_pipe_lsu_mem_global_op_ld.ratio</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">gst_transactions_per_request</td>
+<td style="text-align:center">l1tex__average_t_sectors_per_request_pipe_lsu_mem_global_op_st.ratio</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">shared_efficiency</td>
+<td style="text-align:center">smsp__sass_average_data_bytes_per_wavefront_mem_shared.pct</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">shared_load_throughput</td>
+<td style="text-align:center">l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum.per_second</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">shared_load_transactions</td>
+<td style="text-align:center">l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">shared_store_throughput</td>
+<td style="text-align:center">l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum.per_second</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">shared_store_transactions</td>
+<td style="text-align:center">l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum.per_second</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">inst_per_warp</td>
+<td style="text-align:center">smsp__average_inst_executed_per_warp.ratio</td>
+<td style="text-align:center">比如if分支优化之后，分支减少，inst_per_warp会减少很多</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</li>
+<li>
+<p>metrics命名规则和<a href="https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-decoder">对应实体</a></p>
+</li>
+<li>
+<p>其他</p>
+<ul>
+<li>常见报错：<code>Error: ERR_NVGPUCTRPERM - The user does not have permission to access NVIDIA GPU Performance Counters on the target device.</code>
+<ul>
+<li>官方解决方法：<a href="https://developer.nvidia.com/nvidia-development-tools-solutions-err_nvgpuctrperm-permission-issue-performance-counters"># NVIDIA Development Tools Solutions - ERR_NVGPUCTRPERM: Permission issue with Performance Counters</a></li>
+<li>自己在<code>/etc/modprobe.d</code>下<code>touch nvidia-restrict-profiling.conf</code>并写入<code>options nvidia NVreg_RestrictProfilingToAdminUsers=0</code>，然后重启</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>参考</p>
+<ul>
+<li><a href="https://docs.nvidia.com/nsight-compute/NsightComputeCli/index.html#nvprof-event-comparison">nvprof的metric与ncu的metric的对应关系</a></li>
+<li><a href="https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-decoder">ncu的metric中命名规则和说明</a></li>
+<li><a href="https://docs.nvidia.com/cuda/profiler-users-guide/index.html#metrics-for-capability-7-x">nvprof的metric的说明</a></li>
+<li><a href="https://blog.csdn.net/u013378687/article/details/130114918">nvprof的metric的说明（中文博客）</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="cuda-memcheck">cuda-memcheck</h3>
+<p>CUDA 提供了 CUDA-MEMCHECK 的工具集，包括 memcheck, racecheck, initcheck, synccheck.</p>
+<pre><code>cuda-memcheck --tool memcheck [options] app-name [options]
+</code></pre>
+<p>对于 memcheck 工具，可以简化为：</p>
+<pre><code>cuda-memcheck [options] app-name [options]
+</code></pre>
+<h2 id="实战">实战</h2>
+<p>二维矩阵相加进行profile：https://face2ai.com/CUDA-F-3-3-%E5%B9%B6%E8%A1%8C%E6%80%A7%E8%A1%A8%E7%8E%B0/</p>
+<p>reduce使用全局内存进行profile逐步优化：https://face2ai.com/CUDA-F-3-5-%E5%B1%95%E5%BC%80%E5%BE%AA%E7%8E%AF/</p>
+]]></content:encoded>
+    </item>
+    
+    <item>
+      <title>[cuda-learning-notes] GPU架构发展、兼容性和编译</title>
       <link>https://qinganzhang.github.io/posts/cuda-learning-notes/gpu%E6%9E%B6%E6%9E%84%E5%8F%91%E5%B1%95%E5%85%BC%E5%AE%B9%E6%80%A7%E5%92%8C%E7%BC%96%E8%AF%91/</link>
-      <pubDate>Thu, 01 Feb 2024 22:00:30 +0800</pubDate>
+      <pubDate>Fri, 01 Mar 2024 22:00:30 +0800</pubDate>
       
       <guid>https://qinganzhang.github.io/posts/cuda-learning-notes/gpu%E6%9E%B6%E6%9E%84%E5%8F%91%E5%B1%95%E5%85%BC%E5%AE%B9%E6%80%A7%E5%92%8C%E7%BC%96%E8%AF%91/</guid>
       <description>CUDA编译链和兼容性 兼容性 CPU与GPU的区别 CPU只有少量的计算核心，有更多晶体管用于数据缓存和流程控制， GPU有大量计算能力较弱的计算</description>
