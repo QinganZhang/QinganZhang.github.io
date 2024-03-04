@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>cuda-leaning-notes on Paul&#39;s Blog</title>
+    <link>https://qinganzhang.github.io/categories/cuda-leaning-notes/</link>
+    <description>Recent content in cuda-leaning-notes on Paul&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 01 Feb 2024 22:02:01 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/categories/cuda-leaning-notes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>硬件抽象和执行模型</title>
+      <link>https://qinganzhang.github.io/posts/cuda-learning-notes/%E7%A1%AC%E4%BB%B6%E6%8A%BD%E8%B1%A1%E5%92%8C%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9E%8B/</link>
+      <pubDate>Thu, 01 Feb 2024 22:02:01 +0800</pubDate>
+      
+      <guid>https://qinganzhang.github.io/posts/cuda-learning-notes/%E7%A1%AC%E4%BB%B6%E6%8A%BD%E8%B1%A1%E5%92%8C%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9E%8B/</guid>
+      <description>编程模型 线程组织层次 grid 网格 由一个内核函数启动所产生的所有线程统称为一个网格(grid) grid size和block size都是三维结构，dim3类</description>
+      <content:encoded><![CDATA[<h2 id="编程模型">编程模型</h2>
+<h3 id="线程组织层次">线程组织层次</h3>
+<ul>
+<li>
+<p>grid 网格</p>
+<ul>
+<li>
+<p>由一个内核函数启动所产生的所有线程统称为一个网格(grid)</p>
+</li>
+<li>
+<p>grid size和block size都是三维结构，<code>dim3</code>类型</p>
+<blockquote>
+<p>数据类型<code>dim3</code>是基于<code>uint3</code>定义的：</p>
+<ul>
+<li>比如在主机端配置核函数grid size和block size时，数据类型为<code>dim3</code>类型，此时变量可以进行修改</li>
+<li>比如核函数在运行时，在设备端查询grid size和block size时，此时数据类型为<code>uint3</code>，此时变量已经固定无法修改</li>
+</ul>
+</blockquote>
+<ul>
+<li>三维网格<code>grid_size(gridDim.x, gridDim.y, gridDim.z)</code></li>
+<li>三维线程块<code>block_size(blockDim.x, blockDim.y, blockDim.z)</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>thread block 线程块</p>
+<ul>
+<li>一个grid可以分为很多个thread block，由<code>blockIdx</code>定位</li>
+<li>线程块大小（block size，每个block中线程数量）为1024</li>
+</ul>
+</li>
+<li>
+<p>warp（thread）</p>
+<ul>
+<li>一个thread block中包含很多thread，每相邻的32个（warpSize）thread组成一个warp</li>
+<li>每个thread可以由线程块id<code>blockIdx</code>和线程id<code>threadIdx</code>唯一确定，同样也是三维结构</li>
+</ul>
+</li>
+</ul>
+<h3 id="函数">函数</h3>
+<h4 id="核函数">核函数</h4>
+<ul>
+<li>
+<p>核函数配置：<code>&lt;&lt;&lt;grid_size, block_size, shared_memory_size, stream&gt;&gt;&gt;</code></p>
+</li>
+<li>
+<p>核函数的启动都是异步的，host只是启动（或launch）核函数</p>
+<ul>
+<li>可以使用<code>cudaDeviceSynchronize</code>进行显式同步，或者进行隐式同步</li>
+</ul>
+</li>
+<li>
+<p>核函数的语法相关：</p>
+<ul>
+<li>返回类型必须是 <code>void</code></li>
+<li>必须使用限定符 <code>__glolbal__</code>，也可以加上 c++ 限定符（比如static）；</li>
+<li>核函数支持 c++ 的重载机制；</li>
+<li>核函数不支持可变数量的参数列表，即参数个数必须确定；</li>
+<li>一般情况下，传给核函数的数组（指针）必须指向设备内存（“统一内存编程机制”除外）；</li>
+<li>核函数不可成为一个类的成员（一般以包装函数调用核函数，将包装函数定义为类成员）；</li>
+<li>在计算能力3.5之前，核函数之间不能相互调用；之后，通过“动态并行”机制可以调用；</li>
+</ul>
+</li>
+<li>
+<p>有时启动的线程数量多于数组元素个数，因此通常使用if语句进行控制</p>
+</li>
+</ul>
+<h4 id="设备函数">设备函数</h4>
+<ul>
+<li>
+<p>核函数可以调用不带执行配置的自定义函数，即设备函数。</p>
+</li>
+<li>
+<p>函数执行空间标识符（函数类型限定符）：确定一个函数在哪里被调用，在哪里被运行：</p>
+<blockquote>
+<p>区分变量类型限定符：<code>__device__</code>全局内存，<code>__shared__</code>共享内存，<code>__constant__</code>常量内存，<code>__managed__</code>统一内存</p>
+</blockquote>
+<ul>
+<li><code>__global__</code>修饰的函数称为核函数，一般由主机调用、在设备中执行；</li>
+<li><code>__device__</code>修饰的函数称为设备函数，只能被核函数或其他设备函数调用、在设备中执行；</li>
+<li><code>__host__</code>修饰主机端的普通 c++ 函数，在主机中被调用、在主机中执行，一般可以省略；</li>
+</ul>
+</li>
+<li>
+<p>相关语法：</p>
+<ul>
+<li>设备函数可以有返回值</li>
+<li>不能同时用 <code>__global__</code> 和 <code>__device__</code> 修饰函数（即一个函数不能同时是核函数和设备函数）</li>
+<li>不能同时用 <code>__global__</code> 和 <code>__host__</code> 修饰函数（即一个函数不能同时是核函数和主机函数）</li>
+<li>可以同时用 <code>__host__</code> 和 <code>__device__</code> 修饰函数，从而减少代码冗余，此时编译器将分别在主机和设备上编译该函数，生成两份不同的机器码</li>
+<li>可以通过 <code>__noinline__</code> 建议编译器不要将一个设备函数当作内联函数；</li>
+<li>可以通过 <code>__forceinline__</code> 建议编译器将一个设备函数当作内联函数。</li>
+</ul>
+</li>
+</ul>
+<h3 id="内存模型">内存模型</h3>
+<h2 id="执行模型">执行模型</h2>
+<h3 id="并行方式">并行方式</h3>
+<ul>
+<li>指令级并行：如果某个warp中两条指令相互独立，则可以依次发射，进行指令级并行</li>
+<li>线程并行方式：SIMT
+<ul>
+<li>SIMD：比如向量运算指令
+<ul>
+<li>一个线程可以同时处理多个数据，但是当前只使用一个ALU。比如使用ARM指令拓展NEON中的向量加指令，可以同时进行四个int的相加</li>
+<li>多个数据使用使用相同的指令一起执行</li>
+</ul>
+</li>
+<li>SIMT
+<ul>
+<li>从硬件上看，所有的core有各自的执行单元（与SIMD共用一个ALU不同）</li>
+<li>从软件上看，每个线程都有自己的指令计数器、寄存器，因此每个线程可以有自己独立的执行路径</li>
+<li>尽管一个warp中的所有线程在相同的程序地址上同时开始执行，但是单独的线程仍然可能有不同的行为</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>warp并行方式：SM上同一个线程块的多个warp，通过大量的core实现并行，通过调度和流水线实现并发和并行</li>
+</ul>
+<h3 id="执行模型-1">执行模型</h3>
+<ul>
+<li>
+<p>host启动核函数，GPU异步执行</p>
+</li>
+<li>
+<p>GPU根据运行配置，GPU将启动的核函数作为一个grid，并划分为线程块</p>
+<ul>
+<li>一个线程块分配到一个SM执行，多个线程块可以分配到同一个SM执行，但是一个线程块无法分配到多个SM</li>
+</ul>
+</li>
+<li>
+<p>线程块划分为warp</p>
+<ul>
+<li>
+<p>由于资源和硬件限制，并非所有的warp都可以同时执行，因此warp可以分类：</p>
+<blockquote>
+<p>资源和硬件限制：</p>
+<ul>
+<li>
+<p>限制了运行的warp的最大数量</p>
+<ul>
+<li>
+<p>SM限制：每个SM、每个block的最大共享内存大小</p>
+</li>
+<li>
+<p>寄存器限制：每个SM、每个block、每个thread的最大寄存器数量</p>
+</li>
+<li>
+<p>每个SM中resident block、resident warps、resident threads的最大数量</p>
+<blockquote>
+<p>寄存器和共享内存都是以256个或字节为单元进行分配的</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>
+<p>限制了每个时钟周期发射的warp的数量：比如一个warp scheduler如果只有一个issue slot，则只能从warp slots中发生一个warp</p>
+</li>
+</ul>
+</blockquote>
+<ul>
+<li>active warp：进入到warp slots中的warp（另一种说法是，当寄存器和共享内存分配给线程块，该线程块内的warp处于活跃状态）
+<ul>
+<li>stalled warp：阻塞的warp
+<ul>
+<li>造成阻塞的情况：正在取指，依赖内存指令的访存结果，依赖于之前指令的执行结果，pipeline正在忙，同步barrier</li>
+</ul>
+</li>
+<li>eligible warp：符合条件的warp（32个cuda core可用于执行，数据已经就绪），可以运行的warp</li>
+<li>selected warp：选定的warp，当前正在运行的warp</li>
+</ul>
+</li>
+<li>inactivate warp</li>
+</ul>
+</li>
+<li>
+<p>由于计算资源是在warp之间分配的，且warp的整个生命周期都在片上（上下文常驻SM），所以warp的上下文切换是非常快速的</p>
+<ul>
+<li>而CPU中寄存器数量很有限，进行需要保护和切换上下文</li>
+</ul>
+</li>
+<li>
+<p>参考</p>
+<ul>
+<li><a href="https://blog.csdn.net/feng__shuai/article/details/125665305">warp scheduler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>隐藏延迟：如果warp scheduler在指令周期的每个时钟周期都有一些可以发射的指令，则最大化硬件利用率。通过流水线，来隐藏延迟</p>
+<ul>
+<li>同一个线程中的指令使用流水线来进行指令级并行</li>
+<li>两类指令：
+<ul>
+<li>算数指令：使用ALU，延迟小（大约10~20个时钟周期）
+<ul>
+<li>
+<p>算数指令隐藏延迟的目的是使用全部的计算资源</p>
+</li>
+<li>
+<p>算数运算的并行可以表示为：隐藏算数指令延迟所需要的操作数量</p>
+<ul>
+<li>所需的指令数量=延迟 $\times$ 吞吐量/32</li>
+<li>吞吐量是每个SM每个时钟周期的操作数量，由于SIMT，一个指令对应32个线程的操作，因此指令的吞吐量=（操作数量）吞吐量/32</li>
+</ul>
+<blockquote>
+<p>理论上所需active的warp数量=延迟 $\times$ 吞吐量/32，还是延迟$\times$ warp_scheduler数量，不是很清楚</p>
+</blockquote>
+</li>
+<li>
+<p>比如有4个warp scheduler，一个算数指令的耗时或延迟是8个周期，则为了完全隐藏延迟，最少需要32个active的warp；如果warp表现出指令并行性，则需要的active的warp数量更少</p>
+</li>
+</ul>
+</li>
+<li>内存指令：使用LD/ST，延迟较大（大约400~800个时钟周期）
+<ul>
+<li>内存指令隐藏延迟的目的是使用全部的带宽</li>
+<li>内存操作的并行可以表示为：每个周期内隐藏内存延迟所需的字节数</li>
+<li>$$所需active的warp数量=\frac{\frac{访存延迟(周期)}{内存频率(周期/s)} \times 带宽(GB/s)}{每个线程访问的数据量(B) \times 32} $$</li>
+</ul>
+</li>
+<li>辨析：
+<ul>
+<li>传统CPU流水线：每个硬件部件（译码单元，ALU等）当前运行的，属于不同的指令，隐藏的是整个指令从取指到写回的整个过程。独立的算数指令的流水线也与此类似。
+<ul>
+<li>CPU通过cache来隐藏延迟，而GPU通过计算来隐藏延迟</li>
+</ul>
+</li>
+<li>算数指令的流水线：在一个SM中，warp之间运行的是不同的指令，因为GPU指令相对CPU而言较慢，所以隐藏的是GPU指令的运行时间</li>
+<li>内存指令的流水线：若干个SM中的所有core，使用流水线，从而隐藏访存延迟</li>
+<li>内存延迟的时候，计算资源core正在被别的warp使用，这两种延迟使用的是不同的硬件资源，但是遵循相同的原理</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>一方面，隐藏延迟需要足够多的活跃的warp，数量越多，隐藏越好；另一方面，warp的数量又受到资源和硬件的限制，不能过多</li>
+</ul>
+</li>
+<li>
+<p>warp占用率：<a href="https://karthikeyann.github.io/cuda-calculator/">CUDA Occupancy Calculator</a></p>
+<ul>
+<li>warp占用率=$\frac{SM中活跃的warp的数量}{SM最大支持warp数量}$
+<ul>
+<li>nvcc编译时，添加编译选项<code>--ptxas-options=-v</code>，可以统计共享内存和寄存器的使用量</li>
+</ul>
+</li>
+<li>高占用率不一定有高性能，但是低占用率不利于隐藏延迟</li>
+<li>占用率限制因素：
+<ul>
+<li>资源限制：共享内存和寄存器限制</li>
+<li>硬件设计限制：每个SM的最多block数、warp数、thread数</li>
+</ul>
+</li>
+<li>权衡
+<ul>
+<li>如果每个线程块中线程太少，线程块数量变多，容易受到每个SM中最多block数的限制，导致占用率低</li>
+<li>如果每个线程块中线程太多，每个线程块中warp数量变多，线程块数量减少，容易受到每个线程寄存器/共享内存的限制，剩余的一些warp没法组成一个线程块，导致占用率变低</li>
+</ul>
+</li>
+<li>参考
+<ul>
+<li><a href="https://blog.csdn.net/weixin_44444450/article/details/118058031">https://blog.csdn.net/weixin_44444450/article/details/118058031</a></li>
+<li>一个占用率计算例子：https://blog.csdn.net/wd1603926823/article/details/108871290</li>
+<li><a href="https://face2ai.com/CUDA-F-3-2-%E7%90%86%E8%A7%A3%E7%BA%BF%E7%A8%8B%E6%9D%9F%E6%89%A7%E8%A1%8C%E7%9A%84%E6%9C%AC%E8%B4%A8-P2/">https://face2ai.com/CUDA-F-3-2-%E7%90%86%E8%A7%A3%E7%BA%BF%E7%A8%8B%E6%9D%9F%E6%89%A7%E8%A1%8C%E7%9A%84%E6%9C%AC%E8%B4%A8-P2/</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="避免分支">避免分支</h3>
+<ul>
+<li>
+<p>一个warp中的if语句如果在运行时判断产生分支，会导致一个warp中对应的线程依次执行相应路径，其他线程等待（或是假运行），相当于每个代码块都跑了一遍，分支数量越多，性能越差</p>
+<ul>
+<li>如果if中没有产生分支，则不用考虑</li>
+<li>比如for循环中包含了if判断，则很可能</li>
+<li>可以将分支粒度调整为warp大小的倍数，使得一个warp中执行同一个路径，不同warp间可以执行不同路径，比如<code>(tid/warpSize)%2</code>进行奇偶交错</li>
+</ul>
+</li>
+<li>
+<p>独立线程调度机制中，每个线程有自己的程序计数器和寄存器，此时SIMT如何运行？不是很清楚</p>
+</li>
+<li>
+<p>metric：不是很清楚</p>
+<ul>
+<li><strong>Branch Efficiency</strong> is a measure of how many branches diverged. 100% means no branches diverged. When a branch diverges the warp thread active mask is reduce to be less than 32 so the execution is not as efficient. In addition the branch may have to be executed multiple times based upon the number of ways the branch diverged.</li>
+<li><strong>Control Flow Efficiency</strong> is a measure of how many threads in a warp were active for each instruction. Unless you launch a non-multiple of 32 threads this will be 32 threads or 100%. This number will be less than 100% if the code diverges.</li>
+</ul>
+</li>
+<li>
+<p>参考</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/12539762/what-does-a-high-branch-efficiency-and-low-control-flow-efficiency-indicate">What does a high branch efficiency and low control flow efficiency indicate</a></li>
+</ul>
+</li>
+</ul>
+<h4 id="循环展开">循环展开</h4>
+<ul>
+<li>
+<p>循环展开：在一次循环中，完成多次循环的任务，从而减少循环的迭代次数</p>
+<ul>
+<li>减少了循环判断次数（减少指令消耗）</li>
+<li>循环内部可以有更多独立的操作，有利于流水线</li>
+</ul>
+</li>
+<li>
+<p>例子：reduce中循环展开</p>
+<ul>
+<li>首先一个线程累加多个数据：shrink
+<ul>
+<li>收益：线程数量减半（指数减少）</li>
+<li>代价：多了一次（或若干次）访存，但是可以使用流水线隐藏延迟</li>
+</ul>
+</li>
+<li>然后折半reduce的过程
+<ul>
+<li>要求此时数组长度必须为2的幂次，因此可以写成模板、在编译期判断</li>
+</ul>
+</li>
+<li>最后是一个warp中的reduce过程：此时计算的线程数量&lt;=32，
+<ul>
+<li>不仅没有了循环判断，而且读写过程可以充分使用流水线</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="动态并行">动态并行</h3>
+<ul>
+<li>
+<p>优点：</p>
+<ul>
+<li>让复杂的kernel变得有层次，比如实现递归核函数</li>
+<li>可以等到执行的时候再创建执行配置，利用GPU硬件调度器和加载平衡器动态的调整以适应数据驱动或工作的负载</li>
+</ul>
+</li>
+<li>
+<p>缺点：</p>
+<ul>
+<li>运行效率更低</li>
+</ul>
+</li>
+<li>
+<p>过程</p>
+<ul>
+<li>子grid被父thread启动，必须在对应的父thread，父thread block，父grid结束之前结束。所有的子grid结束后，父thread，父thread block，父grid才能结束</li>
+<li>如果父thread调用子grid时没有显式同步，则运行时保证，父thread与子grid隐式同步</li>
+<li>需要仔细考虑内存竞争的问题
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2023-12-05-15:22:02.png" style="zoom: 33%;" /></li>
+</ul>
+</li>
+<li>
+<p>编译时需要加上<code>-lcudadevrt --relocatable-device-code true</code></p>
+<ul>
+<li><code>--relocatable-device-code true</code>表示生成可重新定位的代码</li>
+</ul>
+</li>
+</ul>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://blog.csdn.net/qq_42683011/article/details/113593860"># CUDA编程第三章: CUDA执行模型</a></li>
+</ul>
+]]></content:encoded>
+    </item>
+    
+  </channel>
+</rss>
