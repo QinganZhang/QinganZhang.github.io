@@ -2,26 +2,65 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://qinganzhang.github.io/posts/a_survey_of_efficient_transformer_on_inference/</loc>
+    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
+  </url><url>
     <loc>https://qinganzhang.github.io/categories/</loc>
-    <lastmod>2024-02-29T15:39:32+08:00</lastmod>
+    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
   </url><url>
-    <loc>https://qinganzhang.github.io/tags/linux/</loc>
-    <lastmod>2024-02-29T15:39:32+08:00</lastmod>
+    <loc>https://qinganzhang.github.io/tags/deep-learning/</loc>
+    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
   </url><url>
-    <loc>https://qinganzhang.github.io/categories/linux/</loc>
-    <lastmod>2024-02-29T15:39:32+08:00</lastmod>
-  </url><url>
-    <loc>https://qinganzhang.github.io/posts/linux%E7%AC%94%E8%AE%B0/</loc>
-    <lastmod>2024-02-29T15:39:32+08:00</lastmod>
+    <loc>https://qinganzhang.github.io/categories/deep-learning/</loc>
+    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
   </url><url>
     <loc>https://qinganzhang.github.io/</loc>
-    <lastmod>2024-02-29T15:39:32+08:00</lastmod>
+    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
   </url><url>
     <loc>https://qinganzhang.github.io/posts/</loc>
-    <lastmod>2024-02-29T15:39:32+08:00</lastmod>
+    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
   </url><url>
     <loc>https://qinganzhang.github.io/tags/</loc>
-    <lastmod>2024-02-29T15:39:32+08:00</lastmod>
+    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/tags/%E6%8E%A8%E7%90%86%E5%8A%A0%E9%80%9F/</loc>
+    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/posts/tmux%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</loc>
+    <lastmod>2024-03-04T20:36:37+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/tags/tools/</loc>
+    <lastmod>2024-03-04T20:36:37+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/categories/tools/</loc>
+    <lastmod>2024-03-04T20:36:37+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/categories/deep-learning-algorithm/</loc>
+    <lastmod>2024-03-04T20:31:46+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/tags/%E9%87%8F%E5%8C%96/</loc>
+    <lastmod>2024-03-04T20:31:46+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/posts/%E9%87%8F%E5%8C%96%E5%9F%BA%E7%A1%80/</loc>
+    <lastmod>2024-03-04T20:31:46+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/tags/compile/</loc>
+    <lastmod>2024-03-03T21:00:30+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/tags/java/</loc>
+    <lastmod>2024-03-03T21:00:30+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/categories/java/</loc>
+    <lastmod>2024-03-03T21:00:30+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/posts/java%E7%BC%96%E8%AF%91%E6%8A%80%E6%9C%AF%E5%88%86%E6%9E%90/</loc>
+    <lastmod>2024-03-03T21:00:30+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/tags/linux/</loc>
+    <lastmod>2024-02-29T15:29:41+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/categories/linux/</loc>
+    <lastmod>2024-02-29T15:29:41+08:00</lastmod>
   </url><url>
     <loc>https://qinganzhang.github.io/tags/vim/</loc>
     <lastmod>2024-02-29T15:29:41+08:00</lastmod>
@@ -133,6 +172,9 @@
   </url><url>
     <loc>https://qinganzhang.github.io/about/</loc>
     <lastmod>2024-01-31T09:26:44+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/posts/linux%E7%AC%94%E8%AE%B0/</loc>
+    <lastmod>2024-01-29T15:39:32+08:00</lastmod>
   </url><url>
     <loc>https://qinganzhang.github.io/archives/</loc>
   </url><url>

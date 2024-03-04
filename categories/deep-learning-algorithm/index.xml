@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>deep-learning-algorithm on Paul&#39;s Blog</title>
+    <link>https://qinganzhang.github.io/categories/deep-learning-algorithm/</link>
+    <description>Recent content in deep-learning-algorithm on Paul&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 04 Mar 2024 20:31:46 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/categories/deep-learning-algorithm/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>量化基础</title>
+      <link>https://qinganzhang.github.io/posts/%E9%87%8F%E5%8C%96%E5%9F%BA%E7%A1%80/</link>
+      <pubDate>Mon, 04 Mar 2024 20:31:46 +0800</pubDate>
+      
+      <guid>https://qinganzhang.github.io/posts/%E9%87%8F%E5%8C%96%E5%9F%BA%E7%A1%80/</guid>
+      <description>1. 背景 从速度看 访存耗时远多于计算 浮点数计算耗时和整型计算耗时差不多？（from 张志），但是浮点数计算单元需要占用更多额外的芯片面积 从ener</description>
+      <content:encoded><![CDATA[<h2 id="1-背景">1. 背景</h2>
+<ul>
+<li>从速度看
+<ul>
+<li>访存耗时远多于计算</li>
+<li>浮点数计算耗时和整型计算耗时差不多？（from 张志），但是浮点数计算单元需要占用更多额外的芯片面积</li>
+</ul>
+</li>
+<li>从energy看
+<ul>
+<li>访存消耗energy远多于计算（200倍）</li>
+<li>浮点数运算消耗energy多于int8类型（十几倍），因此量化有助于keep efficient</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-数值类型浮点数">2. 数值类型（浮点数）</h2>
+<ul>
+<li>FP32：1+8+23</li>
+<li>FP16：1+5+10，通常使用在混合精度训练中</li>
+<li>BF16：1+8+7，直接将FP32进行截断，方便直接进行转换</li>
+<li>TF32：1+8+19，保留了FP32的范围（8位范围）与FP16的精度（10位精度），用于TensorCore中</li>
+<li>FP24：</li>
+</ul>
+<h2 id="3-量化基础">3. 量化基础</h2>
+<ul>
+<li>
+<p>K-Means-based Quantization</p>
+<ul>
+<li>原理：权重进行kmeans聚类（每个类别cluster视为一个模式），每个cluster对应一个浮点数，构成一个codebook（lookup table），权重矩阵中保存的是codebook中的索引
+<ul>
+<li><span id="kmeans">微调过程</span>：给定权重矩阵对应的梯度矩阵，将梯度矩阵按照模式进行分组（对应不同的cluster），每组梯度进行求和，再更新codebook中对应cluster的浮点数</li>
+</ul>
+</li>
+<li>效果：
+<ul>
+<li>从pruning ratio看：剪枝+量化同时使用，可以获得更小的pruning ratio（量化后再微调一下，有助于恢复精度）</li>
+<li>从准确率看：剪枝+量化准确率与只进行量化差不多</li>
+</ul>
+</li>
+<li>优化：霍夫曼编码
+<ul>
+<li>将更频繁的权重使用更短的编码表示（但是这样会导致权重矩阵中各个元素大小不一❓）</li>
+</ul>
+</li>
+<li>特点：量化后存储的是低比特，但是计算仍然是浮点数（只是节省了存储，但是访存翻倍❓）</li>
+</ul>
+</li>
+<li>
+<p>Linear Quantization</p>
+<ul>
+<li>
+<p>原理：直接进行映射，相当于线性的codebook，权重矩阵中存储的是量化值，运算时先反量化到浮点数范围、再使用不同的量化参数量化到int8
+$$
+量化：&amp;uint &amp;=&amp; round( \frac{float}{scale} + offset) \
+反量化：&amp;float &amp;=&amp; (uint - offset) * scale
+$$</p>
+</li>
+<li>
+<p>tricks：</p>
+<ul>
+<li>
+<p>公式中的很多部分可以pre-compute</p>
+</li>
+<li>
+<p>scale的浮点乘法可以转换为定点小数的位移</p>
+<blockquote>
+<p>详见<a href="https://arxiv.org/pdf/1712.05877.pdf">Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference</a> 第2.2章</p>
+<p><a href="https://zhuanlan.zhihu.com/p/149659607">神经网络量化入门&ndash;基本原理</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/413864742">量化推理是如何把scale转换为定点运算的</a></p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>
+<p>分类</p>
+<ul>
+<li>对称量化</li>
+<li>非对称量化（由于补码负数比正数多一个，因此区分两种模式，构造成左右对称的形式，不同框架可能使用不同的mode）
+<ul>
+<li>full range mode：正数128加进来</li>
+<li>restricted range mode：负数-128去掉</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>特点：量化后存储的是int8，计算中也是int8</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-量化种类">4. 量化种类</h2>
+<h3 id="41-post-training-quantizationptq">4.1 Post-Training Quantization(PTQ)</h3>
+<ul>
+<li>
+<p>权重量化Weight Quantization：减小模型大小</p>
+<ul>
+<li>
+<p>Per-tensor vs Per-channel</p>
+</li>
+<li>
+<p>Weight Equalization</p>
+<ul>
+<li>
+<p>背景：</p>
+<ul>
+<li>Per-tensor量化简单，但是由于channel之间range差异较大，导致效果很差</li>
+<li>Per-channel量化效果较好，但是需要特殊硬件支持❓</li>
+<li>目标：make weight ranges similar (or equalize the weight range), so that per-tensor quantization can be applied（既想要per-tensor的简单，又想要per-channel的效果）</li>
+</ul>
+</li>
+<li>
+<p>原理：positive scaling equivariance伸缩等价性</p>
+<p>对于conv、fc和relu，满足：</p>
+<p>$$f(s x) = s f(x), where \quad s \gt 0 $$</p>
+</li>
+<li>
+<p>方法：对于连续的两个卷积层，第一个卷积层乘上一个scale，第二个卷积核对应通道除以一个scale，这样与原来是等价的，但是调整了第一个卷积核的range；然后逐渐连续地调整</p>
+<blockquote>
+<p><a href="https://zhuanlan.zhihu.com/p/393556057">后量化训练-Data free quantization</a></p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>
+<p>Adaptive Rounding</p>
+<ul>
+<li>
+<p>背景：</p>
+<ul>
+<li>
+<p>看似符合直觉的round-to-nearest其实精度并不是最优的</p>
+<blockquote>
+<p>因为并非每个单独的weight的量化损失越小越好，weight之间存在相互影响</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>
+<p>方法：Adaptive地决定weight量化时将浮点数转到最近右定点还是最近左定点❓</p>
+<blockquote>
+<p><a href="https://zhuanlan.zhihu.com/p/363941822">AdaRound解读</a></p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>激活值量化Activation Quantization：减小内存占用</p>
+<p>目标：由于激活值无法提前确定，因此要找到激活值的$r_{min}, r_{max}$</p>
+<ul>
+<li>
+<p>During Training</p>
+<ul>
+<li>
+<p>EMA</p>
+<p>在训练时使用exponential moving averages (EMA)来得到$r_{min}, r_{max}$
+$$
+&amp;\hat{r} ^ {(t)} _ {max, min} = \alpha r ^ {(t)} _ {max, min} + (1 - \alpha) \hat{r} ^ {(t-1)} _ {max, min} \
+&amp;其中  \hat{r} ^ {(t)} _ {max, min} 是EMA激活值范围， \
+&amp;r ^ {(t)} _ {max, min} 是 epoch=t时的激活值范围
+$$</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1712.05877">Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference</a> 3.1段</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>
+<p>Use calibration after training</p>
+<ul>
+<li>
+<p>统计calibration中每个sample的$r_{min}, r_{max}$，然后取平均</p>
+</li>
+<li>
+<p>ACIQ</p>
+<ul>
+<li>
+<p>基本思想：最小化激活值X与量化值Q（X）的MSE，具体假设原始激活值的分布，展开求导
+$$
+\mathop{min}\limits_{|r|_{max}} \mathbb{E} \left[ (X - Q(X))^2 \right]
+$$</p>
+<blockquote>
+<p><a href="https://zhuanlan.zhihu.com/p/138569083">CNN后量化方法：ACIQ</a></p>
+<p><a href="https://arxiv.org/pdf/1810.05723.pdf">Post training 4-bit quantization of convolutional networks for rapid-deployment</a></p>
+</blockquote>
+</li>
+<li>
+<p>缺点：需要假设原始的激活值浮点分布（因为需要密度函数）</p>
+</li>
+</ul>
+</li>
+<li>
+<p>KL-divergence based</p>
+<ul>
+<li>
+<p>基本思想：使用KL散度来衡量量化的信息损失（原始激活值的分布与量化后的分布）</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/Nichlson/article/details/121085747">TensorRT INT8量化原理与实现（非常详细）</a> 第七部分</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>偏置量化Bias Quantization</p>
+<ul>
+<li>
+<p>背景：权重量化之后，权重分布会产生一个shift。一方面希望量化误差尽量小，另一方面希望量化误差的期望为0（但并非如此）</p>
+<blockquote>
+<p><a href="https://zhuanlan.zhihu.com/p/393556057">后训练量化——Data free quantization</a> 中<strong>Bias Correction</strong>，可以看到蓝色的量化误差明显左偏</p>
+</blockquote>
+</li>
+<li>
+<p>方法：</p>
+<ul>
+<li>如果当前有数据：全精度和量化模型分别跑一遍，bias减去这个量化误差，注意对于每一个卷积层或全连接层都要跑一遍</li>
+<li>如果当前没有数据：</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="42-quantization-aware-trainingqat">4.2 Quantization Aware Training(QAT)</h3>
+<ul>
+<li>
+<p><a href="#kmeans">K-means-based Quantization 微调</a></p>
+</li>
+<li>
+<p>STE方法：</p>
+<ul>
+<li>
+<p>想法：权重信息经过伪量化操作，来模拟产生量化误差，反向传播的梯度信息跳过伪量化节点直接更新原始权重，相当于更新权重信息考虑到了量化误差、梯度下降进行优化</p>
+</li>
+<li>
+<p>过程：</p>
+<ul>
+<li>
+<p>拿到训练好的模型</p>
+</li>
+<li>
+<p>在权重、激活值、输入输出等（对应权重量化与激活值量化）前面插入伪量化节点（将浮点权重量化再反量化，模拟推理时的量化）</p>
+<blockquote>
+<p>一开始伪量化节点中量化参数是怎么来的？</p>
+<p>在微调的forward过程中，顺便计算出量化参数：</p>
+<ul>
+<li>如果是针对权重的量化：直接统计权重中的最小值、最大值，从而计算量化参数</li>
+<li>如果是针对激活值的量化：使用指数移动平均EMA来更新量化参数</li>
+</ul>
+</blockquote>
+</li>
+<li>
+<p>前向推理，模拟量化的过程</p>
+</li>
+<li>
+<p>反向传播：正常更新权重（权重是浮点类型），相当于梯度信息跳过了伪量化节点</p>
+<blockquote>
+<p><a href="https://zhuanlan.zhihu.com/p/158776813">神经网络量化入门&ndash;量化感知训练</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/548174416">量化感知训练（Quantization-aware-training）探索-从原理到实践</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/467841404">再读《神经网络量化白皮书》- 0x04 训练时量化(QAT)</a></p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>LSQ方法：在反向传播时可以更新量化参数</p>
+<blockquote>
+<p><a href="https://zhuanlan.zhihu.com/p/396001177">量化训练之可微量化参数—LSQ</a></p>
+</blockquote>
+</li>
+</ul>
+<h2 id="5-低比特量化">5. 低比特量化</h2>
+<ul>
+<li>Binary Quantization</li>
+<li>Ternary Quantization</li>
+<li>Mixed-Percision Quantization</li>
+</ul>
+<p>参考：</p>
+<ul>
+<li><a href="https://blog.csdn.net/weixin_37179744/article/details/130079721?spm=1001.2014.3001.5502">MIT 6.S965 韩松课程 05</a></li>
+<li><a href="https://blog.csdn.net/jinzhuojun/article/details/106955059">闲话模型压缩之量化（Quantization）篇</a></li>
+</ul>
+]]></content:encoded>
+    </item>
+    
+  </channel>
+</rss>

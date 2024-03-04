@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>tools on Paul&#39;s Blog</title>
+    <link>https://qinganzhang.github.io/categories/tools/</link>
+    <description>Recent content in tools on Paul&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 04 Mar 2024 20:36:37 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/categories/tools/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tmux简单使用</title>
+      <link>https://qinganzhang.github.io/posts/tmux%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Mon, 04 Mar 2024 20:36:37 +0800</pubDate>
+      
+      <guid>https://qinganzhang.github.io/posts/tmux%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</guid>
+      <description>1. tmux简单介绍 xshell等工具SSH远程登录服务器时，终端窗口（显示界面）和会话（用户与服务器的交互命令）是绑定的，关闭窗口会话也随之</description>
+      <content:encoded><![CDATA[<h1 id="1-tmux简单介绍">1. tmux简单介绍</h1>
+<p>xshell等工具SSH远程登录服务器时，终端窗口（显示界面）和会话（用户与服务器的交互命令）是绑定的，关闭窗口会话也随之结束。tmux可以将窗口和会话分离，关闭窗口后，会话不终止，下次重新打开窗口可以继续绑定上次的会话。</p>
+<p>界面说明：</p>
+<p>左下角，方括号中为会话编号或名称，后面是窗口编号和名字，星号<code>*</code>表示当前所处窗口</p>
+<h1 id="2-常用命令">2. 常用命令</h1>
+<h2 id="21-会话管理">2.1 会话管理</h2>
+<ol>
+<li>
+<p>新建会话</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">tmux # 会话编号自动从0开始
+</span></span><span class="line"><span class="cl">tmux new -s &lt;session-name&gt; # 自定义会话名称
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>将会话与窗口分离：<code>Ctrl+b d</code>或者<code>tmux detach</code></p>
+</li>
+<li>
+<p>查看会话：<code>tmux ls</code></p>
+</li>
+<li>
+<p>接入会话： <code>tmux attach -t &lt;session-name&gt;/&lt;session-id&gt;</code></p>
+</li>
+<li>
+<p>杀死会话：<code>tmux kill-session -t &lt;session-name&gt;/&lt;session-id&gt;</code></p>
+</li>
+<li>
+<p>退出会话：<code>Ctrl+b d</code></p>
+</li>
+<li>
+<p>切换会话：<code>tmux switch -t &lt;session-name&gt;/&lt;session-id&gt;</code>或者<code>Ctrl+b s</code></p>
+</li>
+<li>
+<p>重命名会话：<code>tmux rename-session -t &lt;old-name&gt; &lt;new-name&gt;</code>或者<code>Ctrl+b $</code></p>
+</li>
+</ol>
+<h2 id="22-窗口window管理">2.2 窗口（window）管理</h2>
+<ol>
+<li>新建窗口：<code>tmux new-window -n &lt;window-name&gt;</code>或者<code>Ctrl+b c</code></li>
+<li>切换窗口：
+<ul>
+<li><code>tmux select-window -t &lt;window-name&gt;/&lt;window-id&gt;</code></li>
+<li><code>Ctrl+b p/n</code>切换上一个/下一个窗口</li>
+<li><code>Ctrl+b l</code>：在两个窗口之间来回切换。</li>
+<li><code>Ctrl+b &lt;window-id&gt;</code>切换指定窗口</li>
+<li><code>Ctrl+b w</code>从列表中选择窗口</li>
+</ul>
+</li>
+<li>当前重命名窗口：<code>tmux rename-window &lt;new-name&gt;</code>或者<code>Ctrl+b ,</code></li>
+<li>关闭当前窗口：<code>Ctrl+b &amp;</code></li>
+</ol>
+<h2 id="23-窗格pane管理">2.3 窗格（pane）管理</h2>
+<ol>
+<li>
+<p>划分窗格：</p>
+<p>左右划分<code>Ctrl+b %</code> 	上下划分<code>Ctrl+b &quot; </code></p>
+</li>
+<li>
+<p>切换选中窗格：</p>
+<p><code>Ctrl+b &lt;方向键&gt; </code></p>
+<p>切换到下一个窗格<code>Ctrl+b o</code>	切换到上一个窗格<code>Ctrl+b ;</code></p>
+</li>
+<li>
+<p>交换窗格：</p>
+<p>与上一个窗格交换位置<code>Ctrl+b {</code>	与下一个窗格交换位置<code>Ctrl+b }</code></p>
+</li>
+<li>
+<p>关闭窗格：</p>
+<p><code>Ctrl+b x</code></p>
+</li>
+<li>
+<p>调整窗格：</p>
+<p><code>Ctrl+b Ctrl+&lt;方向键&gt;</code>：按方向调整窗格大小</p>
+<p><code>Ctrl+b z</code>：当前窗格全屏显示（临时），再用一次复原</p>
+<p><code>Ctrl+b !</code>：将当前窗格拆分为独立的窗口</p>
+</li>
+<li>
+<p>其他：</p>
+<p><code>Ctrl+b q</code>：显示窗格编号</p>
+<p><code>Ctrl+b [</code>：进入翻屏模式，实现上下翻页</p>
+</li>
+</ol>
+<h2 id="24-其他">2.4 其他</h2>
+<ol>
+<li><code>Ctrl+b ?</code>：帮助命令</li>
+<li><code>tmux list-keys</code>列出所有快捷键和对应的tmux命令</li>
+</ol>
+<h1 id="3-参考资料">3. 参考资料</h1>
+<p><a href="https://www.ruanyifeng.com/blog/2019/10/tmux.html">Tmux 使用教程-阮一峰</a></p>
+<p><a href="https://www.51cto.com/article/664989.html">Linux 终端复用神器 Tmux 使用详解，看完可以回家躺平了～</a></p>
+]]></content:encoded>
+    </item>
+    
+  </channel>
+</rss>
