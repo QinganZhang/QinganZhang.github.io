@@ -241,8 +241,8 @@
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">man (section) name	# section:1命令，2系统调用，3库函数，5配置文件（因为可能有同名的）
-</span></span><span class="line"><span class="cl">man -k regexp	# 用正则匹配
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">man (section) name    # section:1命令，2系统调用，3库函数，5配置文件（因为可能有同名的）
+</span></span><span class="line"><span class="cl">man -k regexp    # 用正则匹配
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -253,7 +253,7 @@
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">date &#34;+%Y-%m-%d %H:%M:%S Day %j&#34;	# 格式控制字符串必须以+号开头
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">date &#34;+%Y-%m-%d %H:%M:%S Day %j&#34;    # 格式控制字符串必须以+号开头
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -264,7 +264,7 @@
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bc -l	# 类似于ipython的交互式界面
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bc -l    # 类似于ipython的交互式界面
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -277,9 +277,9 @@
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ls -l &gt; filelist.txt	# 输出重定向
-</span></span><span class="line"><span class="cl">sort &lt; filelist.txt		# 输入重定向
-</span></span><span class="line"><span class="cl">ls -l &gt;&gt; filelist.txt	# 追加内容
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ls -l &gt; filelist.txt    # 输出重定向
+</span></span><span class="line"><span class="cl">sort &lt; filelist.txt        # 输入重定向
+</span></span><span class="line"><span class="cl">ls -l &gt;&gt; filelist.txt    # 追加内容
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -301,7 +301,7 @@
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">less -Nm	 # fb翻页，du翻半页，gG第一/最后一行，v编辑，/?向下或上搜索字符串(nN上一个下一个)
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">less -Nm     # fb翻页，du翻半页，gG第一/最后一行，v编辑，/?向下或上搜索字符串(nN上一个下一个)
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -327,9 +327,9 @@
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">head -n 20 file.txt 	# 显示前20行
-</span></span><span class="line"><span class="cl">hand -n -20 file.txt	# 除了尾部20行，其余算头并显示
-</span></span><span class="line"><span class="cl">tail -f file.txt		# 实时打印文件尾部追加的内容
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">head -n 20 file.txt     # 显示前20行
+</span></span><span class="line"><span class="cl">hand -n -20 file.txt    # 除了尾部20行，其余算头并显示
+</span></span><span class="line"><span class="cl">tail -f file.txt        # 实时打印文件尾部追加的内容
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -356,7 +356,7 @@
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ps -ef | wc -l	# 查看当前进程总数
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ps -ef | wc -l    # 查看当前进程总数
 </span></span><span class="line"><span class="cl">ls | wc -w # 查看当前文件夹下文件个数
 </span></span></code></pre></td></tr></table>
 </div>
@@ -376,7 +376,7 @@
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cat file.txt | tr &#39;[a-z]&#39; &#39;[A-Z]&#39;	# 将file.txt文件中小写字母替换为大写字母
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cat file.txt | tr &#39;[a-z]&#39; &#39;[A-Z]&#39;    # 将file.txt文件中小写字母替换为大写字母
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -395,7 +395,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">tty # 输出当前终端设备文件名
-</span></span><span class="line"><span class="cl">who am i 	# 输出当前终端上的登录用户
+</span></span><span class="line"><span class="cl">who am i     # 输出当前终端上的登录用户
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -420,7 +420,7 @@
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">top -d 1 -n 5	# delay=1, 运行5次
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">top -d 1 -n 5    # delay=1, 运行5次
 </span></span><span class="line"><span class="cl">当前时间 开机时间 用户数量 CPU负载
 </span></span><span class="line"><span class="cl">任务（进程）
 </span></span><span class="line"><span class="cl">PID USER PR NI VIRT进程虚拟地址空间 RES驻留内存数（占用物理内存数） SHR共享内存数 %CPU %MEM TIME+占用CPU的时间 
@@ -528,8 +528,8 @@
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">grep -n &#39;main&#39; *.cpp	# 从文件中筛选
-</span></span><span class="line"><span class="cl">ps -ef | grep -n &#39;^zhang&#39;	# 从输入中筛选
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">grep -n &#39;main&#39; *.cpp    # 从文件中筛选
+</span></span><span class="line"><span class="cl">ps -ef | grep -n &#39;^zhang&#39;    # 从输入中筛选
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -542,7 +542,7 @@
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">sed &#39;s/^zhang/ZHANG/g&#39;	# 将开头为zhang的替换为ZHNAG，s表示替换，用/划分不同的部分，g表示如果有多个符合则全部替换
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">sed &#39;s/^zhang/ZHANG/g&#39;    # 将开头为zhang的替换为ZHNAG，s表示替换，用/划分不同的部分，g表示如果有多个符合则全部替换
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -689,7 +689,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">find . -type f -name &#39;utils.*&#39; -exec ls -lh {} \;
-</span></span><span class="line"><span class="cl">find . ! -newer file.txt \( -name &#39;*.c&#39; -o -name &#39;*.h&#39; \) -exec grep -n -- --help {} /dev/null \;	# 查找早于file.txt的.c或.h文件，并且在检索到的文件(用{}表示)中查找包含--help的内容，通过grep添加两个文件（{}和/dev/null）来显示查找到的内容是在哪一个文件中
+</span></span><span class="line"><span class="cl">find . ! -newer file.txt \( -name &#39;*.c&#39; -o -name &#39;*.h&#39; \) -exec grep -n -- --help {} /dev/null \;    # 查找早于file.txt的.c或.h文件，并且在检索到的文件(用{}表示)中查找包含--help的内容，通过grep添加两个文件（{}和/dev/null）来显示查找到的内容是在哪一个文件中
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -708,8 +708,8 @@
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">find . -name &#39;*.c&#39; -print | grep -n --help	# 每找到一个文件都要创建一个进程来grep
-</span></span><span class="line"><span class="cl">find . -name &#39;*.c&#39; -print | xargs grep -n --help	# 找到所有文件后，只创建一个进程来批处理(grep)这些找到的文件，将标准输入追加到参数列表后面,效率高
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">find . -name &#39;*.c&#39; -print | grep -n --help    # 每找到一个文件都要创建一个进程来grep
+</span></span><span class="line"><span class="cl">find . -name &#39;*.c&#39; -print | xargs grep -n --help    # 找到所有文件后，只创建一个进程来批处理(grep)这些找到的文件，将标准输入追加到参数列表后面,效率高
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -794,7 +794,7 @@
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ln file.txt lnk	# 创建file.txt的硬链接lnk，删除lnk时对应i-node的link数减一，仅限于同一个文件系统中的普通文件
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ln file.txt lnk    # 创建file.txt的硬链接lnk，删除lnk时对应i-node的link数减一，仅限于同一个文件系统中的普通文件
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -1086,9 +1086,9 @@
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">在*.conf文件中匹配&#39;192.168.x.x&#39;结尾
 </span></span><span class="line"><span class="cl">pattern:  &#39;192\.168\.[0-9.]*&#39;$
-</span></span><span class="line"><span class="cl">grep \&#39;&#39;192\.168\.[0-9.]*&#39;\&#39;&#39;$&#39; *.conf	# 使用单引号
-</span></span><span class="line"><span class="cl">grep &#34;&#39;192\\.168\\.[0-9.]*&#39;\S&#34; *.conf	# 使用双引号
-</span></span><span class="line"><span class="cl">grep \&#39;192\\.168\\.\[0-9.]\*\&#39;\$ *.conf	# 只使用转义,不被引号包括的字符串
+</span></span><span class="line"><span class="cl">grep \&#39;&#39;192\.168\.[0-9.]*&#39;\&#39;&#39;$&#39; *.conf    # 使用单引号
+</span></span><span class="line"><span class="cl">grep &#34;&#39;192\\.168\\.[0-9.]*&#39;\S&#34; *.conf    # 使用双引号
+</span></span><span class="line"><span class="cl">grep \&#39;192\\.168\\.\[0-9.]\*\&#39;\$ *.conf    # 只使用转义,不被引号包括的字符串
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -1112,8 +1112,8 @@
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cmd1 &amp;&amp; cmd2	# cmd1执行失败就不执行cmd2
-</span></span><span class="line"><span class="cl">cmd1 || cmd2	# cmd1执行成功就不执行cmd2
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cmd1 &amp;&amp; cmd2    # cmd1执行失败就不执行cmd2
+</span></span><span class="line"><span class="cl">cmd1 || cmd2    # cmd1执行成功就不执行cmd2
 </span></span></code></pre></td></tr></table>
 </div>
 </div></li>
@@ -1203,11 +1203,11 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">if condition
-</span></span><span class="line"><span class="cl">	then list
+</span></span><span class="line"><span class="cl">    then list
 </span></span><span class="line"><span class="cl">elif condition
-</span></span><span class="line"><span class="cl">	then list
+</span></span><span class="line"><span class="cl">    then list
 </span></span><span class="line"><span class="cl">else
-</span></span><span class="line"><span class="cl">	list
+</span></span><span class="line"><span class="cl">    list
 </span></span><span class="line"><span class="cl">fi
 </span></span></code></pre></td></tr></table>
 </div>
@@ -1237,7 +1237,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">while condition
-</span></span><span class="line"><span class="cl">	do list
+</span></span><span class="line"><span class="cl">    do list
 </span></span><span class="line"><span class="cl">done
 </span></span></code></pre></td></tr></table>
 </div>
@@ -1263,16 +1263,16 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">for name in word1, word2, ...
-</span></span><span class="line"><span class="cl">	do list
+</span></span><span class="line"><span class="cl">    do list
 </span></span><span class="line"><span class="cl">done
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"># 或者
 </span></span><span class="line"><span class="cl">for name
-</span></span><span class="line"><span class="cl">	do list
+</span></span><span class="line"><span class="cl">    do list
 </span></span><span class="line"><span class="cl">done
 </span></span><span class="line"><span class="cl"># 相当于
 </span></span><span class="line"><span class="cl">for name in $1, $2, ...
-</span></span><span class="line"><span class="cl">	do list
+</span></span><span class="line"><span class="cl">    do list
 </span></span><span class="line"><span class="cl">done
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">for i in `seq 1 255` # 相当于for i in range(1,256)

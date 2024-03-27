@@ -75,16 +75,16 @@
 <ol>
 <li>
 <p>划分窗格：</p>
-<p>左右划分<code>Ctrl+b %</code> 	上下划分<code>Ctrl+b &quot; </code></p>
+<p>左右划分<code>Ctrl+b %</code>     上下划分<code>Ctrl+b &quot; </code></p>
 </li>
 <li>
 <p>切换选中窗格：</p>
 <p><code>Ctrl+b &lt;方向键&gt; </code></p>
-<p>切换到下一个窗格<code>Ctrl+b o</code>	切换到上一个窗格<code>Ctrl+b ;</code></p>
+<p>切换到下一个窗格<code>Ctrl+b o</code>    切换到上一个窗格<code>Ctrl+b ;</code></p>
 </li>
 <li>
 <p>交换窗格：</p>
-<p>与上一个窗格交换位置<code>Ctrl+b {</code>	与下一个窗格交换位置<code>Ctrl+b }</code></p>
+<p>与上一个窗格交换位置<code>Ctrl+b {</code>    与下一个窗格交换位置<code>Ctrl+b }</code></p>
 </li>
 <li>
 <p>关闭窗格：</p>

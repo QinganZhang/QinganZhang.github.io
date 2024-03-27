@@ -17,12 +17,12 @@
 </span><span class=lnt>8
 </span><span class=lnt>9
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>try</span><span class=p>{</span>
-</span></span><span class=line><span class=cl>	<span class=k>throw</span> <span class=nf>runtime_error</span><span class=p>(</span><span class=s>&#34;Data must be same as size&#34;</span><span class=p>);</span> <span class=c1>// throw抛出使用字符串初始化的异常类型的对象
+</span></span><span class=line><span class=cl>    <span class=k>throw</span> <span class=nf>runtime_error</span><span class=p>(</span><span class=s>&#34;Data must be same as size&#34;</span><span class=p>);</span> <span class=c1>// throw抛出使用字符串初始化的异常类型的对象
 </span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=k>catch</span><span class=p>(</span><span class=n>runtime_error</span> <span class=n>err</span><span class=p>)</span><span class=c1>//异常类型对象的声明（也称异常声明）
 </span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>{</span> 
-</span></span><span class=line><span class=cl>	<span class=c1>// catch子句也称为异常处理代码
-</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=n>err</span><span class=p>.</span><span class=n>what</span><span class=p>();</span><span class=c1>//每个标准异常类都有一个what成员函数，返回初始化对象时使用的字符串
+</span></span><span class=line><span class=cl>    <span class=c1>// catch子句也称为异常处理代码
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=n>err</span><span class=p>.</span><span class=n>what</span><span class=p>();</span><span class=c1>//每个标准异常类都有一个what成员函数，返回初始化对象时使用的字符串
 </span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span><span class=c1>//
 </span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>catch</span><span class=p>(...){</span> <span class=cm>/* 捕获所有异常*/</span> <span class=p>}</span>
 </span></span></code></pre></td></tr></table></div></div><p><a href="obsidian://booknote?type=annotation&amp;book=Cpp_Primer-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/Primer%20C++(%E7%AC%AC5%E7%89%88).pdf&amp;id=92e04fc5-9bef-d3e3-c183-01b5c1524a37&amp;page=202&amp;rect=104.160,508.320,151.680,518.160">标准异常</a>及其继承关系：

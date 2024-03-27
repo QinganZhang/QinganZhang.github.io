@@ -21,11 +21,11 @@
 </span><span class=lnt>12
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>struct</span> <span class=nc>X</span>
 </span></span><span class=line><span class=cl><span class=p>{</span>
-</span></span><span class=line><span class=cl>	<span class=k>friend</span> <span class=kt>void</span> <span class=nf>fir</span><span class=p>()</span> <span class=p>{</span> <span class=cm>/* do something */</span> <span class=p>}</span>
-</span></span><span class=line><span class=cl>	<span class=k>public</span><span class=o>:</span>
-</span></span><span class=line><span class=cl>		<span class=kt>void</span> <span class=n>pub</span><span class=p>();</span>
-</span></span><span class=line><span class=cl>	<span class=k>private</span><span class=o>:</span>
-</span></span><span class=line><span class=cl>		<span class=kt>void</span> <span class=n>pri</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=k>friend</span> <span class=kt>void</span> <span class=nf>fir</span><span class=p>()</span> <span class=p>{</span> <span class=cm>/* do something */</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=kt>void</span> <span class=n>pub</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=k>private</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=kt>void</span> <span class=n>pri</span><span class=p>();</span>
 </span></span><span class=line><span class=cl><span class=p>};</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=kt>void</span> <span class=n>X</span><span class=o>::</span><span class=n>pub</span><span class=p>()</span> <span class=p>{</span> <span class=n>fir</span><span class=p>();</span> <span class=p>}</span> <span class=c1>// 错误：友元函数fri在类外必须进行声明且需要在调用之前进行声明

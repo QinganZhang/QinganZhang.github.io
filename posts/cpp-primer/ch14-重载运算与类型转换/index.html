@@ -49,11 +49,11 @@
 </span><span class=lnt>8
 </span><span class=lnt>9
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=k>class</span> <span class=nc>smallInt</span><span class=p>{</span>
-</span></span><span class=line><span class=cl>	<span class=k>public</span><span class=o>:</span>
-</span></span><span class=line><span class=cl>		<span class=n>smallInt</span><span class=p>(</span><span class=kt>int</span> <span class=n>i</span><span class=p>)</span><span class=o>:</span> <span class=n>val</span><span class=p>(</span><span class=n>i</span><span class=p>)</span> <span class=p>{</span><span class=k>if</span><span class=p>(</span><span class=n>i</span><span class=o>&lt;</span><span class=mi>0</span> <span class=o>||</span> <span class=n>i</span> <span class=o>&gt;</span> <span class=mi>255</span><span class=p>)</span> <span class=n>cout</span><span class=o>&lt;&lt;</span><span class=s>&#34;bad value&#34;</span><span class=o>&lt;&lt;</span><span class=n>endl</span><span class=p>;}</span>
-</span></span><span class=line><span class=cl>		<span class=k>operator</span> <span class=nf>int</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span><span class=k>return</span> <span class=o>-</span><span class=n>val</span><span class=p>;}</span> <span class=c1>// 为了说明类型转换运算符的效果
-</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=k>private</span><span class=o>:</span>
-</span></span><span class=line><span class=cl>		<span class=n>size_t</span> <span class=n>val</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>smallInt</span><span class=p>(</span><span class=kt>int</span> <span class=n>i</span><span class=p>)</span><span class=o>:</span> <span class=n>val</span><span class=p>(</span><span class=n>i</span><span class=p>)</span> <span class=p>{</span><span class=k>if</span><span class=p>(</span><span class=n>i</span><span class=o>&lt;</span><span class=mi>0</span> <span class=o>||</span> <span class=n>i</span> <span class=o>&gt;</span> <span class=mi>255</span><span class=p>)</span> <span class=n>cout</span><span class=o>&lt;&lt;</span><span class=s>&#34;bad value&#34;</span><span class=o>&lt;&lt;</span><span class=n>endl</span><span class=p>;}</span>
+</span></span><span class=line><span class=cl>        <span class=k>operator</span> <span class=nf>int</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span><span class=k>return</span> <span class=o>-</span><span class=n>val</span><span class=p>;}</span> <span class=c1>// 为了说明类型转换运算符的效果
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>private</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>size_t</span> <span class=n>val</span><span class=p>;</span>
 </span></span><span class=line><span class=cl><span class=p>};</span>
 </span></span><span class=line><span class=cl><span class=n>smallInt</span> <span class=n>s</span> <span class=o>=</span> <span class=mf>2.1</span><span class=p>;</span> <span class=c1>// 先将double转换为int，再使用转换构造函数将int转换为smallInt
 </span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>cout</span><span class=o>&lt;&lt;</span><span class=n>s</span> <span class=o>+</span> <span class=mf>2.1</span><span class=o>&lt;&lt;</span><span class=n>endl</span><span class=p>;</span>  <span class=c1>// 使用【类型转换运算符】将s隐式地转换为int，再转换为double相加
@@ -74,11 +74,11 @@
 </span><span class=lnt>15
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>struct</span> <span class=nc>B</span><span class=p>;</span>    
 </span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>A</span><span class=p>{</span>
-</span></span><span class=line><span class=cl>	<span class=n>A</span><span class=p>()</span> <span class=o>=</span><span class=k>default</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>	<span class=n>A</span><span class=p>(</span><span class=k>const</span> <span class=o>&amp;</span><span class=n>B</span><span class=p>);</span> <span class=c1>// 转换构造函数
+</span></span><span class=line><span class=cl>    <span class=n>A</span><span class=p>()</span> <span class=o>=</span><span class=k>default</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>A</span><span class=p>(</span><span class=k>const</span> <span class=o>&amp;</span><span class=n>B</span><span class=p>);</span> <span class=c1>// 转换构造函数
 </span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>};</span>
 </span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>B</span><span class=p>{</span>
-</span></span><span class=line><span class=cl>	<span class=k>operator</span> <span class=nf>A</span><span class=p>()</span> <span class=k>const</span><span class=p>;</span> <span class=c1>// 类型转换运算符
+</span></span><span class=line><span class=cl>    <span class=k>operator</span> <span class=nf>A</span><span class=p>()</span> <span class=k>const</span><span class=p>;</span> <span class=c1>// 类型转换运算符
 </span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>};</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=n>A</span> <span class=nf>f</span><span class=p>(</span><span class=k>const</span> <span class=n>A</span><span class=o>&amp;</span><span class=p>);</span> <span class=c1>// 定义一个函数
@@ -101,10 +101,10 @@
 </span><span class=lnt>12
 </span><span class=lnt>13
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>struct</span> <span class=nc>A</span><span class=p>{</span>
-</span></span><span class=line><span class=cl>	<span class=n>A</span><span class=p>(</span><span class=kt>int</span><span class=p>);</span>
-</span></span><span class=line><span class=cl>	<span class=n>A</span><span class=p>(</span><span class=kt>double</span><span class=p>);</span>
-</span></span><span class=line><span class=cl>	<span class=k>operator</span> <span class=nf>int</span><span class=p>()</span> <span class=k>const</span><span class=p>;</span>
-</span></span><span class=line><span class=cl>	<span class=k>operator</span> <span class=nf>double</span><span class=p>()</span> <span class=k>const</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>A</span><span class=p>(</span><span class=kt>int</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>A</span><span class=p>(</span><span class=kt>double</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>operator</span> <span class=nf>int</span><span class=p>()</span> <span class=k>const</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>operator</span> <span class=nf>double</span><span class=p>()</span> <span class=k>const</span><span class=p>;</span>
 </span></span><span class=line><span class=cl><span class=p>};</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>f</span><span class=p>(</span><span class=kt>long</span> <span class=kt>double</span><span class=p>);</span>
@@ -123,10 +123,10 @@
 </span><span class=lnt>8
 </span><span class=lnt>9
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>struct</span> <span class=nc>C</span><span class=p>{</span>
-</span></span><span class=line><span class=cl>	<span class=n>C</span><span class=p>(</span><span class=kt>int</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>C</span><span class=p>(</span><span class=kt>int</span><span class=p>);</span>
 </span></span><span class=line><span class=cl><span class=p>};</span>
 </span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>D</span><span class=p>{</span>
-</span></span><span class=line><span class=cl>	<span class=n>D</span><span class=p>(</span><span class=kt>int</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>D</span><span class=p>(</span><span class=kt>int</span><span class=p>);</span>
 </span></span><span class=line><span class=cl><span class=p>};</span>
 </span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>func</span><span class=p>(</span><span class=k>const</span> <span class=n>C</span><span class=o>&amp;</span><span class=p>);</span>
 </span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>func</span><span class=p>(</span><span class=k>const</span> <span class=n>D</span><span class=o>&amp;</span><span class=p>);</span> <span class=c1>// 重载函数
@@ -142,12 +142,12 @@
 </span><span class=lnt> 9
 </span><span class=lnt>10
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=k>class</span> <span class=nc>T</span><span class=p>{</span>
-</span></span><span class=line><span class=cl>	<span class=k>friend</span> <span class=n>T</span> <span class=k>operator</span><span class=o>+</span> <span class=p>(</span><span class=k>const</span> <span class=n>T</span><span class=o>&amp;</span><span class=p>,</span> <span class=k>const</span> <span class=n>T</span><span class=o>&amp;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>friend</span> <span class=n>T</span> <span class=k>operator</span><span class=o>+</span> <span class=p>(</span><span class=k>const</span> <span class=n>T</span><span class=o>&amp;</span><span class=p>,</span> <span class=k>const</span> <span class=n>T</span><span class=o>&amp;</span><span class=p>);</span>
 </span></span><span class=line><span class=cl><span class=k>public</span><span class=o>:</span>
-</span></span><span class=line><span class=cl>	<span class=n>T</span><span class=p>(</span><span class=kt>int</span> <span class=n>i</span><span class=p>);</span> <span class=c1>// 转换构造函数
-</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=k>operator</span> <span class=nf>int</span><span class=p>()</span> <span class=k>const</span><span class=p>;</span>  <span class=c1>// 类型转换运算符
+</span></span><span class=line><span class=cl>    <span class=n>T</span><span class=p>(</span><span class=kt>int</span> <span class=n>i</span><span class=p>);</span> <span class=c1>// 转换构造函数
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>operator</span> <span class=nf>int</span><span class=p>()</span> <span class=k>const</span><span class=p>;</span>  <span class=c1>// 类型转换运算符
 </span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>private</span><span class=o>:</span>
-</span></span><span class=line><span class=cl>	<span class=kt>int</span> <span class=n>val</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>val</span><span class=p>;</span>
 </span></span><span class=line><span class=cl><span class=p>};</span>
 </span></span><span class=line><span class=cl><span class=n>T</span> <span class=n>t</span><span class=p>;</span>
 </span></span><span class=line><span class=cl><span class=kt>int</span> <span class=n>result</span> <span class=o>=</span> <span class=n>t</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span> <span class=c1>// 二义性：可以将t转换成int进行内置加法，或者将1转换成类型T进行重载加法
