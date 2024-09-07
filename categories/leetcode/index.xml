@@ -699,7 +699,42 @@
 <li>
 <p><a href="https://leetcode.cn/problems/merge-k-sorted-lists/description/">23.合并K个升序链表</a></p>
 <ul>
-<li>最小堆：<code>priority_queue&lt;ListNode*, vector&lt;ListNode*&gt;, decltype(cmp)&gt; pq;</code></li>
+<li>
+<p>最小堆：<code>priority_queue&lt;ListNode*, vector&lt;ListNode*&gt;, decltype(cmp)&gt; pq;</code></p>
+</li>
+<li>
+<p>归并：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">ListNode</span><span class="o">*</span> <span class="nf">mergeKLists</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">ListNode</span><span class="o">*&gt;&amp;</span> <span class="n">lists</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">merge</span><span class="p">(</span><span class="n">lists</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">lists</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">ListNode</span><span class="o">*</span> <span class="nf">merge</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">listNode</span><span class="o">*&gt;</span> <span class="o">&amp;</span> <span class="n">lists</span><span class="p">,</span> <span class="kt">int</span> <span class="n">l</span><span class="p">,</span> <span class="kt">int</span> <span class="n">r</span><span class="p">){</span> <span class="c1">//[left, right]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">l</span> <span class="o">==</span> <span class="n">r</span><span class="p">)</span> <span class="k">return</span> <span class="n">lists</span><span class="p">[</span><span class="n">l</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">l</span> <span class="o">&gt;</span> <span class="n">r</span><span class="p">)</span> <span class="k">return</span> <span class="k">nullptr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">l</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">mergetTwoLists</span><span class="p">(</span><span class="n">merge</span><span class="p">(</span><span class="n">lists</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">mid</span><span class="p">),</span> <span class="n">merge</span><span class="p">(</span><span class="n">lists</span><span class="p">,</span> <span class="n">mid</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">r</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">ListNode</span><span class="o">*</span> <span class="nf">mergeTwoLists</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">a</span><span class="p">,</span> <span class="n">ListNode</span><span class="o">*</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span><span class="cm">/*两个链表合并*/</span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
 </ul>
 </li>
 <li>
@@ -1578,9 +1613,9 @@
 </ul>
 </li>
 <li>
-<p><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/description/">124.二叉树中的最大路径和 </a> 【好题】，【不会】</p>
+<p><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/description/">124.二叉树中的最大路径和 </a> 【好题】</p>
 <ul>
-<li><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/submissions/493249101/">递归写法</a></li>
+<li><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/submissions/517645623">递归写法</a></li>
 </ul>
 </li>
 <li>
@@ -2094,41 +2129,68 @@
 <p><a href="https://leetcode.cn/problems/longest-increasing-subsequence/">300.最长递增子序列  </a>LIS</p>
 <ul>
 <li>
-<p>更像是记忆化搜索或者递推，而非动规</p>
-</li>
-<li>
-<p>对比<a href="https://leetcode.cn/problems/longest-continuous-increasing-subsequence/">674.最长连续递增序列</a>（或者可称为最长递增数组？），是否连续决定是否内部要使用一个for循环找到比当前元素小的位置</p>
+<p><a href="https://leetcode.cn/problems/longest-continuous-increasing-subsequence/">674.最长连续递增序列</a>是连续的递增序列（或称为递增数组），是否连续决定是否内部要使用一个for循环找到比当前元素小的位置</p>
 </li>
 <li>
 <p>可以使用贪心+二分实现更低的复杂度</p>
 <ul>
 <li>
-<p>贪心：d[len]表示长度为len的LIS，末尾元素的最小值，最小值越小越好</p>
+<p>贪心：<code>d[len]</code>表示：长度为len的LIS的最后一个元素值，该元素值越小越好</p>
 </li>
 <li>
-<p>二分：d[]数组单调递增</p>
+<p>二分：<code>d[]</code>数组单调递增，</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="c1">// d[len]:长度为len的LIS，末尾元素的最小值
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">if</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">d</span><span class="p">[</span><span class="n">len</span><span class="p">])</span>
-</span></span><span class="line"><span class="cl">    <span class="n">d</span><span class="p">[</span><span class="o">++</span><span class="n">len</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl"><span class="k">else</span><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 二分查找：find max l, nums[i] &gt; d[l]
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 因此d[l+1]找到一个更小的末尾元素nums[i]：d[l+1]&gt;nums[i]&gt;d[l]
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">d</span><span class="p">[</span><span class="n">l</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">d</span><span class="p">[</span><span class="n">N</span><span class="p">];</span> <span class="c1">// 长度为len的LIS中的最后一个元素的值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="nf">lengthOfLIS</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1000000</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// 当前最长LIS的长度
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">d</span><span class="p">[</span><span class="n">len</span><span class="p">])</span> <span class="c1">// 如果当前最长LIS后面可以继续添加一个元素
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">d</span><span class="p">[</span><span class="o">++</span><span class="n">len</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">{</span> <span class="c1">// nums[i] &lt;= d[len]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// // 固定nums[i]为结尾，找前面尽可能长的一个LIS，同时该LIS的最大值&lt;nums[i]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// // 即：长度j尽可能大，同时d[j] &lt; nums[i]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// int j = find_last_lt(d, 0, len+1, nums[i]);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// d[j+1] = min(d[j+1], nums[i]);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// 另一种等价的写法：找到d中第一个&gt;nums[i]的位置j
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// 说明j-1长度的LIS的最大元素小于nums[i]，j长度的LIS最大元素又&gt;nums[i]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// 说明为j长度的LIS找到了更小的一个末尾元素
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">find_first_ge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">d</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> 
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">len</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="k">return</span> <span class="n">len</span>
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p><a href="https://leetcode.cn/problems/longest-increasing-subsequence/solutions/147667/zui-chang-shang-sheng-zi-xu-lie-by-leetcode-soluti/">参考</a></p>
@@ -2464,8 +2526,6 @@
 </li>
 </ul>
 <h2 id="继续刷">继续刷</h2>
-<p><a href="https://leetcode.cn/problems/linked-list-cycle-ii/">142.环形链表Ⅱ</a></p>
-<p><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/description/">124.二叉树中的最大路径和 </a></p>
 <p><a href="https://leetcode.cn/problems/path-sum-iii/description/">437.路径总和Ⅲ</a></p>
 <p><a href="https://leetcode.cn/problems/median-of-two-sorted-arrays/solutions/6098/4-xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-shu/">4.寻找两个正序数组的中位数</a></p>
 <p><a href="https://leetcode.cn/problems/maximal-rectangle/description/">85.最大矩形</a></p>

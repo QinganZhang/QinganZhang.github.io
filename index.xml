@@ -6,7 +6,217 @@
     <description>Recent content on Paul&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 04 Mar 2024 20:57:14 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 07 Sep 2024 14:45:54 +0800</lastBuildDate><atom:link href="https://qinganzhang.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Encoder Decoder和decoder Only架构训练和推理浅析</title>
+      <link>https://qinganzhang.github.io/posts/encoder-decoder%E5%92%8Cdecoder-only%E6%9E%B6%E6%9E%84%E8%AE%AD%E7%BB%83%E5%92%8C%E6%8E%A8%E7%90%86%E6%B5%85%E6%9E%90/</link>
+      <pubDate>Sat, 07 Sep 2024 14:45:54 +0800</pubDate>
+      
+      <guid>https://qinganzhang.github.io/posts/encoder-decoder%E5%92%8Cdecoder-only%E6%9E%B6%E6%9E%84%E8%AE%AD%E7%BB%83%E5%92%8C%E6%8E%A8%E7%90%86%E6%B5%85%E6%9E%90/</guid>
+      <description>之前一直对LLM推理过程中的prefill阶段和decode阶段有些困惑，prefill阶段处理prompt，decode阶段自回归地逐to</description>
+      <content:encoded><![CDATA[<p>之前一直对LLM推理过程中的prefill阶段和decode阶段有些困惑，prefill阶段处理prompt，decode阶段自回归地逐token生成。欸，那之前传统机器翻译不也是这样吗，输出一个中文句子，然后再自回归地逐token生成英文句子，有点混乱了。下面我们来重新梳理一下，LLM的发展过程、典型模型架构和训练过程。</p>
+<h1 id="开山之作attention-is-all-you-need">开山之作：Attention is all you need</h1>
+<h2 id="模型架构和训练过程">模型架构和训练过程</h2>
+<p>模型架构自不必多说，就像下面最左边和最右边经典的模型架构图所示，是典型的encoder-decoder架构。Transformer一开始，解决的是一个seq2seq的任务（下面以中译英机器翻译任务为例），模型结构中包含了encoder和decoder（将此时的decoder称为naive-decoder），下面图中是encoder-decoder的Transformer的训练过程，左边是encoder部分，右边是decoder部分。在训练阶段，将中文句子经过encoder生成编码矩阵C，将shifted right的ground truth（开头加了BOS的英文句子）作为decoder的输入，整体模型的监督信号是对应的英文句子。因此，训练是并行的，一个iteration就可以将一个中英pair训练完（假设batch size=1），训练任务就是next token predicate。</p>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-05-15:01:57.png" alt="encoder-decoder架构的训练过程（以机器翻译为例）" style="zoom:120%;" />
+<h2 id="推理过程">推理过程</h2>
+<p>训练完成后，实际使用中开始进行推理。首先encoder部分要输入一个中文句子，还是经过encoder生成编码矩阵C。然后是decoder部分，一开始输入一个BOS，通过自回归的方式逐token生成，渐变的颜色就表示token生成的不同次序。</p>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-05-15:02:08.png" alt="encoder-decoder架构的推理过程（以机器翻译为例）" style="zoom:80%;" />
+<p>这里有一个问题需要明确一下，每次decoder部分的输入，是一个token呢，还是前面的所有token呢？比如要预测“a”这个token，那么此时decoder的输入是“have”这个token呢，还是BOS+“I”+“have”这三个token都输入呢？其实都可以，</p>
+<ul>
+<li>
+<p>比如每次decoder部分的输入是前面所有的token（比如BOS+“I”+“have”这三个token都输入），那么Masked MHA、MHA部分的Q、K、V都有多行（比如现在是三行），最终decoder出来的这个矩阵，我们只需要最后一个向量（下面红框的这个向量），进行linear+softmax+采样，得到next token</p>
+  <img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-05-15:39:09.png" alt="image-20240905153902066" style="zoom:50%;" />
+</li>
+<li>
+<p>也可以每次decoder部分的输入是一个token（比如预测“a”这个token，只输入“have”这个token），那么此时就需要将之前token的K、V向量缓存下来（即KV-Cache），一个Q向量和concat(当前的KV向量，之前缓存下来的KV向量)算注意力，Masked MHA、MHA部分的attn-score只有一行，然后最终decoder出来的矩阵也只是一个向量，直接进行linear+softmax+采样，得到next token</p>
+</li>
+</ul>
+<p>采用kv-cache的方式，可以在推理过程中减少很多不必要的运算，而且从显存占用来看，kv-cache也是划算的。如果不使用kv-cache，那么每次都要输入之前生成的所有token，Q、K、V都是完整的矩阵；如果使用kv-cache，K、V显存占用与之前相同，Q只是一个行向量而原来只是一个多行的矩阵，使用kv-cache的显存占用相对于不使用kv-cache的峰值显存占用是更少的。虽然说“相对峰值显存更少”，但是需要留意的是，kv-cache还是很占显存的，尤其是大batch_size和长序列的情况下，后面产生了MQA、GQA等优化，这是后话了。</p>
+<p>这样看来，似乎在很早以前就有kv-cache的概念，但是似乎在LLM中才真正被普遍应用起来，我想有这么几个原因（not for sure, hope your discussion）：</p>
+<ol>
+<li>之前可能更关注模型架构的改进，之前encoder-decoder架构、encoder-only架构、decoder-only架构没有一个特别突出的模型，直到GPT-3（decoder-only）的出现，掀起了LLM的时代，现在的LLM基本上都是decoder-only的架构</li>
+<li>在推理场景中，之前的模型上下文长度（或者叫最长序列长度）比较小，计算强度没那么大（但是比如语音流式识别等场景中也会用到kv-cache，不是很确定），LLM时代的transformer上下文长度普遍较大，而且往往是chat场景，对延迟有要求，因此要想法设法减少计算</li>
+</ol>
+<h1 id="encoder-only的代表bert">encoder-only的代表：Bert</h1>
+<p>Bert是典型的encoder-only架构，其训练和推理过程很相似，训练怎么训，往往推理就是直接一个前向的过程。现在LLM基本都是生成式任务，encoder-only的架构总是感觉很别扭，decoder-only架构就很自然。可以关注知乎问题：<a href="https://www.zhihu.com/question/588325646">为什么现在的LLM都是Decoder only的架构？</a></p>
+<h1 id="llm时代">LLM时代</h1>
+<h2 id="模型架构和训练过程-1">模型架构和训练过程</h2>
+<p>在模型架构方面，GPT-3和Llama只是Decoder-only架构的两个典型代表，基本保持了Vanilla-Transformer-decoder的结构，但是中间很多地方做了改动，比如去掉了与encoder的cross-attn，在masked-MHA的输入QK前面在加上旋转位置编码RoPE，将LayerNomr调整为post-norm结构，MLP部分可能会进行一些调整等，如果仅仅是走一遍训练和推理的流程，那么不会有影响。</p>
+<p>从LLM训练过程来看，预训练阶段与之前的语言模型基本一致（如下图，这里不讨论微调、RLHF等过程，更侧重工程和流程方面），都是next token predicate任务，没有了encoder部分，模型结构看起来更加简洁。</p>
+<p>
+  <img loading="lazy" src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-06-23:26:59.png" alt="decoder-only架构的训练过程（以语言模型为例）"  /></p>
+<h2 id="推理过程-1">推理过程</h2>
+<p>Decoder-only架构的推理过程和训练过程基本保持了相同的形式，推理过程就是先输入prompt，然后自回归的逐token生成。这里提一下prompt，LLM可以认为是一种特殊的语言模型，语言模型通俗来说就是续写，但是LLM包含了in-context learning的能力，prompt可以认为是一个指令，一个问题，使得“续写”的内容能够反映prompt的意图。</p>
+<p>这里我们可以尝试分析一下文章开头提出的疑惑：</p>
+<ul>
+<li>在encoder-decoder架构的机器翻译任务中，
+<ul>
+<li>训练过程：中文句子输入到encoder，decoder部分的训练就是语言模型</li>
+<li>推理过程：中文句子输入到encoder，BOS输入到decoder，然后自回归的逐token进行生成</li>
+</ul>
+</li>
+<li>在decoder-only架构的LLM中，
+<ul>
+<li>预训练过程：没有encoder，就是训练语言模型</li>
+<li>推理过程：prompt输入到decoder（prefill阶段），然后自回归的逐token进行生成（decode阶段）</li>
+</ul>
+</li>
+</ul>
+<p>LLM推理过程分为prefill阶段和decode阶段，不仅仅是从推理过程上看起来可以分成两个阶段，更重要的是，这两个阶段的特点不同，性质不同，为了尽可能推理加速，才有必要分成两个阶段。</p>
+<ul>
+<li>prefill阶段：输入prompt，生成第一个token。由于prompt往往较长，或者实际使用中将多个prompt打成一个batch（小batch），以提高模型吞吐，所以这个阶段计算量较大。衡量该阶段的一个指标是首字延迟（TTFT，Time To First Token）。还有一个需要注意的是，为了减小decode阶段的计算量，prefill阶段在计算prompt的注意力机制的时候，会将K、V矩阵缓存下来，空间换时间，即kv-cache。</li>
+<li>decode阶段：后续自回归的逐token进行生成的过程，直到生成一个终止符（或者达到长度限制）。该阶段中，每次自回归过程中，输入一个token，然后生成q、k、v向量，k、v向量更新到kv-cache中，然后q向量和矩阵的计算（gemv），计算量较小，访存逐渐称为bottleneck。为了提高计算强度，往往会将多个请求decoder阶段的计算组成一个大batch。衡量该阶段的一个指标是TPOT（Time Per Output Token，生成每个token的耗时）。</li>
+</ul>
+<p>上面TTFT和TPOT指标是针对streaming generate场景，如果是non-streaming generate场景，则还是使用经典的延迟（Latency，生成一个完整输出的耗时）、吞吐（Throughput，每秒可以生成几个完整的输出）作为指标。</p>
+<p>reference and more reading：</p>
+<p><a href="https://zhuanlan.zhihu.com/p/685706549">一些已成为LLM 推理引擎中事实标准的方法</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/696850285">大模型高效推理 I 推理技术框架总结</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/683359705">LLM推理到底需要什么样的芯片？（1）</a>  <a href="https://zhuanlan.zhihu.com/p/683908169">LLM推理到底需要什么样的芯片？（2)</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/704408423">大模型推理原理&amp;流程详解</a></p>
+]]></content:encoded>
+    </item>
+    
+    <item>
+      <title>LLM时代的transformer量化分析 参数量、计算量、激活值</title>
+      <link>https://qinganzhang.github.io/posts/llm%E6%97%B6%E4%BB%A3%E7%9A%84transformer%E9%87%8F%E5%8C%96%E5%88%86%E6%9E%90-%E5%8F%82%E6%95%B0%E9%87%8F%E8%AE%A1%E7%AE%97%E9%87%8F%E6%BF%80%E6%B4%BB%E5%80%BC/</link>
+      <pubDate>Sat, 07 Sep 2024 14:43:19 +0800</pubDate>
+      
+      <guid>https://qinganzhang.github.io/posts/llm%E6%97%B6%E4%BB%A3%E7%9A%84transformer%E9%87%8F%E5%8C%96%E5%88%86%E6%9E%90-%E5%8F%82%E6%95%B0%E9%87%8F%E8%AE%A1%E7%AE%97%E9%87%8F%E6%BF%80%E6%B4%BB%E5%80%BC/</guid>
+      <description>定性分析 GPU上都存了哪些东西 首先我们来从全局整体的角度看一看，在训练阶段GPU显存上都有哪些内容： Model States：模型训练过程中必须存储的</description>
+      <content:encoded><![CDATA[<h1 id="定性分析">定性分析</h1>
+<h2 id="gpu上都存了哪些东西">GPU上都存了哪些东西</h2>
+<p>首先我们来从全局整体的角度看一看，在训练阶段GPU显存上都有哪些内容：</p>
+<ul>
+<li>Model States：模型训练过程中必须存储的states
+<ul>
+<li>params（下面有时也叫做weights）：模型参数，记参数量为$\Phi$</li>
+<li>grads：模型梯度，梯度数量同参数量$\Phi$</li>
+<li>optimizer states：Adam优化器中的momentum和variance，数量分别是$\Phi$，共$2\Phi$</li>
+</ul>
+</li>
+<li>Residual States：模型训练过程中，中间临时的、动态产生的states
+<ul>
+<li>activation：中间激活值，这个部分可能在训练过程中占据很大一部分显存，下面会详细分析。但是激活值不是必须存储的，可以使用重计算（recompute，也叫做activation checkpoint），在反向算梯度的时候，再重新算一遍，当然计算增加了，时间换空间，实际使用中可以部分选择性的进行重计算。</li>
+<li>temporary buffers：临时存储，比如cuda、nccl等临时申请的显存。</li>
+<li>unusable fragment memory：内存碎片导致的内存浪费</li>
+</ul>
+</li>
+</ul>
+<p>推理阶段就相对简单一些，最主要的是Model States中的params和Residual States中的activation。</p>
+<p>参考：<a href="https://zhuanlan.zhihu.com/p/618865052">图解大模型训练之：数据并行下篇( DeepSpeed ZeRO，零冗余优化)</a></p>
+<h2 id="混合精度训练">混合精度训练</h2>
+<p>上面只是列出了训练过程中，显存中存放的内容和保存的数值数量，但是实际训练过程中，为了节省显存，以及考虑到训练过程中间某些过程对精度不是特别敏感，所以中间有些部分会使用fp32，有些部分会使用fp16/bf16。下面以Megatron为例，简单分析混合精度训练的一个大致流程。</p>
+<p>首先我们来看一下不使用混合精度训练的场景，数值精度全使用fp32，作为一个分析的baseline。具体过程是：</p>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-07-21:18:21.png" alt="fp32精度训练" style="zoom: 40%;" />
+<p>占用显存为：$4\Phi$（fp32 weights）+$4\Phi$（fp32 momentum）+$4\Phi$（fp32 variance）+$4\Phi$（fp32 grad）+fp32 activation（可能很大）=$16\Phi$ Bytes + fp32 activation（4代表fp32的4Bytes，2代表fp16/bf16的2Bytes）</p>
+<p>如果使用fp16的混合精度训练（bf16应该也可以，但是实际Megatron有点不同，下面会提到），具体过程是：</p>
+<img src="C:\Users\zhang\Desktop\fp16混合精度训练.png" alt="fp16混合精度训练" style="zoom:50%;" />
+<p>占用显存为：$4\Phi$（fp32 weights）+$4\Phi$（fp32 momentum）+$4\Phi$（fp32 variance）+$2\Phi$（fp16 grad）+$2\Phi$（fp16 scaled grad）+$4\Phi$（fp32 unscaled and cliped grad）+fp16 activation（可能很大）=$20\Phi$ Bytes + fp16 activation</p>
+<p>需要说明的有两点：</p>
+<ol>
+<li>当fp16 scaled grad转为为fp32 unscaled and cliped grad后，fp16 scaled grad就没用了，但是此时Megatron中仍然保留着一份fp16 scaled grad，所以显存占用中这两部分都会计算在内，这也符合Megatron offical readme中的描述：</li>
+</ol>
+<img src="C:\Users\zhang\AppData\Roaming\Typora\typora-user-images\image-20240907213340085.png" alt="image-20240907213340085" style="zoom:80%;" />
+<ol start="2">
+<li>
+<p>注意到上面流程中多了一个scale/unscale的操作，这叫做“loss scaling”</p>
+<p>​	在使用混合精度训练时，如果直接使用fp16的grad来更新fp16的梯度，一是会产生舍入误差（比如梯度很小，权重更新后，由于精度不够，累加上的lr * grad被舍入，权重没变，一句话来说就是<strong>大数吃小数</strong>），二是会产生梯度下溢（比如梯度过小，fp16范围不够，导致很小的梯度下溢成为0，而这样的小梯度占比很大，一句话来说就是<strong>下溢成0</strong>）。对于舍入误差，可以在更新权重时，将fp16的梯度转换为fp32，再更新fp32的权重，从而避免精度问题。对于梯度下溢，需要使用loss scale。</p>
+<p>​	loss scale就是FWD计算出loss后，对loss放大若干倍，由于求导的链式法则，放大的若干倍同样会传导到fp16梯度，这样fp16梯度就不会产生梯度下溢。在更新权重时，将fp16的梯度转换为fp32，同时进行unscale。</p>
+</li>
+</ol>
+<p>刚才说到bf16有一点点特殊，我们看相应的代码：（Megatron中的arguments.py）</p>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-07-21:49:42.png" alt="image-20240907214939077" style="zoom: 80%;" />
+<p>注意到如果使用bf16，那么会强行设置accumulate_allreduce_grads_in_fp32=True，这与上面Megatron offical readme截图（Distributed Optimizer）表格中的第二行【bf16 param, fp32 grads】相对应。具体过程应该是（not for sure, hope for discuss）：</p>
+<blockquote>
+<p>accumulate_allreduce_grads_in_fp32：If true, do the gradient accumulation and communication in fp32. <a href="https://docs.nvidia.com/megatron-core/developer-guide/latest/api-guide/distributed.html">from here</a></p>
+<p>gradient accumulation：在若干次iteration中，每次都会反向得到一份梯度，将这若干次iteration得到的梯度进行累加、求平均，在最后一次iteration才更新权重。gradient accumulation与data parallel是等价的，gradient accumulation在时间维度上训练多个mini-batch，而data parallel在相同时间内将不同mini-batch放在不同的机器上训练，结果都是一样的。</p>
+<p>参考：</p>
+<ul>
+<li>
+<p><a href="https://zhuanlan.zhihu.com/p/595716023">聊聊梯度累加(Gradient Accumulation)</a></p>
+</li>
+<li>
+<p><a href="https://zhuanlan.zhihu.com/p/650710443">梯度累积算法</a></p>
+</li>
+<li>
+<p><a href="https://huggingface.co/docs/accelerate/usage_guides/gradient_accumulation">Hugging Face:Performing gradient accumulation with 🤗 Accelerate </a></p>
+</li>
+</ul>
+</blockquote>
+<img src="C:\Users\zhang\Desktop\bf16混合精度训练.png" alt="bf16混合精度训练" style="zoom:50%;" />
+<p>这里找到一个为什么要将bf16与accumulate_allreduce_grads_in_fp32绑定的<a href="https://github.com/NVIDIA/Megatron-LM/issues/372">issue</a>，里面提到“We found this to lead to more stable training before, but you could also try to perform the all-reduce in <code>bf16</code> (it might hurt convergence but will be faster).”</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/618865052">图解大模型训练之：数据并行下篇( DeepSpeed ZeRO，零冗余优化)</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/662700424">图解大模型训练系列之：Megatron源码解读3，分布式混合精度训练</a></li>
+<li><a href="https://docs.nvidia.com/deeplearning/performance/mixed-precision-training">NVIDIA Docs Hub：Train With Mixed Precision</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/441591808">全网最全-混合精度训练原理</a></li>
+</ul>
+<h1 id="量化分析">量化分析</h1>
+<h2 id="transformer结构详解">transformer结构详解</h2>
+<p>LLM中的transformer一般是decoder-only结构，所以下面的transformer block主要是decoder，但是与经典的Transformer中的decoder不同的是，这里没有了cross-attn，因此结构看起来反而有点像encoder（但不是，因为有casual mask）。</p>
+<p>下面图中的Transformer，没有上kv-cache、GQA等优化，这部分后面会分析。其中，参数量$\Phi$表示有多少个参数；中间激活值$A$是，单位是Bytes，</p>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-04-22:12:10.jpg" alt="20240904221135" style="zoom:150%;" />
+<p>KV cache对显存占用的影响</p>
+<p>MQA和GQA对显存占用的影响</p>
+<h5 id="简单分析">简单分析</h5>
+<p>忽略层数l，拿单层来进行分析</p>
+<ol>
+<li>
+<p>参数量与隐藏层维度h的平方成正比</p>
+</li>
+<li>
+<p>激活值中间包含两项，$34bsh$和$8bas^2$，提取出相同的部分，剩下即比较$34h$和$8as$的大小,一般来说8as会大一点（如果没用MQA或GQA），是34h的2~10倍，因此增大b、s、h都会显著增加激活值占用的显存，举个例子说明：</p>
+<table>
+<thead>
+<tr>
+<th>config（假设使用bf16）</th>
+<th>$34bsh$</th>
+<th>$8bas^2$</th>
+<th>total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>b=1,s=2048,a=96,h=12288</td>
+<td>816MB</td>
+<td>3072MB</td>
+<td>3.8G</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p>计算量与参数量成正比，与输入token数量成正比</p>
+</li>
+</ol>
+<h5 id="其他说明">其他说明</h5>
+<h6 id="1-layernorm的计算">1. LayerNorm的计算</h6>
+<p>LayerNorm的计算过程见<a href="https://blog.csdn.net/weixin_39228381/article/details/107939602">pytorch LayerNorm参数详解，计算过程</a>，总结一下就是：</p>
+<ol>
+<li>比如输入是<code>[b,s,h]</code>，LN的<code>normalized_shape=[h]</code>，此时就是对每一个大小为<code>h</code>的向量分别进行归一化（一共<code>b*s</code>个）</li>
+<li>然后如果LN的<code>elementwise_affine=True</code>，就需要对每个大小为<code>h</code>的向量elementwise的乘上$\gamma: [h]$，再elementwise的加上$\beta:[h]$，$\gamma$和$\beta$就是该LN层的两个可学习的参数。如果LN的<code>elementwise_affine=False</code>，则只会进行第一步的归一化，不会进行第二步的affine</li>
+</ol>
+<p>一个有趣的问题是，<a href="https://zhuanlan.zhihu.com/p/707778968">Transformer中的LayerNorm可以并行吗？</a></p>
+<p>关键词： Welford online Algorithm，当一个集合新增加一个元素$x_N$的时候，可以通过前N-1个样本的corrected sum of squares($\sum_{i=1}^{N-1}(x_i-\bar{x})^2$)，计算出前N个样本的corrected sum of squares，从而只需要one pass就可以完成LN的计算（之前navie的方法是two pass）</p>
+<h6 id="2-layernorm的位置">2. LayerNorm的位置</h6>
+<p>
+  <img loading="lazy" src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-04-22:22:22.png" alt="image-20240904222219836"  /></p>
+<p>原始Transformer中使用post-norm居多，后来使用pre-norm居多，而且往往在FFN之前也加一个norm。尤其在大模型中，可能在通过LN之后MHA之前，Q和K还要加上旋转位置编码。</p>
+<p>参考：<a href="https://zhuanlan.zhihu.com/p/474988236">【重新了解Transformer模型系列_1】PostNorm/PreNorm的差别</a></p>
+<h6 id="3-关于dropout的位置">3. 关于dropout的位置</h6>
+<p>一共（可能）在有四个地方有dropout：</p>
+<ol>
+<li>在PositionalEmbedding中有一个dropout：<code>dropout(x + PositionEmbedding(x))</code>，不过好像LLM现在使用旋转位置编码RoPE多一些，在计算attention之前在Q和K上加上RoPE，一开始输入的embedding不加PositionalEmbedding了</li>
+<li>在softmax计算得到的attention score之后有一个droput：$dropout( softmax(\frac{QK^T}{scale}+casual_mask) )$</li>
+<li>在sublayer（Attention和MLP）计算完之后，各有一个dropout：<code>x+dropout(sublayer(norm(x)))</code></li>
+</ol>
+<p>参考：</p>
+<p><a href="https://zhuanlan.zhihu.com/p/624740065">分析transformer模型的参数量、计算量、中间激活、KV cache</a></p>
+]]></content:encoded>
+    </item>
+    
     <item>
       <title>A survey of Efficient Transformer on Inference</title>
       <link>https://qinganzhang.github.io/posts/a_survey_of_efficient_transformer_on_inference/</link>
@@ -5496,7 +5706,42 @@ $$</p>
 <li>
 <p><a href="https://leetcode.cn/problems/merge-k-sorted-lists/description/">23.合并K个升序链表</a></p>
 <ul>
-<li>最小堆：<code>priority_queue&lt;ListNode*, vector&lt;ListNode*&gt;, decltype(cmp)&gt; pq;</code></li>
+<li>
+<p>最小堆：<code>priority_queue&lt;ListNode*, vector&lt;ListNode*&gt;, decltype(cmp)&gt; pq;</code></p>
+</li>
+<li>
+<p>归并：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">ListNode</span><span class="o">*</span> <span class="nf">mergeKLists</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">ListNode</span><span class="o">*&gt;&amp;</span> <span class="n">lists</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">merge</span><span class="p">(</span><span class="n">lists</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">lists</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">ListNode</span><span class="o">*</span> <span class="nf">merge</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">listNode</span><span class="o">*&gt;</span> <span class="o">&amp;</span> <span class="n">lists</span><span class="p">,</span> <span class="kt">int</span> <span class="n">l</span><span class="p">,</span> <span class="kt">int</span> <span class="n">r</span><span class="p">){</span> <span class="c1">//[left, right]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">l</span> <span class="o">==</span> <span class="n">r</span><span class="p">)</span> <span class="k">return</span> <span class="n">lists</span><span class="p">[</span><span class="n">l</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">l</span> <span class="o">&gt;</span> <span class="n">r</span><span class="p">)</span> <span class="k">return</span> <span class="k">nullptr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">l</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">mergetTwoLists</span><span class="p">(</span><span class="n">merge</span><span class="p">(</span><span class="n">lists</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">mid</span><span class="p">),</span> <span class="n">merge</span><span class="p">(</span><span class="n">lists</span><span class="p">,</span> <span class="n">mid</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">r</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">ListNode</span><span class="o">*</span> <span class="nf">mergeTwoLists</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">a</span><span class="p">,</span> <span class="n">ListNode</span><span class="o">*</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span><span class="cm">/*两个链表合并*/</span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
 </ul>
 </li>
 <li>
@@ -6375,9 +6620,9 @@ $$</p>
 </ul>
 </li>
 <li>
-<p><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/description/">124.二叉树中的最大路径和 </a> 【好题】，【不会】</p>
+<p><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/description/">124.二叉树中的最大路径和 </a> 【好题】</p>
 <ul>
-<li><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/submissions/493249101/">递归写法</a></li>
+<li><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/submissions/517645623">递归写法</a></li>
 </ul>
 </li>
 <li>
@@ -6891,41 +7136,68 @@ $$</p>
 <p><a href="https://leetcode.cn/problems/longest-increasing-subsequence/">300.最长递增子序列  </a>LIS</p>
 <ul>
 <li>
-<p>更像是记忆化搜索或者递推，而非动规</p>
-</li>
-<li>
-<p>对比<a href="https://leetcode.cn/problems/longest-continuous-increasing-subsequence/">674.最长连续递增序列</a>（或者可称为最长递增数组？），是否连续决定是否内部要使用一个for循环找到比当前元素小的位置</p>
+<p><a href="https://leetcode.cn/problems/longest-continuous-increasing-subsequence/">674.最长连续递增序列</a>是连续的递增序列（或称为递增数组），是否连续决定是否内部要使用一个for循环找到比当前元素小的位置</p>
 </li>
 <li>
 <p>可以使用贪心+二分实现更低的复杂度</p>
 <ul>
 <li>
-<p>贪心：d[len]表示长度为len的LIS，末尾元素的最小值，最小值越小越好</p>
+<p>贪心：<code>d[len]</code>表示：长度为len的LIS的最后一个元素值，该元素值越小越好</p>
 </li>
 <li>
-<p>二分：d[]数组单调递增</p>
+<p>二分：<code>d[]</code>数组单调递增，</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="c1">// d[len]:长度为len的LIS，末尾元素的最小值
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">if</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">d</span><span class="p">[</span><span class="n">len</span><span class="p">])</span>
-</span></span><span class="line"><span class="cl">    <span class="n">d</span><span class="p">[</span><span class="o">++</span><span class="n">len</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl"><span class="k">else</span><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 二分查找：find max l, nums[i] &gt; d[l]
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 因此d[l+1]找到一个更小的末尾元素nums[i]：d[l+1]&gt;nums[i]&gt;d[l]
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">d</span><span class="p">[</span><span class="n">l</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">d</span><span class="p">[</span><span class="n">N</span><span class="p">];</span> <span class="c1">// 长度为len的LIS中的最后一个元素的值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="nf">lengthOfLIS</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1000000</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// 当前最长LIS的长度
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nums</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">d</span><span class="p">[</span><span class="n">len</span><span class="p">])</span> <span class="c1">// 如果当前最长LIS后面可以继续添加一个元素
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">d</span><span class="p">[</span><span class="o">++</span><span class="n">len</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">{</span> <span class="c1">// nums[i] &lt;= d[len]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// // 固定nums[i]为结尾，找前面尽可能长的一个LIS，同时该LIS的最大值&lt;nums[i]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// // 即：长度j尽可能大，同时d[j] &lt; nums[i]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// int j = find_last_lt(d, 0, len+1, nums[i]);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// d[j+1] = min(d[j+1], nums[i]);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// 另一种等价的写法：找到d中第一个&gt;nums[i]的位置j
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// 说明j-1长度的LIS的最大元素小于nums[i]，j长度的LIS最大元素又&gt;nums[i]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// 说明为j长度的LIS找到了更小的一个末尾元素
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">find_first_ge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">d</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> 
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">len</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="k">return</span> <span class="n">len</span>
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p><a href="https://leetcode.cn/problems/longest-increasing-subsequence/solutions/147667/zui-chang-shang-sheng-zi-xu-lie-by-leetcode-soluti/">参考</a></p>
@@ -7261,8 +7533,6 @@ $$</p>
 </li>
 </ul>
 <h2 id="继续刷">继续刷</h2>
-<p><a href="https://leetcode.cn/problems/linked-list-cycle-ii/">142.环形链表Ⅱ</a></p>
-<p><a href="https://leetcode.cn/problems/binary-tree-maximum-path-sum/description/">124.二叉树中的最大路径和 </a></p>
 <p><a href="https://leetcode.cn/problems/path-sum-iii/description/">437.路径总和Ⅲ</a></p>
 <p><a href="https://leetcode.cn/problems/median-of-two-sorted-arrays/solutions/6098/4-xun-zhao-liang-ge-you-xu-shu-zu-de-zhong-wei-shu/">4.寻找两个正序数组的中位数</a></p>
 <p><a href="https://leetcode.cn/problems/maximal-rectangle/description/">85.最大矩形</a></p>

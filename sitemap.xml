@@ -2,25 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://qinganzhang.github.io/posts/a_survey_of_efficient_transformer_on_inference/</loc>
-    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
-  </url><url>
     <loc>https://qinganzhang.github.io/categories/</loc>
-    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
+    <lastmod>2024-09-07T14:45:54+08:00</lastmod>
   </url><url>
     <loc>https://qinganzhang.github.io/tags/deep-learning/</loc>
-    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
+    <lastmod>2024-09-07T14:45:54+08:00</lastmod>
   </url><url>
     <loc>https://qinganzhang.github.io/categories/deep-learning/</loc>
-    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
+    <lastmod>2024-09-07T14:45:54+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/posts/encoder-decoder%E5%92%8Cdecoder-only%E6%9E%B6%E6%9E%84%E8%AE%AD%E7%BB%83%E5%92%8C%E6%8E%A8%E7%90%86%E6%B5%85%E6%9E%90/</loc>
+    <lastmod>2024-09-07T14:45:54+08:00</lastmod>
   </url><url>
     <loc>https://qinganzhang.github.io/</loc>
-    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
+    <lastmod>2024-09-07T14:45:54+08:00</lastmod>
   </url><url>
     <loc>https://qinganzhang.github.io/posts/</loc>
-    <lastmod>2024-03-04T20:57:14+08:00</lastmod>
+    <lastmod>2024-09-07T14:45:54+08:00</lastmod>
   </url><url>
     <loc>https://qinganzhang.github.io/tags/</loc>
+    <lastmod>2024-09-07T14:45:54+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/tags/transformer/</loc>
+    <lastmod>2024-09-07T14:45:54+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/posts/llm%E6%97%B6%E4%BB%A3%E7%9A%84transformer%E9%87%8F%E5%8C%96%E5%88%86%E6%9E%90-%E5%8F%82%E6%95%B0%E9%87%8F%E8%AE%A1%E7%AE%97%E9%87%8F%E6%BF%80%E6%B4%BB%E5%80%BC/</loc>
+    <lastmod>2024-09-07T14:43:19+08:00</lastmod>
+  </url><url>
+    <loc>https://qinganzhang.github.io/posts/a_survey_of_efficient_transformer_on_inference/</loc>
     <lastmod>2024-03-04T20:57:14+08:00</lastmod>
   </url><url>
     <loc>https://qinganzhang.github.io/tags/%E6%8E%A8%E7%90%86%E5%8A%A0%E9%80%9F/</loc>
