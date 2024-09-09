@@ -78,13 +78,14 @@
     </item>
     
     <item>
-      <title>LLM时代的transformer量化分析 参数量、计算量、激活值</title>
+      <title>LLM时代的transformer参数量、计算量、激活值的分析</title>
       <link>https://qinganzhang.github.io/posts/llm%E6%97%B6%E4%BB%A3%E7%9A%84transformer%E9%87%8F%E5%8C%96%E5%88%86%E6%9E%90-%E5%8F%82%E6%95%B0%E9%87%8F%E8%AE%A1%E7%AE%97%E9%87%8F%E6%BF%80%E6%B4%BB%E5%80%BC/</link>
       <pubDate>Sat, 07 Sep 2024 14:43:19 +0800</pubDate>
       
       <guid>https://qinganzhang.github.io/posts/llm%E6%97%B6%E4%BB%A3%E7%9A%84transformer%E9%87%8F%E5%8C%96%E5%88%86%E6%9E%90-%E5%8F%82%E6%95%B0%E9%87%8F%E8%AE%A1%E7%AE%97%E9%87%8F%E6%BF%80%E6%B4%BB%E5%80%BC/</guid>
-      <description>定性分析 GPU上都存了哪些东西 首先我们来从全局整体的角度看一看，在训练阶段GPU显存上都有哪些内容： Model States：模型训练过程中必须存储的</description>
-      <content:encoded><![CDATA[<h1 id="定性分析">定性分析</h1>
+      <description>导读：本文可以看作是对分析transformer模型的参数量、计算量、中间激活、KV cache的详细说明 定性分析 GPU上都存了哪些东西 首先我</description>
+      <content:encoded><![CDATA[<p>导读：本文可以看作是对<a href="https://zhuanlan.zhihu.com/p/624740065">分析transformer模型的参数量、计算量、中间激活、KV cache</a>的详细说明</p>
+<h1 id="定性分析">定性分析</h1>
 <h2 id="gpu上都存了哪些东西">GPU上都存了哪些东西</h2>
 <p>首先我们来从全局整体的角度看一看，在训练阶段GPU显存上都有哪些内容：</p>
 <ul>
@@ -111,13 +112,13 @@
 <img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-07-21:18:21.png" alt="fp32精度训练" style="zoom: 40%;" />
 <p>占用显存为：$4\Phi$（fp32 weights）+$4\Phi$（fp32 momentum）+$4\Phi$（fp32 variance）+$4\Phi$（fp32 grad）+fp32 activation（可能很大）=$16\Phi$ Bytes + fp32 activation（4代表fp32的4Bytes，2代表fp16/bf16的2Bytes）</p>
 <p>如果使用fp16的混合精度训练（bf16应该也可以，但是实际Megatron有点不同，下面会提到），具体过程是：</p>
-<img src="C:\Users\zhang\Desktop\fp16混合精度训练.png" alt="fp16混合精度训练" style="zoom:50%;" />
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-07-23:19:15.png" alt="fp16混合精度训练" style="zoom:50%;" />
 <p>占用显存为：$4\Phi$（fp32 weights）+$4\Phi$（fp32 momentum）+$4\Phi$（fp32 variance）+$2\Phi$（fp16 grad）+$2\Phi$（fp16 scaled grad）+$4\Phi$（fp32 unscaled and cliped grad）+fp16 activation（可能很大）=$20\Phi$ Bytes + fp16 activation</p>
 <p>需要说明的有两点：</p>
 <ol>
 <li>当fp16 scaled grad转为为fp32 unscaled and cliped grad后，fp16 scaled grad就没用了，但是此时Megatron中仍然保留着一份fp16 scaled grad，所以显存占用中这两部分都会计算在内，这也符合Megatron offical readme中的描述：</li>
 </ol>
-<img src="C:\Users\zhang\AppData\Roaming\Typora\typora-user-images\image-20240907213340085.png" alt="image-20240907213340085" style="zoom:80%;" />
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-07-23:19:22.png" alt="image-20240907213340085" style="zoom:80%;" />
 <ol start="2">
 <li>
 <p>注意到上面流程中多了一个scale/unscale的操作，这叫做“loss scaling”</p>
@@ -144,7 +145,7 @@
 </li>
 </ul>
 </blockquote>
-<img src="C:\Users\zhang\Desktop\bf16混合精度训练.png" alt="bf16混合精度训练" style="zoom:50%;" />
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-07-23:19:37.png" alt="bf16混合精度训练" style="zoom:50%;" />
 <p>这里找到一个为什么要将bf16与accumulate_allreduce_grads_in_fp32绑定的<a href="https://github.com/NVIDIA/Megatron-LM/issues/372">issue</a>，里面提到“We found this to lead to more stable training before, but you could also try to perform the all-reduce in <code>bf16</code> (it might hurt convergence but will be faster).”</p>
 <p>参考：</p>
 <ul>
@@ -155,43 +156,1039 @@
 </ul>
 <h1 id="量化分析">量化分析</h1>
 <h2 id="transformer结构详解">transformer结构详解</h2>
-<p>LLM中的transformer一般是decoder-only结构，所以下面的transformer block主要是decoder，但是与经典的Transformer中的decoder不同的是，这里没有了cross-attn，因此结构看起来反而有点像encoder（但不是，因为有casual mask）。</p>
-<p>下面图中的Transformer，没有上kv-cache、GQA等优化，这部分后面会分析。其中，参数量$\Phi$表示有多少个参数；中间激活值$A$是，单位是Bytes，</p>
-<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-04-22:12:10.jpg" alt="20240904221135" style="zoom:150%;" />
-<p>KV cache对显存占用的影响</p>
-<p>MQA和GQA对显存占用的影响</p>
-<h5 id="简单分析">简单分析</h5>
-<p>忽略层数l，拿单层来进行分析</p>
+<p>LLM中的transformer一般是decoder-only结构，所以下面的transformer block主要是decoder，但是与Vanilla Transformer中的decoder不同的是，这里没有了cross-attn，因此结构看起来反而有点像encoder（但不是，因为有casual mask）。</p>
+<p>下面图中的Transformer，没有上kv-cache、GQA等优化，这部分后面会分析。其中，参数量$\Phi$表示有多少个参数；中间激活值$A$的单位是Bytes，主要参考的是<a href="https://zhuanlan.zhihu.com/p/624740065">分析transformer模型的参数量、计算量、中间激活、KV cache</a></p>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-09-15:58:31.png" alt="transformer详细分析" style="zoom:150%;" />
+<p>在<a href="https://arxiv.org/pdf/2205.05198">Reducing Activation Recomputation in Large Transformer Models</a> 4.1节中也对transformer激活值进行了一个分析，但是该论文中，self-attention block部分softmax之前没有加mask，上图中添加了mask，具体在Attention部分stage SA_3，其中mask由于是整个transformer共享的，所以就省略了，$QK^T$的乘积被mask原地修改，所以$wbas^2$也省略了，这样激活值与原论文中仍然是一样的。</p>
+<h2 id="kv-cache对参数量计算量激活值的影响">KV cache对参数量、计算量、激活值的影响</h2>
+<p>关于KV Cache的来龙去脉，<a href="https://qinganzhang.github.io/posts/encoder-decoder%E5%92%8Cdecoder-only%E6%9E%B6%E6%9E%84%E8%AE%AD%E7%BB%83%E5%92%8C%E6%8E%A8%E7%90%86%E6%B5%85%E6%9E%90/">Encoder Decoder和decoder Only架构训练和推理浅析</a>中简单捋了一下。简单来说，kv cache在推理过程中使用，而且模型只能是decoder-only架构。由于自回归的方式逐token生成，self-attention部分必须使用casual mask，因此Q矩阵部分只需要计算最新token的q向量即可，K、V矩阵部分只需要拼接新token的k、v向量即可：</p>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-08-14:04:56.png" alt="kv_cache" style="zoom: 50%;" />
+<p>上面又重新回顾了一下kv cache。首先kv cache不会对参数量有影响，kv cache主要是用来减少不必要的计算的，显存因此也可能有相应的减少，上面只是一个示意图，中间省略了一些部分，详细的量化分析见下图，需要说明的有两点：</p>
 <ol>
-<li>
-<p>参数量与隐藏层维度h的平方成正比</p>
-</li>
-<li>
-<p>激活值中间包含两项，$34bsh$和$8bas^2$，提取出相同的部分，剩下即比较$34h$和$8as$的大小,一般来说8as会大一点（如果没用MQA或GQA），是34h的2~10倍，因此增大b、s、h都会显著增加激活值占用的显存，举个例子说明：</p>
+<li>kv cache使用场景是推理场景，LLM推理分为prefill阶段和decode阶段，prefill阶段创建kv-cache，decode阶段更新kv-cache。在输入prompt的这个prefill阶段中，with kv-cache和without kv-cache的计算量是相同的（显存占用由于分配kv-cache，可能with kv-cache会更多一点）。计算量的减少主要体现在decode阶段，因此下面的分析主要是针对单次decode阶段的，因此固定$s==1$</li>
+<li>下图中说的“相对于原来“指的是without kv-cache时，每次都输入之前所有的token，计算完整的attention-score方阵，因而此时的序列长度$s=s_n \le s_m$。在最终分析时，取最大值$s=s_m$进行比较，对应decode阶段的最后一个token的生成过程，有的博客可能会将输入序列长度（prompt长度）和输出序列长度分开，这里合起来了，注意区别。</li>
+</ol>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-09-16:10:01.png" alt="transformer详细分析（kv cache）" style="zoom:150%;" />
 <table>
 <thead>
 <tr>
-<th>config（假设使用bf16）</th>
-<th>$34bsh$</th>
-<th>$8bas^2$</th>
-<th>total</th>
+<th></th>
+<th>原来（without kv-cache）</th>
+<th>现在（with kv-cache）</th>
+<th>变化</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>b=1,s=2048,a=96,h=12288</td>
-<td>816MB</td>
-<td>3072MB</td>
-<td>3.8G</td>
+<td>参数量</td>
+<td>$2Vh+(12h^2+13h)l$</td>
+<td>$2Vh+(12h^2+13h)l$</td>
+<td>不变</td>
+</tr>
+<tr>
+<td>中间激活</td>
+<td>$2bsh+(34bs_mh+5bas_m^2)l$</td>
+<td>$2bsh+(30bh+4bs_mh+5bas_m)l$</td>
+<td>减少了$(30bh(s_m-1)+5bas_m(s_m-1))l$，原来中间激活是最长序列长度$s_m$的二次方，现在随着$s_m$线性增长</td>
+</tr>
+<tr>
+<td>计算量</td>
+<td>$(24h+4s_m)bs_mhl+2bs_mhV$</td>
+<td>$(24h+4s_m)bhl+2bhV$</td>
+<td>减少了$(24h+4s_m)bhl(s_m-1)+2bhV(s_m-1)$，原来计算量是最长序列长度$s_m$的二次方，现在随着$s_m$线性增长</td>
 </tr>
 </tbody>
 </table>
+<p>code:  from <a href="https://zhuanlan.zhihu.com/p/667763542">【手撕LLM-KVCache】显存刺客的前世今生&ndash;文末含代码</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># author: xiaodongguaAIGC</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># KV-Cache + Generation + decoder </span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">LlamaModel</span><span class="p">,</span> <span class="n">LlamaConfig</span><span class="p">,</span> <span class="n">LlamaForCausalLM</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">D</span> <span class="o">=</span> <span class="mi">128</span> <span class="c1"># single-head-dim</span>
+</span></span><span class="line"><span class="cl"><span class="n">V</span> <span class="o">=</span> <span class="mi">64</span>  <span class="c1"># vocab_size</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">xiaodonggua_kv_cache</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">V</span><span class="p">):</span>  
+</span></span><span class="line"><span class="cl">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="n">D</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">V</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">Embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">V</span><span class="p">,</span><span class="n">D</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">Wq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">D</span><span class="p">)</span>     
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">Wk</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">D</span><span class="p">)</span>     
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">Wv</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">D</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">lm_head</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">V</span><span class="p">)</span> <span class="c1"># LM_head</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">cache_K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_V</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># initial</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">X</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Q</span><span class="p">,</span><span class="n">K</span><span class="p">,</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Wq</span><span class="p">(</span><span class="n">X</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">Wk</span><span class="p">(</span><span class="n">X</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">Wv</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;input_Q:&#34;</span><span class="p">,</span> <span class="n">Q</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;input_K:&#34;</span><span class="p">,</span> <span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;input_V:&#34;</span><span class="p">,</span> <span class="n">V</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># Easy KV_Cache</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_K</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># first time</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">cache_K</span> <span class="o">=</span> <span class="n">K</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">cache_V</span> <span class="o">=</span> <span class="n">V</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">cache_K</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_K</span><span class="p">,</span> <span class="n">K</span><span class="p">),</span> <span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">cache_V</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_V</span><span class="p">,</span> <span class="n">V</span><span class="p">),</span> <span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_K</span>
+</span></span><span class="line"><span class="cl">            <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_V</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;cache_K:&#34;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_K</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;cache_V:&#34;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_K</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># ignore proj/MLP/scaled/mask/multi-head when calculate Attention</span>
+</span></span><span class="line"><span class="cl">        <span class="n">attn</span> <span class="o">=</span><span class="n">Q</span><span class="nd">@K.transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="nd">@V</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># output</span>
+</span></span><span class="line"><span class="cl">        <span class="n">output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lm_head</span><span class="p">(</span><span class="n">attn</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">output</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">xiaodonggua_kv_cache</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">V</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl"><span class="c1"># 创建数据、不使用tokenizer</span>
+</span></span><span class="line"><span class="cl"><span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">Generation </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> step input_shape: </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">：&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">next_token</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="o">-</span><span class="mi">1</span><span class="p">)[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">next_token</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">X</span> <span class="o">=</span> <span class="n">next_token</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>reference and more reading：</p>
+<p><a href="https://blog.csdn.net/weixin_65514978/article/details/141399339">【大模型理论篇】Transformer KV Cache原理深入浅出</a></p>
+<p><a href="https://juejin.cn/post/7362789570217885759#heading-3">大模型推理优化技术-KV Cache</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/686183300">一文读懂KVCache</a></p>
+<h2 id="mqa和gqa对显存占用的影响">MQA和GQA对显存占用的影响</h2>
+<p>在实际推理场景中，kv-cache已经是默认的选项。但是kv-cache是很占显存的，占用显存为$2 w_{kv} b s_m (a h_a) l$（其中$h=a * h_a$），后面会有case study分析。针对kv cache的各种优化层出不穷，下面的参考中有几篇博客总结了一下对kv cache的各种优化，简单来说，从上面的显存分析入手，有以下几种优化方法：</p>
+<ul>
+<li>针对attention 窗口（或者叫做context，上下文，或者当作最长序列长度$s_m$）$s_m$的优化，比如window attention，sparse attention，StreamingLLM</li>
+<li>针对注意力头$a$的优化，比如MQA，GQA共享kv-cache（sharing）</li>
+<li>针对层数$l$的优化，比如YOCO层间共享kv-cache（sharing）</li>
+<li>针对精度$w_{kv}$的优化，比如kv-cache采用int8量化</li>
+<li>针对内存分配的优化，减少内存碎片等，比如PagedAttention</li>
+<li>其他优化。。。</li>
+</ul>
+<p>其中MQA/GQA在LLM中广泛使用，比如Llama2中就使用到了GQA。下面简单分析一下。</p>
+<p>GQA方法很简单，原来MHA中每个q向量对应一个k向量和v向量，进行attention计算；现在好几个q向量对应（或者说共享）一个k向量和v向量，这“好几个q向量”构成一组，一共有g组，每组就有$\frac{a}{g}$个q向量。如果g=1，那么就是MQA，a个q向量构成一组，共享一个k、v向量；如果g=a，那么就是MHA，每个q向量构成一组，对应一个k、v向量。实际场景中，往往g=8，比如推理场景中单卡放不下，正好单机八卡，每张卡对应一组q向量。</p>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-08-16:40:24.png" alt="image-20240908164016647" style="zoom: 67%;" />
+<p>虽然MQA/GQA是针对推理过程中kv-cache的优化，但是在训练中也能用，也能省显存。下面对GQA在推理场景中的使用（with kv_cache）进行一个量化分析。</p>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-08-17:24:56.png" alt="image-20240908172449500" style="zoom:150%;" />
+<p>因为GQA只影响self-attention计算部分，因此其他部分省略，下面的表格也是只分析这个变化的部分。可以看出，由于kv-cache在长序列的情况下会占用很多显存，GQA针对中间激活的优化与序列长度相关，实际上GQA对中间激活的优化就是将kv-cache变为原来的$\frac{g}{a}$倍。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>原来（MHA）-现在（GQA）</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>参数量</td>
+<td>$\left [3(h^2+h) \right ]l - \left [ (\frac{2g}{a}+1)(h^2+h) \right ]l=2(1-\frac{g}{a})(h^2+h)l$</td>
+<td></td>
+</tr>
+<tr>
+<td>中间激活</td>
+<td>$\left [ wbsh+2w_{kv}bs_mh \right]l - \left [ wbsh + 2w_{kv}bs_mh \times\frac{g}{a} \right ]l = 2w_{kv}bs_mhl(1-\frac{g}{a})$</td>
+<td>尤其当长序列（$bs_m$较大），大模型（$hl$较大）时，前面系数较大，整体激活减少比较可观</td>
+</tr>
+<tr>
+<td>计算量</td>
+<td>$\left [ 6bsh^2 \right ]l - \left [ 2bsh^2 (\frac{2g}{a}+1) \right ] l = 4bsh^2l(1-\frac{g}{a}) \overset{s=1}{=} 4bh^2l(1-\frac{g}{a}) $</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>在训练场景中，同样给出量化分析。需要说明的是，上述分析是在推理场景+kv_cache+GQA的情况下进行的分析，下面公式是针对的是训练场景+GQA。</p>
+<p>
+  <img loading="lazy" src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-09-17:47:01.png" alt="transformer训练场景分析（GQA）"  /></p>
+<p>code： from <a href="https://zhuanlan.zhihu.com/p/717838262">MHA，MQA，GQA注意力</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">GroupedQueryAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">num_groups</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span> <span class="o">=</span> <span class="n">num_heads</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span> <span class="o">=</span> <span class="n">num_groups</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span> <span class="o">=</span> <span class="n">embed_dim</span> <span class="o">//</span> <span class="n">num_heads</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># attention weights</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">wq</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">wk</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">,</span> <span class="n">num_groups</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">wv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">,</span> <span class="n">num_groups</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">wo</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">split_heads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">num_groups</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># n == num_heads or num_groups</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span>  <span class="c1"># (batch_size, seq_len, n, head_dim)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">batch_size</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">head_dim</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">num_groups</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span> <span class="o">//</span> <span class="n">num_groups</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">head_dim</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="n">head_dim</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># (batch_size, num_heads, seq_len, head_dim)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">x</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">merge_heads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">        :param x: (batch_size, num_heads, seq_len, head_dim)
+</span></span></span><span class="line"><span class="cl"><span class="s2">        &#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>  <span class="c1"># (batch_size, seq_len, num_heads, head_dim)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># ( batch_size, seq_len, embed_dim)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">x</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_states</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">causal_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">q</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wq</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">wk</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">wv</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 分割注意力头</span>
+</span></span><span class="line"><span class="cl">        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_heads</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_heads</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">num_groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_heads</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">num_groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 注意力计算</span>
+</span></span><span class="line"><span class="cl">        <span class="n">attn_weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">k</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">q</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># causal mask</span>
+</span></span><span class="line"><span class="cl">        <span class="n">mask_value</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">attn_weights</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">min</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">causal_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">seq_len</span> <span class="o">=</span> <span class="n">hidden_states</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">causal_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="n">attn_weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">causal_mask</span><span class="p">,</span> <span class="n">attn_weights</span><span class="p">,</span> <span class="n">mask_value</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 归一化</span>
+</span></span><span class="line"><span class="cl">        <span class="n">attn_weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">attn_weights</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">attn_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">attn_weights</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 合并注意力头</span>
+</span></span><span class="line"><span class="cl">        <span class="n">attn_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merge_heads</span><span class="p">(</span><span class="n">attn_output</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">attn_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wo</span><span class="p">(</span><span class="n">attn_output</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">attn_output</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>参考：</p>
+<p><a href="https://zhuanlan.zhihu.com/p/685853516">大模型百倍推理加速之KV cache篇</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/659770503">LLM（二十）：漫谈 KV Cache 优化方法，深度理解 StreamingLLM</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/697311739">[KV Cache优化]🔥MQA/GQA/YOCO/CLA/MLKV笔记: 层内和层间KV Cache共享</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/708120479">大模型推理加速：KV Cache 和 GQA</a></p>
+<h2 id="case-study">case study</h2>
+<p>我们以GPT和Llama为例，进行case study。</p>
+<h3 id="关于参数量的分析">关于参数量的分析</h3>
+<h4 id="gpt-3">GPT-3</h4>
+<p>GPT-3模型结构就大致上面【transformer结构详解】中的结构，但是多了一个可学习的position embedding，包含$n_{ctx} * h$个参数，其中$n_{ctx}=2048$，rectified这一列是加上这些参数后的参数量。</p>
+<table>
+<thead>
+<tr>
+<th>params</th>
+<th>h</th>
+<th>l</th>
+<th>a</th>
+<th>b</th>
+<th>V <a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf">from GPT-2</a></th>
+<th>calculated params=$Vh+(12h^2+13h)l$</th>
+<th>rectified</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPT-3 Small: 125M</td>
+<td>768</td>
+<td>12</td>
+<td>64</td>
+<td>0.5M</td>
+<td>50257</td>
+<td>123651840  $\approx$ 123.7M</td>
+<td>125224704  $\approx$ 125.2M</td>
+</tr>
+<tr>
+<td>GPT-3 Medium: 350M</td>
+<td>1024</td>
+<td>24</td>
+<td>64</td>
+<td>0.5M</td>
+<td>50257</td>
+<td>353772544 $\approx$353.8M</td>
+<td>355869696 $\approx$ 355.9M</td>
+</tr>
+<tr>
+<td>GPT-3 Large: 760M</td>
+<td>1536</td>
+<td>24</td>
+<td>96</td>
+<td>0.5M</td>
+<td>50257</td>
+<td>757151232 $\approx$ 757.1M</td>
+<td>760296960 $\approx$ 760.3M</td>
+</tr>
+<tr>
+<td>GPT-3 2.7B</td>
+<td>2560</td>
+<td>32</td>
+<td>80</td>
+<td>1M</td>
+<td>50257</td>
+<td>2646305280 $\approx$ 2.64B</td>
+<td>2651548160 $\approx$ 2.65B</td>
+</tr>
+<tr>
+<td>GPT-3 6.7B</td>
+<td>4096</td>
+<td>32</td>
+<td>128</td>
+<td>2M</td>
+<td>50257</td>
+<td>6650007552 $\approx$ 6.65B</td>
+<td>6658396160 $\approx$ 6.67B</td>
+</tr>
+<tr>
+<td>GPT-3 13B</td>
+<td>5140</td>
+<td>40</td>
+<td>128</td>
+<td>2M</td>
+<td>50257</td>
+<td>12942401780 $\approx$ 12.94B</td>
+<td>12952928500 $\approx$ 12.95B</td>
+</tr>
+<tr>
+<td>GPT-3 175B</td>
+<td>12288</td>
+<td>96</td>
+<td>128</td>
+<td>3.2M</td>
+<td>50257</td>
+<td>174579068928 $\approx$ 174.58B</td>
+<td>174604234752 $\approx$ 174.60B</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>说明：</p>
+<ol>
+<li>GPT-3词表大小V在论文中没找到，所以用的GPT-2的词表大小，这里论文中是提到的</li>
+</ol>
+<p>more relative reading：</p>
+<ul>
+<li><a href="https://www.lesswrong.com/posts/3duR8CrvcHywrnhLo/how-does-gpt-3-spend-its-175b-parameters">How does GPT-3 spend its 175B parameters?</a></li>
+</ul>
+</blockquote>
+<h4 id="llama-1-llama--open-and-efficient-foundation-language-modelshttpsarxivorgpdf230213971">Llama 1: <a href="https://arxiv.org/pdf/2302.13971">LLaMa:  Open and Efficient Foundation Language Models</a></h4>
+<p>模型结构：<a href="https://huggingface.co/docs/transformers/model_doc/llama">from hugging face transformers LLaMA</a></p>
+<img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-08-22:35:04.png" alt="llama1" style="zoom: 40%;" />
+<p>论文中说，该模型与Vanilla Transformer有三处区别：</p>
+<ol>
+<li>
+<p>Pre-normalization and RMSNorm</p>
+ <img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-04-22:22:22.png" alt="image-20240904222219836" style="zoom: 50%;" />
+<p>​	原始Transformer中使用post-norm居多，后来使用pre-norm居多，而且往往在FFN之前也加一个norm。尤其在大模型中，可能在通过LN之后MHA之前，Q和K还要加上旋转位置编码。</p>
+<blockquote>
+<p>参考：<a href="https://zhuanlan.zhihu.com/p/474988236">【重新了解Transformer模型系列_1】PostNorm/PreNorm的差别</a></p>
+</blockquote>
 </li>
 <li>
-<p>计算量与参数量成正比，与输入token数量成正比</p>
+<p>SwiGLU activation function</p>
+<p>SwiGLU激活函数不太像传统的ReLU等激活函数那样简单，比如ReLU都不带参数，而SwiGLU乍一看上去不明觉厉，实际上将SwiGLU理解成对传统FFM的替换，感觉更合适一些。直接看公式有点懵，看图更容易理解，下面是FFM和SwiGLU的对比</p>
+ <img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-08-23:03:55.png" alt="SwiGLU" style="zoom: 50%;" />
+<p>SwiGLU写成公式就是$SwiGLU(x) = \left [ SiGU \left( gate_proj(x) \right) \odot up_proj(x)  \right] \times down_proj(x)$，其中可能有点困惑的是这个$\frac{8h}{3}$是怎么来的，实际上就是为了左右这两个结构的参数量相等：$2 \times h \times 4h \equiv 2 \times h \times \frac{8h}{3} + \frac{8h}{3} \times h$</p>
+</li>
+<li>
+<p>Rotary Embedding</p>
 </li>
 </ol>
-<h5 id="其他说明">其他说明</h5>
+<p>下面是模型配置，验证一下前面推出来的参数量相关的公式能否对上：</p>
+<table>
+<thead>
+<tr>
+<th>params</th>
+<th>h</th>
+<th>l</th>
+<th>a</th>
+<th>b</th>
+<th><a href="https://huggingface.co/docs/transformers/model_doc/llama#transformers.LlamaConfig">V</a></th>
+<th>intermediate_size</th>
+<th>calculated params=$2Vh+(12h^2+13h)l$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6.7B</td>
+<td>4096</td>
+<td>32</td>
+<td>32</td>
+<td>4M</td>
+<td>32K</td>
+<td><a href="https://github.com/NVIDIA/NeMo-Framework-Launcher/blob/main/launcher_scripts/conf/training/llama/llama1_7b.yaml">11008</a></td>
+<td>6706298880  $\approx$ 6.71B</td>
+</tr>
+<tr>
+<td>13.0B</td>
+<td>5120</td>
+<td>40</td>
+<td>40</td>
+<td>4M</td>
+<td>32K</td>
+<td><a href="https://github.com/NVIDIA/NeMo-Framework-Launcher/blob/main/launcher_scripts/conf/training/llama/llama1_13b.yaml">13824</a></td>
+<td>12913254400  $\approx$ 12.91B</td>
+</tr>
+<tr>
+<td>32.5B</td>
+<td>6656</td>
+<td>60</td>
+<td>52</td>
+<td>4M</td>
+<td>32K</td>
+<td><a href="https://github.com/NVIDIA/NeMo-Framework-Launcher/blob/main/launcher_scripts/conf/training/llama/llama1_30b.yaml">17920</a></td>
+<td>32328857600 $\approx$ 32.33B</td>
+</tr>
+<tr>
+<td>65.2B</td>
+<td>8192</td>
+<td>80</td>
+<td>64</td>
+<td>4M</td>
+<td>32K</td>
+<td><a href="https://github.com/NVIDIA/NeMo-Framework-Launcher/blob/main/launcher_scripts/conf/training/llama/llama1_65b.yaml">22016</a></td>
+<td>64957317120 $\approx$ 64.96B</td>
+</tr>
+</tbody>
+</table>
+<p>每次总是差一点，但是差的不多，差在了哪里呢？MLP部分，理论上intermediate_size=$\frac{8h}{3}$，但是实际上可能会比这个值大一些，往往向上取到256、512、1024等的倍数，对矩阵乘法性能更好，因此来修正一下参数量、计算量、激活值的量化分析：</p>
+<p>
+  <img loading="lazy" src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-09-16:15:19.png" alt="transformer详细分析(llama)"  /></p>
+<p>重新计算一下，这次参数量就很接近了</p>
+<table>
+<thead>
+<tr>
+<th>params</th>
+<th>h</th>
+<th>l</th>
+<th>a</th>
+<th>b</th>
+<th><a href="https://huggingface.co/docs/transformers/model_doc/llama#transformers.LlamaConfig">V</a></th>
+<th>intermediate_size</th>
+<th>calculated params=$2Vh+(4h+4+3I)hl$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6.7B</td>
+<td>4096</td>
+<td>32</td>
+<td>32</td>
+<td>4M</td>
+<td>32K</td>
+<td><a href="https://github.com/NVIDIA/NeMo-Framework-Launcher/blob/main/launcher_scripts/conf/training/llama/llama1_7b.yaml">11008</a></td>
+<td>6738673664  $\approx$ 6.74B</td>
+</tr>
+<tr>
+<td>13.0B</td>
+<td>5120</td>
+<td>40</td>
+<td>40</td>
+<td>4M</td>
+<td>32K</td>
+<td><a href="https://github.com/NVIDIA/NeMo-Framework-Launcher/blob/main/launcher_scripts/conf/training/llama/llama1_13b.yaml">13824</a></td>
+<td>13016268800  $\approx$ 13.02B</td>
+</tr>
+<tr>
+<td>32.5B</td>
+<td>6656</td>
+<td>60</td>
+<td>52</td>
+<td>4M</td>
+<td>32K</td>
+<td><a href="https://github.com/NVIDIA/NeMo-Framework-Launcher/blob/main/launcher_scripts/conf/training/llama/llama1_30b.yaml">17920</a></td>
+<td>32529735680 $\approx$ 32.53B</td>
+</tr>
+<tr>
+<td>65.2B</td>
+<td>8192</td>
+<td>80</td>
+<td>64</td>
+<td>4M</td>
+<td>32K</td>
+<td><a href="https://github.com/NVIDIA/NeMo-Framework-Launcher/blob/main/launcher_scripts/conf/training/llama/llama1_65b.yaml">22016</a></td>
+<td>65286963200 $\approx$ 65.29B</td>
+</tr>
+</tbody>
+</table>
+<h4 id="llama-2-llama-2-open-foundation-and-fine-tuned-chat-modelshttpsarxivorgpdf230709288">Llama 2: <a href="https://arxiv.org/pdf/2307.09288">Llama 2: Open Foundation and Fine-Tuned Chat Models</a></h4>
+<p>Llama2在模型结构方面与Llama1相差不大，只是将MHA替换为GQA，将attention的context length从2k提升到4k。下面是Llama2的模型配置</p>
+<table>
+<thead>
+<tr>
+<th>config</th>
+<th>h</th>
+<th>l</th>
+<th>a</th>
+<th>b</th>
+<th><a href="https://huggingface.co/docs/transformers/model_doc/llama2#transformers.LlamaConfig">V</a></th>
+<th>intermediate_size</th>
+<th>MHA or GQA</th>
+<th>calculated params=$2Vh+(12h^2+13h)l$</th>
+<th>calculated params=$2Vh+(4h+4+3I)hl$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7B, <a href="https://gitee.com/hf-models/Llama-2-7b-hf/blob/main/config.json">config</a></td>
+<td>4096</td>
+<td>32</td>
+<td>32</td>
+<td>4M</td>
+<td>32K</td>
+<td>11008</td>
+<td>MHA</td>
+<td>6706298880  $\approx$ 6.71B</td>
+<td>6738673664  $\approx$ 6.74B</td>
+</tr>
+<tr>
+<td>13B, <a href="https://gitee.com/hf-models/Llama-2-13b-hf/blob/main/config.json">config</a></td>
+<td>5120</td>
+<td>40</td>
+<td>40</td>
+<td>4M</td>
+<td>32K</td>
+<td>13824</td>
+<td>MHA</td>
+<td>12913254400  $\approx$ 12.91B</td>
+<td>13016268800  $\approx$ 13.02B</td>
+</tr>
+</tbody>
+</table>
+<p>至于70B的<a href="https://gitee.com/hf-models/Llama-2-70b-hf/blob/main/config.json">config</a>（h=8192, l=80, a=64, b=4M, V=32K, intermediate_size=28672, g=8）使用了group=8的GQA，只有attention部分的参数量会发生一些变化，调整公式后，分别计算一下：</p>
+<ul>
+<li>calculated params=$2Vh+\left[ 10h^2 + 11h + \frac{2g}{a}(h^2+h)\right] l$ = 5556092928 $\approx$ 55.56B，相差较大</li>
+<li>llama calculated params=$2Vh + \left [ (2+\frac{2g}{a}) h ^ 2 + 4h + 3hI \right ] l$ = 68977950720 $\approx$ 68.98B，比较接近了</li>
+</ul>
+<p>因此，对于transformer而言，</p>
+<ul>
+<li>如果MLP是传统FFN那样的结构，calculated params=$2Vh+(12h^2+13h)l$
+<ul>
+<li>如果attention部分使用了GQA，则calculated params=$2Vh+\left[ 10h^2 + 11h + \frac{2g}{a}(h^2+h)\right] l$</li>
+</ul>
+</li>
+<li>如果MLP是SwiGLU那样的结构，calculated params=$2Vh+(4h+4+3I)hl$
+<ul>
+<li>如果attention部分使用了GQA，则calculated params=$2Vh + \left [ (2+\frac{2g}{a}) h ^ 2 + 4h + 3hI \right ] l$</li>
+</ul>
+</li>
+</ul>
+<p>但是总的来说，transformer的复杂度还是$O(h^2l)$级别的</p>
+<blockquote>
+<p>more relative reading：</p>
+<p><a href="https://medium.com/@saratbhargava/mastering-llama-math-part-1-a-step-by-step-guide-to-counting-parameters-in-llama-2-b3d73bc3ae31">“Mastering Llama Math (Part-1): A Step-by-Step Guide to Counting Parameters in Llama-2”</a></p>
+<p><a href="https://bitddd.blog.csdn.net/article/details/132161203">LLM - Transformer &amp;&amp; LLaMA2 结构分析与 LoRA 详解</a></p>
+</blockquote>
+<h4 id="llama-3-the-llama-3-herd-of-modelshttpsarxivorgpdf240721783">Llama 3: <a href="https://arxiv.org/pdf/2407.21783">The Llama 3 Herd of Models</a></h4>
+<p>Llama3的改进相对于Llama2和Llama1，主要体现在使用了更高质量的数据和更大规模的训练，模型结构基本没变。下面是模型配置，</p>
+<table>
+<thead>
+<tr>
+<th>config</th>
+<th>h</th>
+<th>l</th>
+<th>a</th>
+<th>b</th>
+<th>V</th>
+<th>intermediate_size</th>
+<th>GQA group</th>
+<th>calculated params=$2Vh + \left [ (2+\frac{2g}{a}) h ^ 2 + 4h + 3hI \right ] l$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8B, <a href="https://gitee.com/hf-models/llava-llama-3-8b-hf/blob/main/config.json">config</a></td>
+<td>32</td>
+<td>4096</td>
+<td>32</td>
+<td>4M-&gt;8M-&gt;16M</td>
+<td>128K</td>
+<td>14336</td>
+<td>8</td>
+<td>8028422144 $\approx$ 8.03B</td>
+</tr>
+<tr>
+<td>70B, <a href="https://gitee.com/hf-models/Meta-Llama-3-70B/blob/main/config.json">config</a></td>
+<td>80</td>
+<td>8192</td>
+<td>64</td>
+<td>4M-&gt;8M-&gt;16M</td>
+<td>128K</td>
+<td>28672</td>
+<td>8</td>
+<td>70550814720 $\approx$ 70.55B</td>
+</tr>
+<tr>
+<td>405B</td>
+<td>126</td>
+<td>16384</td>
+<td>128</td>
+<td>4M-&gt;8M-&gt;16M</td>
+<td>128K</td>
+<td>53248</td>
+<td>8</td>
+<td>405849112576 $\approx$ 405.85B</td>
+</tr>
+</tbody>
+</table>
+<p>参考：</p>
+<p><a href="https://blog.csdn.net/weixin_54338498/article/details/135269411">LLaMa-1/2/3 原理+源码——拆解 (KV-Cache, RoPE, RMSNorm, GQA, SwiGLU)</a></p>
+<h3 id="关于激活的分析">关于激活的分析</h3>
+<p>前面总说中间激活可能很占显存，我们来分析几个case。</p>
+<p>GPT-3</p>
+<table>
+<thead>
+<tr>
+<th>config</th>
+<th>h</th>
+<th>l</th>
+<th>a</th>
+<th>b</th>
+<th>s</th>
+<th>V <a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf">from GPT-2</a></th>
+<th>activation $\approx (34bsh+5bas^2)l$</th>
+<th>activation （with GQA）$\approx \left [  (28+\frac{4g}{a})bsh+5bas^2\right]l$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPT-3 Small: 125M</td>
+<td>768</td>
+<td>12</td>
+<td>64</td>
+<td>1</td>
+<td>2048</td>
+<td>50257</td>
+<td>15972.0MB  $\approx 67.0 \times 2\Phi$</td>
+<td>15873.0MB $\approx 66.58 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 Medium: 350M</td>
+<td>1024</td>
+<td>24</td>
+<td>64</td>
+<td>1</td>
+<td>2048</td>
+<td>50257</td>
+<td>32352.0MB $\approx 48.5 \times 2\Phi$</td>
+<td>32088.0 $\approx 48.1 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 Large: 760M</td>
+<td>1536</td>
+<td>24</td>
+<td>96</td>
+<td>1</td>
+<td>2048</td>
+<td>50257</td>
+<td>48528.0 MB  $\approx 33.5 \times 2\Phi$</td>
+<td>48120.0MB $\approx 33.2 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 2.7B</td>
+<td>2560</td>
+<td>32</td>
+<td>80</td>
+<td>1</td>
+<td>2048</td>
+<td>50257</td>
+<td>55.3GB $\approx 11.0 \times 2\Phi$ wrong</td>
+<td>54.4GB $\approx 10.82 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 6.7B</td>
+<td>4096</td>
+<td>32</td>
+<td>128</td>
+<td>1</td>
+<td>2048</td>
+<td>50257</td>
+<td>88.5GB  $\approx 7.10 \times 2\Phi$</td>
+<td>87.1GB $\approx 6.98 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 13B</td>
+<td>5140</td>
+<td>40</td>
+<td>128</td>
+<td>1</td>
+<td>2048</td>
+<td>50257</td>
+<td>113.3GB $\approx 4.68 \times 2\Phi$</td>
+<td>111.1GB $\approx 4.59 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 175B</td>
+<td>12288</td>
+<td>96</td>
+<td>128</td>
+<td>1</td>
+<td>2048</td>
+<td>50257</td>
+<td>316.5GB $\approx 0.97 \times 2\Phi$</td>
+<td>303.6GB $\approx 0.93 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 175B</td>
+<td>12288</td>
+<td>96</td>
+<td>128</td>
+<td>8</td>
+<td>2048</td>
+<td>50257</td>
+<td>2532.0GB $\approx 7.77 \times 2\Phi$</td>
+<td>2428.5GB $\approx 7.45 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 175B</td>
+<td>12288</td>
+<td>96</td>
+<td>128</td>
+<td>64</td>
+<td>2048</td>
+<td>50257</td>
+<td>19.78TB $\approx 62.14 \times 2\Phi$</td>
+<td>18.97TB $\approx 59.60 \times 2 \Phi$</td>
+</tr>
+</tbody>
+</table>
+<p>Llama-2：</p>
+<table>
+<thead>
+<tr>
+<th>config</th>
+<th>h</th>
+<th>l</th>
+<th>a</th>
+<th>b</th>
+<th>s</th>
+<th><a href="https://huggingface.co/docs/transformers/model_doc/llama2#transformers.LlamaConfig">V</a></th>
+<th>intermediate_size</th>
+<th>GQA: group</th>
+<th>activation （with GQA）$\approx \left [  (13+\frac{4g}{a})bsh+5bas^2 + 6bsI\right]l$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7B, <a href="https://gitee.com/hf-models/Llama-2-7b-hf/blob/main/config.json">config</a></td>
+<td>4096</td>
+<td>32</td>
+<td>32</td>
+<td>1</td>
+<td>4096</td>
+<td>32K</td>
+<td>11008</td>
+<td>32(MHA)</td>
+<td>96.6GB $\approx 7.4 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>13B, <a href="https://gitee.com/hf-models/Llama-2-13b-hf/blob/main/config.json">config</a></td>
+<td>5120</td>
+<td>40</td>
+<td>40</td>
+<td>1</td>
+<td>4096</td>
+<td>32K</td>
+<td>13824</td>
+<td>40(MHA)</td>
+<td>150.9GB $\approx 6.2 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>70B, <a href="https://gitee.com/hf-models/Llama-2-70b-hf/blob/main/config.json">config</a></td>
+<td>8192</td>
+<td>80</td>
+<td>64</td>
+<td>1</td>
+<td>4096</td>
+<td>32K</td>
+<td>28672</td>
+<td>8</td>
+<td>486.25GB $\approx 3.7 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>70B, <a href="https://gitee.com/hf-models/Llama-2-70b-hf/blob/main/config.json">config</a></td>
+<td>8192</td>
+<td>80</td>
+<td>64</td>
+<td>8</td>
+<td>4096</td>
+<td>32K</td>
+<td>28672</td>
+<td>8</td>
+<td>3890.0GB $\approx 29.8 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>70B, <a href="https://gitee.com/hf-models/Llama-2-70b-hf/blob/main/config.json">config</a></td>
+<td>8192</td>
+<td>80</td>
+<td>64</td>
+<td>64</td>
+<td>4096</td>
+<td>32K</td>
+<td>28672</td>
+<td>8</td>
+<td>30.39TB $\approx 238.7 \times 2\Phi$</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>由于前面分析过，intermediate_size往往会略微大于$\frac{8h}{3}$，因此根据前面分析的llama结构，重新推导一下激活的计算公式，这里省略了。</p>
+</blockquote>
+<p>可以看出，当大batch、长序列的情况下，中间激活可以是模型参数所占显存的很多倍，即使使用了GQA。</p>
+<p>上面都是在训练场景下的激活值分析，在推理阶段中，可以使用kv-cache减少模型计算量，同时中间激活也大幅度减少，kv-cache的大小为$2w_{kv}bs_mh$（单层），我们也来量化分析一下（假设$w_{kv}$=2，且s=1，推理context长度最后一个token的情况，即最坏情况）</p>
+<table>
+<thead>
+<tr>
+<th>config</th>
+<th>b</th>
+<th>$s_m$</th>
+<th>h</th>
+<th>a</th>
+<th>l</th>
+<th>kv_cache size=$2w_{kv}bs_mhl$</th>
+<th>without kv-cache activation$\approx (34bs_mh+5bas_m^2)l$</th>
+<th>with kv-cache activation $\approx (30bh+4bs_mh+5bas_m)l$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPT-3 Small: 125M</td>
+<td>1</td>
+<td>2048</td>
+<td>768</td>
+<td>64</td>
+<td>12</td>
+<td>72MB $\approx 0.30 \times 2\Phi$</td>
+<td>15972.0MB $\approx 67.0 \times 2\Phi$</td>
+<td>79.8MB $\approx 0.33 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 Medium: 350M</td>
+<td>1</td>
+<td>2048</td>
+<td>1024</td>
+<td>64</td>
+<td>24</td>
+<td>192MB $\approx 0.29 \times 2\Phi$</td>
+<td>32352.0MB $\approx 48.5 \times 2\Phi$</td>
+<td>207.7MB $\approx 0.31 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 Large: 760M</td>
+<td>1</td>
+<td>2048</td>
+<td>1536</td>
+<td>96</td>
+<td>24</td>
+<td>288MB $\approx 0.20 \times 2\Phi$</td>
+<td>48528.0MB $\approx 33.5 \times 2\Phi$</td>
+<td>311.6MB $\approx 0.21 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 2.7B</td>
+<td>1</td>
+<td>2048</td>
+<td>2560</td>
+<td>80</td>
+<td>32</td>
+<td>640MB $\approx 0.12 \times 2\Phi$</td>
+<td>55.3GB $\approx 11.0 \times 2\Phi$</td>
+<td>667.3MB $\approx 0.13 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 6.7B</td>
+<td>1</td>
+<td>2048</td>
+<td>4096</td>
+<td>128</td>
+<td>40</td>
+<td>1280MB $\approx 0.1 \times 2\Phi$</td>
+<td>110.6GB $\approx 8.9 \times 2 \Phi$</td>
+<td>1334.7MB $\approx 0.1 \times 2 \Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 13B</td>
+<td>1</td>
+<td>2048</td>
+<td>5140</td>
+<td>128</td>
+<td>96</td>
+<td>3.76GB $\approx 0.15 \times 2\Phi$</td>
+<td>272.0GB $\approx 11.2 \times 2\Phi$</td>
+<td>3.89GB $\approx 0.16 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 175B</td>
+<td>1</td>
+<td>2048</td>
+<td>12288</td>
+<td>128</td>
+<td>96</td>
+<td>9.0GB $\approx 0.02 \times 2\Phi$</td>
+<td>316.5GB $\approx 0.97\times 2\Phi $</td>
+<td>9.15GB $\approx 0.03 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 175B</td>
+<td>8</td>
+<td>2048</td>
+<td>12288</td>
+<td>128</td>
+<td>96</td>
+<td>72.0GB $\approx 0.22 \times 2\Phi$</td>
+<td>2532.0GB $\approx 7.77 \times 2\Phi$</td>
+<td>73.2GB $\approx 0.22 \times 2\Phi$</td>
+</tr>
+<tr>
+<td>GPT-3 175B</td>
+<td>64</td>
+<td>2048</td>
+<td>12288</td>
+<td>128</td>
+<td>96</td>
+<td>576.0GB $\approx 1.77 \times 2\Phi$</td>
+<td>19.78TB $\approx 62.1 \times 2\Phi$</td>
+<td>585.6GB $\approx 1.80 \times 2\Phi$</td>
+</tr>
+</tbody>
+</table>
+<p>可以看出在推理时，kv-cache大幅度减少了中间激活。而且使用了kv-cache以后，kv-cache在激活中占据了绝大部分的比例，kv-cache甚至可以超过模型所占内存。</p>
+<h3 id="关于计算量的分析">关于计算量的分析</h3>
+<p>量化分析模型的计算量，主要是为了预估模型训练时间。根据前面的分析，一个FWD+BWD的iteration训练过程中，计算量FLOPs=$6 \times \Phi \times 输入tokens数量$，因此可以大致估计训练时间=$\frac{6 \times \Phi \times 输入tokens数量}{GPU数量\times GPU算力(flops) \times MFU}$。</p>
+<h2 id="其他说明">其他说明</h2>
 <h6 id="1-layernorm的计算">1. LayerNorm的计算</h6>
 <p>LayerNorm的计算过程见<a href="https://blog.csdn.net/weixin_39228381/article/details/107939602">pytorch LayerNorm参数详解，计算过程</a>，总结一下就是：</p>
 <ol>
@@ -200,20 +1197,41 @@
 </ol>
 <p>一个有趣的问题是，<a href="https://zhuanlan.zhihu.com/p/707778968">Transformer中的LayerNorm可以并行吗？</a></p>
 <p>关键词： Welford online Algorithm，当一个集合新增加一个元素$x_N$的时候，可以通过前N-1个样本的corrected sum of squares($\sum_{i=1}^{N-1}(x_i-\bar{x})^2$)，计算出前N个样本的corrected sum of squares，从而只需要one pass就可以完成LN的计算（之前navie的方法是two pass）</p>
-<h6 id="2-layernorm的位置">2. LayerNorm的位置</h6>
-<p>
-  <img loading="lazy" src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-04-22:22:22.png" alt="image-20240904222219836"  /></p>
-<p>原始Transformer中使用post-norm居多，后来使用pre-norm居多，而且往往在FFN之前也加一个norm。尤其在大模型中，可能在通过LN之后MHA之前，Q和K还要加上旋转位置编码。</p>
-<p>参考：<a href="https://zhuanlan.zhihu.com/p/474988236">【重新了解Transformer模型系列_1】PostNorm/PreNorm的差别</a></p>
-<h6 id="3-关于dropout的位置">3. 关于dropout的位置</h6>
+<h6 id="2-关于dropout的位置">2. 关于dropout的位置</h6>
 <p>一共（可能）在有四个地方有dropout：</p>
 <ol>
 <li>在PositionalEmbedding中有一个dropout：<code>dropout(x + PositionEmbedding(x))</code>，不过好像LLM现在使用旋转位置编码RoPE多一些，在计算attention之前在Q和K上加上RoPE，一开始输入的embedding不加PositionalEmbedding了</li>
 <li>在softmax计算得到的attention score之后有一个droput：$dropout( softmax(\frac{QK^T}{scale}+casual_mask) )$</li>
 <li>在sublayer（Attention和MLP）计算完之后，各有一个dropout：<code>x+dropout(sublayer(norm(x)))</code></li>
 </ol>
-<p>参考：</p>
-<p><a href="https://zhuanlan.zhihu.com/p/624740065">分析transformer模型的参数量、计算量、中间激活、KV cache</a></p>
+<h1 id="总结">总结</h1>
+<p>transformer的参数量的复杂度是$O(h^2l)$级别的，粗略估计可以认为是$12h^2l$或者$(4h+3I)hl$，如果要详细分析，就要看一看每个部分的结构，是否使用了bias，使用的不同优化，比如：</p>
+<ul>
+<li>如果MLP是传统FFN那样的结构，calculated params=$2Vh+(12h^2+13h)l$
+<ul>
+<li>如果attention部分使用了GQA，则calculated params=$2Vh+\left[ 10h^2 + 11h + \frac{2g}{a}(h^2+h)\right] l$</li>
+</ul>
+</li>
+<li>如果MLP是SwiGLU那样的结构，calculated params=$2Vh+(4h+4+3I)hl$
+<ul>
+<li>如果attention部分使用了GQA，则calculated params=$2Vh + \left [ (2+\frac{2g}{a}) h ^ 2 + 4h + 3hI \right ] l$</li>
+</ul>
+</li>
+</ul>
+<p>对transformer中间激活的分析要分训练场景和推理场景</p>
+<ul>
+<li>在训练场景中，中间激活可以是模型参数所占显存的很多倍，尤其在大batch、长序列的情况下。
+<ul>
+<li>中间激活值所占显存粗略估计可以认为是$(34bsh+5bas^2)l$或者$(17bsh+5bas^2+6bsI)l$，可以看出与输入token数量（batch和seq_len）、隐藏层维度、头数、intermediate_size、层数相关，因此相对参数量的分析稍微复杂一点。</li>
+</ul>
+</li>
+<li>在推理场景中，prefill阶段基本同训练场景，decode阶段每次输入的序列长度为1，而且默认使用kv-cache。由于使用kv-cache，中间激活相对于训练时的中间激活大幅度减小，但是在大batch、长序列的情况下，kv-cache的显存占用仍然可能超过模型参数的显存占用。还有一点需要注意，推理场景中kv-cache在中间激活中占据了绝大部分。
+<ul>
+<li>中间激活值所占显存粗略估计可以认为是$(30bh+4bs_mh+5bas_m)l$或者$(13bh+4bs_mh+5bs_ma+6bI)l$</li>
+</ul>
+</li>
+</ul>
+<p>对transformer的计算量的分析比较简单，transformer中计算较为规整，计算量体现在若干个大块矩阵的乘法。一般量化分析计算量主要是为了预估模型训练时间，所以一般分析的不多（一般也没有机会训练大模型，如果训练普通规模的网络，尝试跑几个iteration就能估计）。</p>
 ]]></content:encoded>
     </item>
     
