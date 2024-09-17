@@ -100,7 +100,7 @@
 <ul>
 <li>activation：中间激活值，这个部分可能在训练过程中占据很大一部分显存，下面会详细分析。但是激活值不是必须存储的，可以使用重计算（recompute，也叫做activation checkpoint），在反向算梯度的时候，再重新算一遍，当然计算增加了，时间换空间，实际使用中可以部分选择性的进行重计算。</li>
 <li>temporary buffers：临时存储，比如cuda、nccl等临时申请的显存。</li>
-<li>unusable fragment memory：内存碎片导致的内存浪费</li>
+<li>unusable fragment memory：内存碎片导致的内存浪费，比如在开启重计算（或者叫做activation checkpointing）的情况下，中间激活不持久保留，这部分显存不断申请、释放，中间可能带来大量的内存碎片</li>
 </ul>
 </li>
 </ul>
