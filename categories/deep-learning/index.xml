@@ -316,10 +316,10 @@
 <li>
 <p>PP不推荐ZeRO-2/ZeRO-3同时使用，原因在于增加了很多通信，但是缺节省不了多少下显存。</p>
 <p>下图中是PP+ZeRO-2的示意图，dp_size = 2，每个DP内部又划分为p = 4的PP。每个DP吃掉的mini-batch都是不同的，PP又将每个DP吃掉的mini-batch再次切分为micro-batch，即图中DP1对应micro-batch1~4，DP2对应micro-batch5~8。注意，由于使用ZeRO-2（或ZeRO-3），会对反向得到的梯度进行切分，DP1反向得到完整的un-reduced梯度，DP2反向得到完整的un-reduced梯度，然后进行Reduce-Scatter通信（比如GPU4上mbs1的梯度要与GPU8上mbs5的梯度进行Reduce-Scatter通信），DP1得到不完整的reduced梯度（即前半部分参数对应的梯度），DP2得到不完整的reduced梯度（即后半部分参数对应的梯度）。除此之外，由于PP使用梯度累计，所以最后UPD先进行梯度累积，然后使用不完整的redued梯度更新完权重后，还要进行All-Gather通信拿到完整的权重（因为ZeRO-2没有切权重）。如果是PP+ZeRO-3，则要在每个mbs的前向过程之前进行一次All-Gather，在mbs的反向过程之前进行一次All-Gather，反向过程之后进行一次Reduce-Scatter，最后的All-Gather可以省去。</p>
- <img src="C:\Users\zhang\Desktop\ZeRO2+PP.png" alt="ZeRO2+PP" style="zoom:80%;" />
+ <img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-24-00:52:50.png" alt="ZeRO2+PP" style="zoom:80%;" />
 <p>针对大模型而言，PP一般是要使用的，此时再使用ZeRO就是想减少单卡的内存占用。一方面，我们来看一下PP+ZeRO-2对减少内存占用的一个效果，PP切分模型后，每个stage上的参数量基本上是整个模型参数量的$\frac{1}{N_s+1}$，ZeRO-2又切分了梯度，相比于ZeRO-1内存占用减少了$\frac{1}{N_s+1}(1-\frac{1}{N})w\Phi$（如果进一步使用TP并行进行切分，则会进一步减小内存占用，这个内存减少的量也会进一步减小），因此，使用PP后再使用ZeRO-2可能节省不了多少显存。另一方面，从通信量来分析，由于ZeRO-2的梯度切分，反向得到梯度后要在DP group间通信，PP将mini-batch切分为micro-batch，又使得梯度Reduce-Scatter变得很频繁（相当于DP group变多），每一次Reduce-Scatter通信量都是两倍的对应梯度大小再乘以数值精度，通信量直接暴涨（虽然有可能做到计算和通信overlap，我也不太确定这一点，但是毕竟性能肯定还是有损失的）。PP+ZeRO-3也是同理，显存占用可能再少一点，但是带来的通信量增加是很大的。因此，在PP基础上使用ZeRO-2（或者ZeRO-3）节省不了多少显存，还会增加很多通信量，对性能的提升可能很有限甚至负提升。可以参考知乎问题：<a href="https://www.zhihu.com/question/652836990">大模型训练时ZeRO-2、ZeRO-3能否和Pipeline并行相结合？</a></p>
 <p>但是可以PP+ZeRO-1（比如下图），由于梯度（和权重）都是完整的，先进行完整的un-reduced梯度的梯度累积，然后进行Reduce-Scatter通信，得到不完整的reduced梯度，ZeRO-1只会切分optimizer_states（和混合精度中使用到的fp32权重），正好更新那一部分权重，最后使用All-Gather通信拿到全部的权重。</p>
- <img src="C:\Users\zhang\Desktop\ZeRO1+PP.png" alt="ZeRO1+PP" style="zoom:80%;" />
+ <img src="https://cdn.jsdelivr.net/gh/QinganZhang/ImageHosting/img/2024-09-24-00:52:46.png" alt="ZeRO1+PP" style="zoom:80%;" />
 </li>
 </ol>
 <p>参考：</p>
